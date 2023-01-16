@@ -4,7 +4,26 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>Scheduler</Title>
+    <Version>0.1.0-preview</Version>
+    <Company>Egil Hansen</Company>
+    <Authors>Egil Hansen</Authors>
+    <Description>A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.</Description>
+    <Copyright>Egil Hansen</Copyright>
+    <PackageProjectUrl>https://github.com/egil/scheduler</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/egil/scheduler</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-all</AnalysisLevel>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
