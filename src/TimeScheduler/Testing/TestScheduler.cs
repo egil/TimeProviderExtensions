@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Scheduler.Testing;
+namespace TimeScheduler.Testing;
 
 public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 {

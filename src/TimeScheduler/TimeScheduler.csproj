@@ -10,9 +10,10 @@
     <Authors>Egil Hansen</Authors>
     <Description>A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.</Description>
     <Copyright>Egil Hansen</Copyright>
-    <PackageProjectUrl>https://github.com/egil/scheduler</PackageProjectUrl>
+    <PackageId>TimeScheduler</PackageId>
+    <PackageProjectUrl>https://github.com/egil/TimeScheduler</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/egil/scheduler</RepositoryUrl>
+    <RepositoryUrl>https://github.com/egil/TimeScheduler</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-all</AnalysisLevel>
@@ -23,10 +24,6 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
 </Project>

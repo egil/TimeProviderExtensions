@@ -1,4 +1,4 @@
-namespace Scheduler.Testing;
+namespace TimeScheduler.Testing;
 
 public partial class TestScheduler : ITimeScheduler, IDisposable
 {

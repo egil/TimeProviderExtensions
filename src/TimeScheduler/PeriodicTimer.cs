@@ -1,4 +1,4 @@
-namespace Scheduler;
+namespace TimeScheduler;
 
 /// <summary>Provides a periodic timer that enables waiting asynchronously for timer ticks.</summary>
 /// <remarks>

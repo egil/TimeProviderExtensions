@@ -1,4 +1,4 @@
-# Scheduler
+# Time Scheduler
 A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.
 
 ## Control time during tests
@@ -7,7 +7,7 @@ If a system under test (SUT) uses things like `Task.Delay`, `DateTimeOffset.UtcN
 it becomes hard to create tests that runs fast and predictably.
 
 The idea is to replace the use of e.g. `Task.Delay` with an abstraction, the `ITimeScheduler`, that in production
-is represented by the `TimeScheduler`, that just uses the real `Task.Delay`. During testing it is now possible to
+is represented by the `DefaultScheduler`, that just uses the real `Task.Delay`. During testing it is now possible to
 pass in `TestScheduler`, that allows the test to control the progress of time, making it possible to skip ahead,
 e.g. 10 minutes, and also pause time, leading to fast and predictable tests.
 
@@ -56,4 +56,12 @@ public void DoStuff_does_stuff_every_10_seconds()
   // Assert
   container.Should().ContainSingle();
 }
+```
+
+## Set up in production
+
+To use in production, pass in `DefaultScheduler` to the types that depend on `ITimeScheduler`. This can be done directly, or via an IoC Container, e.g. .NETs built-in `IServiceCollection` like so:
+
+```c#
+services.AddSingleton<ITimeScheduler, DefaultScheduler>();
 ```

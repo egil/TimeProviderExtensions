@@ -1,6 +1,6 @@
-namespace Scheduler;
+namespace TimeScheduler;
 
-public partial class TimeScheduler : ITimeScheduler
+public partial class DefaultScheduler : ITimeScheduler
 {
     private sealed class PeriodicTimerWrapper : PeriodicTimer
     {

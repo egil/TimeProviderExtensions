@@ -5,11 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{695B57CD-9E0E-4648-8A48-9E8A358B014B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scheduler", "src\Scheduler\Scheduler.csproj", "{0392FB3B-2403-42F2-925F-CDFBA8DAA926}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{7C987338-A88E-4AB5-98CE-39A93F4CDC94}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scheduler.Tests", "test\Scheduler.Tests\Scheduler.Tests.csproj", "{DA5D75CD-65FC-496A-956E-D4FD4D7C71EC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5DAF1353-6694-4340-BC06-28DACFB3100B}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,27 +13,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeScheduler", "src\TimeScheduler\TimeScheduler.csproj", "{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeScheduler.Tests", "test\TimeScheduler.Tests\TimeScheduler.Tests.csproj", "{F475F44C-35A3-408D-824A-177EA43A8E2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0392FB3B-2403-42F2-925F-CDFBA8DAA926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0392FB3B-2403-42F2-925F-CDFBA8DAA926}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0392FB3B-2403-42F2-925F-CDFBA8DAA926}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0392FB3B-2403-42F2-925F-CDFBA8DAA926}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA5D75CD-65FC-496A-956E-D4FD4D7C71EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA5D75CD-65FC-496A-956E-D4FD4D7C71EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA5D75CD-65FC-496A-956E-D4FD4D7C71EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA5D75CD-65FC-496A-956E-D4FD4D7C71EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F475F44C-35A3-408D-824A-177EA43A8E2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F475F44C-35A3-408D-824A-177EA43A8E2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F475F44C-35A3-408D-824A-177EA43A8E2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F475F44C-35A3-408D-824A-177EA43A8E2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{0392FB3B-2403-42F2-925F-CDFBA8DAA926} = {695B57CD-9E0E-4648-8A48-9E8A358B014B}
-		{DA5D75CD-65FC-496A-956E-D4FD4D7C71EC} = {7C987338-A88E-4AB5-98CE-39A93F4CDC94}
+		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2} = {695B57CD-9E0E-4648-8A48-9E8A358B014B}
+		{F475F44C-35A3-408D-824A-177EA43A8E2A} = {7C987338-A88E-4AB5-98CE-39A93F4CDC94}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A7780397-0E8F-4C60-8D68-569022905162}
