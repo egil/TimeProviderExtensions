@@ -1,6 +1,10 @@
 # Time Scheduler
 A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.
 
+## Installation
+
+Get the latest release from https://www.nuget.org/packages/TimeScheduler
+
 ## Control time during tests
 
 If a system under test (SUT) uses things like `Task.Delay`, `DateTimeOffset.UtcNow`, or `PeriodicTimer`, 
