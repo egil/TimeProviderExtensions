@@ -38,7 +38,7 @@ public partial class TestScheduler : ITimeScheduler, IDisposable
 
             completionSource = new TaskCompletionSource<bool>();
 
-            owner.RegisterDelayedTask(
+            owner.RegisterFutureAction(
                 nextSignal,
                 () => Signal(),
                 () => completionSource?.TrySetCanceled(),
@@ -49,13 +49,13 @@ public partial class TestScheduler : ITimeScheduler, IDisposable
 
         private void Signal()
         {
-            if (completionSource is not null)
-            {
-                completionSource.TrySetResult(!stopped);
-                completionSource = null;
-            }
-
             SetNextSignalTime();
+            
+            if (completionSource is TaskCompletionSource<bool> tcs)
+            {
+                completionSource = null;
+                tcs.SetResult(!stopped);
+            }
         }
 
         private void SetNextSignalTime()

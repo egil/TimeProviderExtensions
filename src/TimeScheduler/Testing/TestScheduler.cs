@@ -4,7 +4,7 @@ namespace TimeScheduler.Testing;
 
 public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 {
-    private readonly List<DelayedAction> delayedActions = new();
+    private readonly List<FutureAction> futureActions = new();
 
     public DateTimeOffset UtcNow { get; private set; }
 
@@ -26,7 +26,7 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
     public Task Delay(TimeSpan delay, CancellationToken cancellationToken)
     {
         var tcs = new TaskCompletionSource();
-        RegisterDelayedTask(UtcNow + delay, () => tcs.TrySetResult(), () => tcs.TrySetCanceled(), cancellationToken);
+        RegisterFutureAction(UtcNow + delay, () => tcs.TrySetResult(), () => tcs.TrySetCanceled(), cancellationToken);
         return tcs.Task;
     }
 
@@ -43,44 +43,44 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 
     private void CompleteDelayedTasks()
     {
-        var tasksToComplete = delayedActions
+        var tasksToComplete = futureActions
             .Where(x => x.CompletionTime <= UtcNow)
             .OrderBy(x => x.CompletionTime)
             .ToArray();
 
-        foreach (var pair in tasksToComplete)
+        foreach (var delayedAction in tasksToComplete)
         {
-            pair.Complete();
-            delayedActions.Remove(pair);
+            delayedAction.Complete();
+            futureActions.Remove(delayedAction);
         }
     }
 
-    private void RegisterDelayedTask(
+    private void RegisterFutureAction(
         DateTimeOffset completionTime,
         Action complete,
         Action cancel,
         CancellationToken cleanupToken = default)
     {
-        var delayedAction = new DelayedAction(completionTime, complete, cancel);
+        var futureAction = new FutureAction(completionTime, complete, cancel);
 
         cleanupToken.Register(() =>
         {
             cancel();
-            delayedActions.Remove(delayedAction);
+            futureActions.Remove(futureAction);
         });
 
-        delayedActions.Add(delayedAction);
+        futureActions.Add(futureAction);
     }
 
     public void Dispose()
     {
-        foreach (var delayedAction in delayedActions)
+        foreach (var delayedAction in futureActions)
         {
             delayedAction.Cancel();
         }
     }
 
-    private sealed class DelayedAction
+    private sealed class FutureAction
     {
         private readonly Action complete;
         private readonly Action cancel;
@@ -88,7 +88,7 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 
         public DateTimeOffset CompletionTime { get; }
 
-        public DelayedAction(DateTimeOffset completionTime, Action complete, Action cancel)
+        public FutureAction(DateTimeOffset completionTime, Action complete, Action cancel)
         {
             CompletionTime = completionTime;
             this.complete = complete;

@@ -103,4 +103,27 @@ public class TestSchedulerTests
 
         await throws.Should().ThrowAsync<OperationCanceledException>();
     }
+
+    [Fact]
+    public void PeriodicTimer_WaitForNextTickAsync_completes_multiple()
+    {
+        using var sut = new TestScheduler();
+        var calledTimes = 0;
+        var looper = WaitForNextTickInLoop(sut, () => calledTimes++);
+
+        sut.ForwardTime(TimeSpan.FromSeconds(1));
+        calledTimes.Should().Be(1);
+
+        sut.ForwardTime(TimeSpan.FromSeconds(1));
+        calledTimes.Should().Be(2);
+        
+        static async Task WaitForNextTickInLoop(ITimeScheduler scheduler, Action callback)
+        {
+            using var periodicTimer = scheduler.PeriodicTimer(TimeSpan.FromSeconds(1));
+            while (await periodicTimer.WaitForNextTickAsync(CancellationToken.None))
+            {
+                callback();
+            }
+        }
+    }
 }
