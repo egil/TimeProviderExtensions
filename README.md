@@ -72,7 +72,7 @@ The test, using xUnit and FluentAssertions, could look like this:
 
 ```c#
 [Fact]
-public void DoStuff_does_stuff_every_10_seconds()
+public void DoStuff_does_stuff_every_11_seconds()
 {
   // Arrange
   var scheduler = new TestScheduler();
@@ -97,7 +97,7 @@ Writing a similar test for `StuffServiceSystem` is both more simple and runs muc
 
 ```c#
 [Fact]
-public async Task DoStuff_does_stuff_every_10_seconds()
+public async Task DoStuff_does_stuff_every_11_seconds()
 {
   // Arrange
   var container = new List<DateTimeOffset>();  
