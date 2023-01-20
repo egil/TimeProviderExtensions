@@ -22,9 +22,9 @@ public class StuffService
 {
   private static readonly TimeSpan doStuffDelay = TimeSpan.FromSeconds(10);
   private readonly ITimeScheduler scheduler;
-  private readonly List<string> container;
+  private readonly List<DateTimeOffset> container;
 
-  public StuffService(ITimeScheduler scheduler, List<string> container)
+  public StuffService(ITimeScheduler scheduler, List<DateTimeOffset> container)
   {
     this.scheduler = scheduler;
     this.container = container;
@@ -35,8 +35,9 @@ public class StuffService
     using var periodicTimer = scheduler.PeriodicTimer(doStuffDelay);
     
     while (await periodicTimer.WaitForNextTickAsync(cancellationToken))
-    {
-      container.Add("stuff");    
+    {      
+      await scheduler.Delay(TimeSpan.FromSeconds(1));
+      container.Add(scheduler.UtcNow);
     }
   }
 }
@@ -55,10 +56,15 @@ public void DoStuff_does_stuff_every_10_seconds()
   
   // Act
   _ = sut.DoStuff(CancellationToken.None);
-  scheduler.ForwardTime(TimeSpan.FromSeconds(10));
+  scheduler.ForwardTime(TimeSpan.FromSeconds(11));
   
   // Assert
-  container.Should().ContainSingle();
+  container
+    .Should()
+    .ContainSingle()
+    .Which
+    .Should()
+    .Be(scheduler.UtcNow);
 }
 ```
 
