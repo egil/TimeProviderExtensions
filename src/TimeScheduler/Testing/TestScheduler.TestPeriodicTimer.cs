@@ -54,7 +54,7 @@ public partial class TestScheduler : ITimeScheduler, IDisposable
             if (completionSource is TaskCompletionSource<bool> tcs)
             {
                 completionSource = null;
-                tcs.SetResult(!stopped);
+                tcs.TrySetResult(!stopped);
             }
         }
 
