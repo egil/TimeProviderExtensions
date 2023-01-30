@@ -50,7 +50,7 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 
         foreach (var delayedAction in tasksToComplete)
         {
-            futureActions.TryRemove(delayedAction, out var _);            
+            futureActions.TryRemove(delayedAction, out var _);
             delayedAction.Complete();
         }
     }
@@ -74,12 +74,14 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 
     public void Dispose()
     {
-        foreach (var delayedAction in futureActions.Keys)
+
+        foreach (var futureAction in futureActions.Keys)
         {
-            delayedAction.Cancel();
+            futureAction.Cancel();
         }
-        
+
         futureActions.Clear();
+
     }
 
     private sealed class FutureAction
