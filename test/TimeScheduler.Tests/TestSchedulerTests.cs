@@ -116,7 +116,7 @@ public class TestSchedulerTests
 
         sut.ForwardTime(TimeSpan.FromSeconds(1));
         calledTimes.Should().Be(2);
-        
+
         static async Task WaitForNextTickInLoop(ITimeScheduler scheduler, Action callback)
         {
             using var periodicTimer = scheduler.PeriodicTimer(TimeSpan.FromSeconds(1));

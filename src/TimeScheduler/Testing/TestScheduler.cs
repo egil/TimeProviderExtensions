@@ -4,7 +4,7 @@ namespace TimeScheduler.Testing;
 
 public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 {
-    private readonly List<FutureAction> futureActions = new();
+    private readonly ConcurrentDictionary<FutureAction, object?> futureActions = new();
 
     public DateTimeOffset UtcNow { get; private set; }
 
@@ -44,14 +44,14 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
     private void CompleteDelayedTasks()
     {
         var tasksToComplete = futureActions
+            .Keys
             .Where(x => x.CompletionTime <= UtcNow)
-            .OrderBy(x => x.CompletionTime)
-            .ToArray();
+            .OrderBy(x => x.CompletionTime);
 
         foreach (var delayedAction in tasksToComplete)
         {
+            futureActions.TryRemove(delayedAction, out var _);            
             delayedAction.Complete();
-            futureActions.Remove(delayedAction);
         }
     }
 
@@ -65,19 +65,21 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 
         cleanupToken.Register(() =>
         {
+            futureActions.TryRemove(futureAction, out var _);
             cancel();
-            futureActions.Remove(futureAction);
         });
 
-        futureActions.Add(futureAction);
+        futureActions.TryAdd(futureAction, null);
     }
 
     public void Dispose()
     {
-        foreach (var delayedAction in futureActions)
+        foreach (var delayedAction in futureActions.Keys)
         {
             delayedAction.Cancel();
         }
+        
+        futureActions.Clear();
     }
 
     private sealed class FutureAction
