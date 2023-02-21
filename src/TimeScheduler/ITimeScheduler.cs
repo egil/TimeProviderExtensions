@@ -56,4 +56,46 @@ public interface ITimeScheduler
     /// to interrupt it and cause it to return false.
     /// </remarks>
     PeriodicTimer PeriodicTimer(TimeSpan period);
+
+    /// <summary>
+    /// Gets a <see cref="Task"/> that will complete when this <see cref="Task"/> completes or when the specified timeout expires.
+    /// Use this method as a replacement for <see cref="System.Threading.Tasks.Task.WaitAsync(TimeSpan)"/>.
+    /// </summary>
+    /// <param name="task">The task to wait for.</param>
+    /// <param name="timeout">
+    /// The timeout after which the <see cref="Task"/> should be faulted with a <see cref="TimeoutException"/> if it hasn't otherwise completed.
+    /// </param>
+    /// <returns>The <see cref="Task"/> representing the asynchronous wait. It may or may not be the same instance as the current instance.</returns>
+    Task WaitAsync(Task task, TimeSpan timeout);
+
+    /// <summary>
+    /// Gets a <see cref="Task"/> that will complete when this <see cref="Task"/> completes, when the specified timeout expires, or when the specified <see cref="CancellationToken"/> has cancellation requested.
+    /// Use this method as a replacement for <see cref="System.Threading.Tasks.Task.WaitAsync(TimeSpan, CancellationToken)"/>.
+    /// </summary>
+    /// <param name="task">The task to wait for.</param>
+    /// <param name="timeout">The timeout after which the <see cref="Task"/> should be faulted with a <see cref="TimeoutException"/> if it hasn't otherwise completed.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to monitor for a cancellation request.</param>
+    /// <returns>The <see cref="Task"/> representing the asynchronous wait.  It may or may not be the same instance as the current instance.</returns>
+    Task WaitAsync(Task task, TimeSpan timeout, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets a <see cref="Task{TResult}"/> that will complete when this <see cref="Task{TResult}"/> completes or when the specified timeout expires.
+    /// Use this method as a replacement for <see cref="System.Threading.Tasks.Task{TResult}.WaitAsync(TimeSpan)"/>.
+    /// </summary>
+    /// <param name="task">The task to wait for.</param>
+    /// <param name="timeout">
+    /// The timeout after which the <see cref="Task"/> should be faulted with a <see cref="TimeoutException"/> if it hasn't otherwise completed.
+    /// </param>
+    /// <returns>The <see cref="Task{TResult}"/> representing the asynchronous wait. It may or may not be the same instance as the current instance.</returns>
+    Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout);
+
+    /// <summary>
+    /// Gets a <see cref="Task{TResult}"/> that will complete when this <see cref="Task{TResult}"/> completes, when the specified timeout expires, or when the specified <see cref="CancellationToken"/> has cancellation requested.
+    /// Use this method as a replacement for <see cref="System.Threading.Tasks.Task.WaitAsync(TimeSpan, CancellationToken)"/>.
+    /// </summary>
+    /// <param name="task">The task to wait for.</param>
+    /// <param name="timeout">The timeout after which the <see cref="Task"/> should be faulted with a <see cref="TimeoutException"/> if it hasn't otherwise completed.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to monitor for a cancellation request.</param>
+    /// <returns>The <see cref="Task{TResult}"/> representing the asynchronous wait. It may or may not be the same instance as the current instance.</returns>
+    Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout, CancellationToken cancellationToken);
 }

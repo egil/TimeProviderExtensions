@@ -1,13 +1,23 @@
 # Time Scheduler
 A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.
 
+Currently, the following .NET `Task` and `DateTimeOffset`-based APIs are supported:
+
+| TimeScheduler method | .NET API it replaces |
+|----------------------|----------------------|
+| `UtcNow` property | `DateTimeOffset.UtcNow` property |
+| `Delay(TimeSpan, CancellationToken)` method | `Task.Delay(TimeSpan, CancellationToken)` method |
+| `PeriodicTimer(TimeSpan)` method | `System.Threading.PeriodicTimer` type |
+| `WaitAsync(Task, TimeSpan)` method | `Task.WaitAsync(TimeSpan)` method |
+| `WaitAsync(Task, TimeSpan, CancellationToken)` method | `Task.WaitAsync(TimeSpan, CancellationToken)` method |
+
 ## Installation
 
 Get the latest release from https://www.nuget.org/packages/TimeScheduler
 
-## Control time during tests
+## Example - control time during tests
 
-If a system under test (SUT) uses things like `Task.Delay`, `DateTimeOffset.UtcNow`, or `PeriodicTimer`, 
+If a system under test (SUT) uses things like `Task.Delay`, `DateTimeOffset.UtcNow`, `Task.WaitAsync`, or `PeriodicTimer`, 
 it becomes hard to create tests that runs fast and predictably.
 
 The idea is to replace the use of e.g. `Task.Delay` with an abstraction, the `ITimeScheduler`, that in production
