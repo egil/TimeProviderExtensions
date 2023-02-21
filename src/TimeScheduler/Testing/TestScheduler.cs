@@ -55,48 +55,68 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
         }
     }
 
-    private void RegisterFutureAction(
+    private FutureAction RegisterFutureAction(
         DateTimeOffset completionTime,
         Action complete,
         Action cancel,
         CancellationToken cleanupToken = default)
     {
-        var futureAction = new FutureAction(completionTime, complete, cancel);
+        var futureAction = new FutureAction(
+            completionTime,
+            complete,
+            cancel,
+            futureAction => futureActions.TryRemove(futureAction, out var _),
+            cleanupToken);
 
-        cleanupToken.Register(() =>
+        // If the cleanup token is already canceled, the cancel        
+        // action will run immediately.
+        if (!cleanupToken.IsCancellationRequested && !futureAction.IsCompleted)
         {
-            futureActions.TryRemove(futureAction, out var _);
-            cancel();
-        });
-
-        futureActions.TryAdd(futureAction, null);
+            futureActions.TryAdd(futureAction, null);
+        }
+        
+        return futureAction;
     }
 
     public void Dispose()
     {
-
         foreach (var futureAction in futureActions.Keys)
         {
             futureAction.Cancel();
         }
 
         futureActions.Clear();
-
     }
 
+    // TODO: Would perf improve if this was a ref struct?
     private sealed class FutureAction
     {
         private readonly Action complete;
         private readonly Action cancel;
+        private readonly Action<FutureAction> cleanup;
+        private readonly CancellationTokenRegistration registration;
         private int completed;
+
+        public bool IsCompleted => completed != 0;
 
         public DateTimeOffset CompletionTime { get; }
 
-        public FutureAction(DateTimeOffset completionTime, Action complete, Action cancel)
+        public FutureAction(
+            DateTimeOffset completionTime,
+            Action complete,
+            Action cancel,
+            Action<FutureAction> cleanup,
+            in CancellationToken cancellationToken)
         {
             CompletionTime = completionTime;
             this.complete = complete;
             this.cancel = cancel;
+            this.cleanup = cleanup;
+            registration = cancellationToken.UnsafeRegister(static (state, token) =>
+            {
+                var futureAction = (FutureAction)state!;
+                futureAction.Cancel();
+            }, this);
         }
 
         public void Complete()
@@ -105,15 +125,19 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
             if (Interlocked.CompareExchange(ref completed, 1, 0) == 0)
             {
                 complete();
+                cleanup(this);
+                registration.Dispose();
             }
         }
 
         public void Cancel()
         {
-            // Ensure that cancel/cancel is only being called once.
+            // Ensure that complete/cancel is only being called once.
             if (Interlocked.CompareExchange(ref completed, 2, 0) == 0)
             {
                 cancel();
+                cleanup(this);
+                registration.Dispose();
             }
         }
     }
