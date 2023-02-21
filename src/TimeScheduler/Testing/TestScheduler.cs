@@ -18,12 +18,6 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
         UtcNow = startDateTime;
     }
 
-
-    public PeriodicTimer PeriodicTimer(TimeSpan period)
-    {
-        return new TestPeriodicTimer(period, this);
-    }
-
     public void ForwardTime(TimeSpan timeSpan)
     {
         UtcNow = UtcNow + timeSpan;

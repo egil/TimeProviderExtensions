@@ -2,6 +2,11 @@ namespace TimeScheduler.Testing;
 
 public partial class TestScheduler : ITimeScheduler, IDisposable
 {
+    public PeriodicTimer PeriodicTimer(TimeSpan period)
+    {
+        return new TestPeriodicTimer(period, this);
+    }
+
     private sealed class TestPeriodicTimer : PeriodicTimer
     {
         private readonly TimeSpan period;
@@ -15,7 +20,6 @@ public partial class TestScheduler : ITimeScheduler, IDisposable
             this.period = period;
             this.owner = owner;
             SetNextSignalTime();
-
         }
 
         public override ValueTask<bool> WaitForNextTickAsync(CancellationToken cancellationToken = default)
