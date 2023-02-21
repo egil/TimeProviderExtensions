@@ -45,7 +45,7 @@ public partial class TestScheduler : ITimeScheduler, IDisposable
             owner.RegisterFutureAction(
                 nextSignal,
                 () => Signal(),
-                () => completionSource?.TrySetCanceled(),
+                () => completionSource?.TrySetCanceled(cancellationToken),
                 cancellationToken);
 
             return new ValueTask<bool>(completionSource.Task);
