@@ -18,17 +18,6 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
         UtcNow = startDateTime;
     }
 
-    public Task Delay(TimeSpan delay)
-    {
-        return Delay(delay, CancellationToken.None);
-    }
-
-    public Task Delay(TimeSpan delay, CancellationToken cancellationToken)
-    {
-        var tcs = new TaskCompletionSource();
-        RegisterFutureAction(UtcNow + delay, () => tcs.TrySetResult(), () => tcs.TrySetCanceled(), cancellationToken);
-        return tcs.Task;
-    }
 
     public PeriodicTimer PeriodicTimer(TimeSpan period)
     {
