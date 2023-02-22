@@ -11,9 +11,9 @@ Currently, the following .NET `Task` and `DateTimeOffset`-based APIs are support
 | `WaitAsync(Task, TimeSpan)` method | `Task.WaitAsync(TimeSpan)` method |
 | `WaitAsync(Task, TimeSpan, CancellationToken)` method | `Task.WaitAsync(TimeSpan, CancellationToken)` method |
 
-There are two of `ITimeScheduler` included in the package, `DefaultScheduler` which is used in production, and `TestScheduler` which is used during testing.
+There are two implementations of `ITimeScheduler` included in the package, `DefaultScheduler` which is used in production, and `TestScheduler` which is used during testing.
 
-During testing, you can move time forward by calling `TestScheduler.ForwardTime(TimeSpan)`, This allows you to write tests that run fast and predictable, even if the system under test pauses execution for multiple minutes using e.g. `ITimeScheduler.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
+During testing, you can move time forward by calling `TestScheduler.ForwardTime(TimeSpan)`. This allows you to write tests that run fast and predictable, even if the system under test pauses execution for multiple minutes using e.g. `ITimeScheduler.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
 
 ## Installation
 
