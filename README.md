@@ -1,5 +1,5 @@
 # Time Scheduler
-A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.
+A library that wraps common .NET scheduling and time related operations in an abstraction, `ITimeScheduler`, that enables deterministic control of time during testing using a `ForwardTime` method.
 
 Currently, the following .NET `Task` and `DateTimeOffset`-based APIs are supported:
 
@@ -11,9 +11,42 @@ Currently, the following .NET `Task` and `DateTimeOffset`-based APIs are support
 | `WaitAsync(Task, TimeSpan)` method | `Task.WaitAsync(TimeSpan)` method |
 | `WaitAsync(Task, TimeSpan, CancellationToken)` method | `Task.WaitAsync(TimeSpan, CancellationToken)` method |
 
+There are two of `ITimeScheduler` included in the package, `DefaultScheduler` which is used in production, and `TestScheduler` which is used during testing.
+
+During testing, you can move time forward by calling `TestScheduler.ForwardTime(TimeSpan)`, This allows you to write tests that run fast and predictable, even if the system under test pauses execution for multiple minutes using e.g. `ITimeScheduler.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
+
 ## Installation
 
 Get the latest release from https://www.nuget.org/packages/TimeScheduler
+
+## Set up in production
+
+To use in production, pass in `DefaultScheduler` to the types that depend on `ITimeScheduler`. 
+This can be done directly, or via an IoC Container, e.g. .NETs built-in `IServiceCollection` like so:
+
+```c#
+services.AddSingleton<ITimeScheduler, DefaultScheduler>();
+```
+
+If you do not want to register the `ITimeScheduler` with your IoC container, you can instead create an additional constructor in the types that use it, which allow you to pass in a `ITimeScheduler`, and in the existing constructor(s) you have, just new up `DefaultScheduler` directly. For example:
+
+```c#
+public class MyService
+{
+    private readonly ITimeScheduler scheduler;
+
+    public MyService() : this(new DefaultScheduler())
+    {
+    }
+
+    public MyService(ITimeScheduler scheduler)
+	{
+		this.scheduler = scheduler;
+	}
+}
+```
+
+This allows you to explicitly pass in an `TestScheduler` during testing.
 
 ## Example - control time during tests
 
@@ -125,13 +158,4 @@ public async Task DoStuff_does_stuff_every_11_seconds()
     .Should()
     .BeCloseTo(DateTimeOffset.UtcNow, precision: TimeSpan.FromMilliseconds(50));
 }
-```
-
-## Set up in production
-
-To use in production, pass in `DefaultScheduler` to the types that depend on `ITimeScheduler`. 
-This can be done directly, or via an IoC Container, e.g. .NETs built-in `IServiceCollection` like so:
-
-```c#
-services.AddSingleton<ITimeScheduler, DefaultScheduler>();
 ```
