@@ -16,18 +16,23 @@ public partial class DefaultScheduler : ITimeScheduler
     public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
 
     /// <inheritdoc/>
+    /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task Delay(TimeSpan delay)
         => Task.Delay(delay);
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task Delay(TimeSpan delay, CancellationToken cancellationToken)
         => Task.Delay(delay, cancellationToken);
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public PeriodicTimer PeriodicTimer(TimeSpan period)
         => new PeriodicTimerWrapper(period);
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task WaitAsync(Task task, TimeSpan timeout)
     {
         ArgumentNullException.ThrowIfNull(task);
@@ -35,6 +40,7 @@ public partial class DefaultScheduler : ITimeScheduler
     }
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task WaitAsync(Task task, TimeSpan timeout, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(task);
@@ -42,6 +48,7 @@ public partial class DefaultScheduler : ITimeScheduler
     }
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout)
     {
         ArgumentNullException.ThrowIfNull(task);
@@ -49,6 +56,7 @@ public partial class DefaultScheduler : ITimeScheduler
     }
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(task);
