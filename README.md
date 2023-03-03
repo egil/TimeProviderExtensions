@@ -25,7 +25,7 @@ To use in production, pass in `DefaultScheduler` to the types that depend on `IT
 This can be done directly, or via an IoC Container, e.g. .NETs built-in `IServiceCollection` like so:
 
 ```c#
-services.AddSingleton<ITimeScheduler, DefaultScheduler>();
+services.AddSingleton<ITimeScheduler>(DefaultScheduler.Instance);
 ```
 
 If you do not want to register the `ITimeScheduler` with your IoC container, you can instead create an additional constructor in the types that use it, which allow you to pass in a `ITimeScheduler`, and in the existing constructor(s) you have, just new up `DefaultScheduler` directly. For example:
@@ -35,7 +35,7 @@ public class MyService
 {
     private readonly ITimeScheduler scheduler;
 
-    public MyService() : this(new DefaultScheduler())
+    public MyService() : this(DefaultScheduler.Instance)
     {
     }
 

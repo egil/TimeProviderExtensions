@@ -12,6 +12,11 @@ namespace TimeScheduler;
 /// </remarks>
 public partial class DefaultScheduler : ITimeScheduler
 {
+    /// <summary>
+    /// Gets a singleton instance of the <see cref="DefaultScheduler"/>.
+    /// </summary>
+    public static DefaultScheduler Instance { get; } = new DefaultScheduler();
+
     /// <inheritdoc/>
     public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
 
