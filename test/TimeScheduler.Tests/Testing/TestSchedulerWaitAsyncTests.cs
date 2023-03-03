@@ -5,6 +5,7 @@ namespace TimeScheduler.Testing;
 
 public class TestSchedulerWaitAsyncTests
 {
+    internal const uint MaxSupportedTimeout = 0xfffffffe;
     private readonly static TimeSpan DelayedTaskDelay = TimeSpan.FromMilliseconds(2);
     private readonly static string StringTaskResult = Guid.NewGuid().ToString();
 
@@ -46,10 +47,10 @@ public class TestSchedulerWaitAsyncTests
             sut => sut.WaitAsync(DelayedTask(sut), TimeSpan.FromMilliseconds(-2), CancellationToken.None),
             sut => sut.WaitAsync(DelayedStringTask(sut), TimeSpan.FromMilliseconds(-2)),
             sut => sut.WaitAsync(DelayedStringTask(sut), TimeSpan.FromMilliseconds(-2), CancellationToken.None),
-            sut => sut.WaitAsync(DelayedTask(sut), TimeSpan.FromMilliseconds(0xfffffffe + 1)),
-            sut => sut.WaitAsync(DelayedTask(sut), TimeSpan.FromMilliseconds(0xfffffffe + 1), CancellationToken.None),
-            sut => sut.WaitAsync(DelayedStringTask(sut), TimeSpan.FromMilliseconds(0xfffffffe + 1)),
-            sut => sut.WaitAsync(DelayedStringTask(sut), TimeSpan.FromMilliseconds(0xfffffffe + 1), CancellationToken.None),
+            sut => sut.WaitAsync(DelayedTask(sut), TimeSpan.FromMilliseconds(MaxSupportedTimeout + 1)),
+            sut => sut.WaitAsync(DelayedTask(sut), TimeSpan.FromMilliseconds(MaxSupportedTimeout + 1), CancellationToken.None),
+            sut => sut.WaitAsync(DelayedStringTask(sut), TimeSpan.FromMilliseconds(MaxSupportedTimeout + 1)),
+            sut => sut.WaitAsync(DelayedStringTask(sut), TimeSpan.FromMilliseconds(MaxSupportedTimeout + 1), CancellationToken.None),
         };
 
     [Theory, MemberData(nameof(TimeoutInvalidInvocations))]

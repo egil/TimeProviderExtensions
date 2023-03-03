@@ -47,8 +47,14 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
     /// by the specified <paramref name="time"/>.
     /// </summary>
     /// <param name="time">The span of time to forward <see cref="UtcNow"/> with.</param>
+    /// <exception cref="ArgumentException">If <paramref name="time"/> is negative or zero.</exception>
     public void ForwardTime(TimeSpan time)
     {
+        if (time <= TimeSpan.Zero)
+        {
+            throw new ArgumentException("The timespan to forward time by must be positive.", nameof(time));
+        }
+
         UtcNow = UtcNow + time;
         CompleteDelayedTasks();
     }
