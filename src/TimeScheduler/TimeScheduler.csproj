@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <TargetFramework>net6.0</TargetFramework>    
     <Title>Scheduler</Title>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Company>Egil Hansen</Company>
     <Authors>Egil Hansen</Authors>
     <Description>A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.</Description>
@@ -14,11 +12,30 @@
     <PackageProjectUrl>https://github.com/egil/TimeScheduler</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/egil/TimeScheduler</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest-all</AnalysisLevel>
+    <RepositoryType>git</RepositoryType>    
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReleaseNotes>Version 0.2.0 adds replacement for the `Task.WaitAsync` methods that takes a timeout.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Compile settings">
+    <Deterministic>true</Deterministic>
+    <Nullable>enable</Nullable>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+
+    <!-- Used by code coverage -->
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Analyzer settings">
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-all</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>

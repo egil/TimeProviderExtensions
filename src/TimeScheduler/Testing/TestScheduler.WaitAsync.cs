@@ -12,9 +12,11 @@ public sealed partial class TestScheduler
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     internal const uint UnsignedInfinite = unchecked((uint)-1);
 
+    /// <inheritdoc/>
     public Task WaitAsync(Task task, TimeSpan timeout)
         => WaitAsync(task, timeout, CancellationToken.None);
 
+    /// <inheritdoc/>
     public Task WaitAsync(Task task, TimeSpan timeout, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(task);
@@ -33,9 +35,11 @@ public sealed partial class TestScheduler
         return WaitAsyncInternal(task, timeout, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout)
         => WaitAsync(task, timeout, CancellationToken.None);
 
+    /// <inheritdoc/>
     public Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(task);

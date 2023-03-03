@@ -2,6 +2,7 @@ namespace TimeScheduler.Testing;
 
 public partial class TestScheduler : ITimeScheduler, IDisposable
 {
+    /// <inheritdoc/>
     public PeriodicTimer PeriodicTimer(TimeSpan period)
     {
         return new TestPeriodicTimer(period, this);

@@ -32,6 +32,14 @@ public abstract class PeriodicTimer : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Stops the timer and releases associated managed resources.
+    /// </summary>
+    /// <remarks>
+    /// This method follows the dispose pattern.
+    /// See <see href="https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose"/>
+    /// to learn more.
+    /// </remarks>
     protected virtual void Dispose(bool disposing)
     {
     }

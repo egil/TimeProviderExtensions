@@ -2,25 +2,54 @@ using System.Collections.Concurrent;
 
 namespace TimeScheduler.Testing;
 
+/// <summary>
+/// Represents a test implementation of a <see cref="ITimeScheduler"/>,
+/// where time stands still until a call to <see cref="ForwardTime(TimeSpan)"/>
+/// is called.
+/// </summary>
+/// <remarks>
+/// Learn more at <see href="https://github.com/egil/TimeScheduler"/>.
+/// </remarks>
 public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 {
     private readonly ConcurrentDictionary<FutureAction, object?> futureActions = new();
 
+    /// <summary>
+    /// Returns a DateTimeOffset representing the <see cref="TestScheduler"/>'s
+    /// current date and time.
+    /// </summary>
+    /// <remarks>
+    /// To advance time, call <see cref="ForwardTime(TimeSpan)"/>.
+    /// </remarks>
     public DateTimeOffset UtcNow { get; private set; }
 
+    /// <summary>
+    /// Creates an instance of the <see cref="TestScheduler"/> with
+    /// <see cref="UtcNow"/> set to <see cref="DateTimeOffset.UtcNow"/>.
+    /// </summary>
     public TestScheduler()
     {
         UtcNow = DateTimeOffset.UtcNow;
     }
 
+    /// <summary>
+    /// Creates an instance of the <see cref="TestScheduler"/> with
+    /// <see cref="UtcNow"/> set to <paramref name="startDateTime"/>.
+    /// </summary>
+    /// <param name="startDateTime">The date and time to use for <see cref="UtcNow"/> initially.</param>
     public TestScheduler(DateTimeOffset startDateTime)
     {
         UtcNow = startDateTime;
     }
 
-    public void ForwardTime(TimeSpan timeSpan)
+    /// <summary>
+    /// Forward the date and time represented by <see cref="UtcNow"/>
+    /// by the specified <paramref name="time"/>.
+    /// </summary>
+    /// <param name="time">The span of time to forward <see cref="UtcNow"/> with.</param>
+    public void ForwardTime(TimeSpan time)
     {
-        UtcNow = UtcNow + timeSpan;
+        UtcNow = UtcNow + time;
         CompleteDelayedTasks();
     }
 
@@ -57,10 +86,14 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
         {
             futureActions.TryAdd(futureAction, null);
         }
-        
+
         return futureAction;
     }
 
+    /// <summary>
+    /// Disposing the scheduler will cancel all scheduled tasks that are waiting
+    /// for time to be forwarded.
+    /// </summary>
     public void Dispose()
     {
         foreach (var futureAction in futureActions.Keys)

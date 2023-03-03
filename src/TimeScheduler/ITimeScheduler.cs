@@ -2,6 +2,11 @@ using System;
 
 namespace TimeScheduler;
 
+/// <summary>
+/// Represents an abstraction for common .NET scheduling and time related operations
+/// that enables deterministic control of time during testing, and normal operation
+/// in production.
+/// </summary>
 public interface ITimeScheduler
 {
     /// <summary>
@@ -52,7 +57,7 @@ public interface ITimeScheduler
     /// </summary>
     /// <remarks>
     /// This timer is intended to be used only by a single consumer at a time: only one call to <see cref="PeriodicTimer.WaitForNextTickAsync" />
-    /// may be in flight at any given moment. <see cref="PeriodicTimer.Dispose"/> may be used concurrently with an active <see cref="PeriodicTimer.WaitForNextTickAsync"/>
+    /// may be in flight at any given moment. <see cref="PeriodicTimer.Dispose()"/> may be used concurrently with an active <see cref="PeriodicTimer.WaitForNextTickAsync"/>
     /// to interrupt it and cause it to return false.
     /// </remarks>
     PeriodicTimer PeriodicTimer(TimeSpan period);
@@ -75,6 +80,7 @@ public interface ITimeScheduler
     /// <param name="task">The task to wait for.</param>
     /// <param name="timeout">The timeout after which the <see cref="Task"/> should be faulted with a <see cref="TimeoutException"/> if it hasn't otherwise completed.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to monitor for a cancellation request.</param>
+    /// <exception cref="ArgumentNullException">The <paramref name="task"/> is null.</exception>
     /// <returns>The <see cref="Task"/> representing the asynchronous wait.  It may or may not be the same instance as the current instance.</returns>
     Task WaitAsync(Task task, TimeSpan timeout, CancellationToken cancellationToken);
 
@@ -86,6 +92,7 @@ public interface ITimeScheduler
     /// <param name="timeout">
     /// The timeout after which the <see cref="Task"/> should be faulted with a <see cref="TimeoutException"/> if it hasn't otherwise completed.
     /// </param>
+    /// <exception cref="ArgumentNullException">The <paramref name="task"/> is null.</exception>
     /// <returns>The <see cref="Task{TResult}"/> representing the asynchronous wait. It may or may not be the same instance as the current instance.</returns>
     Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout);
 
@@ -96,6 +103,7 @@ public interface ITimeScheduler
     /// <param name="task">The task to wait for.</param>
     /// <param name="timeout">The timeout after which the <see cref="Task"/> should be faulted with a <see cref="TimeoutException"/> if it hasn't otherwise completed.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to monitor for a cancellation request.</param>
+    /// <exception cref="ArgumentNullException">The <paramref name="task"/> is null.</exception>
     /// <returns>The <see cref="Task{TResult}"/> representing the asynchronous wait. It may or may not be the same instance as the current instance.</returns>
     Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout, CancellationToken cancellationToken);
 }
