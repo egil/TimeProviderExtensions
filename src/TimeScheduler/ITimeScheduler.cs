@@ -106,4 +106,32 @@ public interface ITimeScheduler
     /// <exception cref="ArgumentNullException">The <paramref name="task"/> is null.</exception>
     /// <returns>The <see cref="Task{TResult}"/> representing the asynchronous wait. It may or may not be the same instance as the current instance.</returns>
     Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Schedules a Cancel operation on the <paramref name="cancellationTokenSource"/>.
+    /// </summary>
+    /// <param name="cancellationTokenSource">
+    /// The <see cref="CancellationTokenSource"/> to cancel after the specified delay.
+    /// </param>
+    /// <param name="delay">The time span to wait before canceling the <paramref name="cancellationTokenSource"/>.
+    /// </param>
+    /// <exception cref="ObjectDisposedException">The exception thrown when the <paramref name="cancellationTokenSource"/>
+    /// has been disposed.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// The <paramref name="delay"/> is less than -1 or greater than maximum allowed timer duration.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">The <paramref name="cancellationTokenSource"/> is null.</exception>
+    /// <remarks>
+    /// <para>
+    /// The countdown for the delay starts during this call. When the delay expires,
+    /// the <paramref name="cancellationTokenSource"/> is canceled, if it has
+    /// not been canceled already.
+    /// </para>
+    /// <para>
+    /// Subsequent calls to CancelAfter will reset the delay for the
+    /// <paramref name="cancellationTokenSource"/>, if it has not been canceled already.
+    /// </para>
+    /// </remarks>
+    void CancelAfter(CancellationTokenSource cancellationTokenSource, TimeSpan delay);
 }

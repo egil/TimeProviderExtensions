@@ -1,11 +1,15 @@
+using TimeScheduler.Testing;
+
 namespace TimeScheduler;
 
 public class DefaultSchedulerTests
 {
+    internal const uint MaxSupportedTimeout = 0xfffffffe;
+
     [Fact]
     public void UtcNow_returns()
     {
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
 
         sut.UtcNow.Should().BeCloseTo(
             nearbyTime: DateTimeOffset.UtcNow,
@@ -15,7 +19,7 @@ public class DefaultSchedulerTests
     [Fact]
     public async Task Delay_waits_for_n_seconds()
     {
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var timer = Stopwatch.StartNew();
 
         await sut.Delay(TimeSpan.FromSeconds(1));
@@ -29,7 +33,7 @@ public class DefaultSchedulerTests
     [Fact]
     public async Task PeriodicTimer()
     {
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         using var periodTimer = sut.PeriodicTimer(TimeSpan.FromMilliseconds(5));
 
         var result = await periodTimer.WaitForNextTickAsync(CancellationToken.None);
@@ -41,7 +45,7 @@ public class DefaultSchedulerTests
     public async Task PeriodicTimer_cancelled_throws()
     {
         using var cts = new CancellationTokenSource();
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var timerTask = TimerTask(cts.Token);
 
         cts.Cancel();
@@ -59,9 +63,9 @@ public class DefaultSchedulerTests
     }
 
     [Fact]
-    public async void WaitAsync_with_timeout()
+    public async Task WaitAsync_with_timeout()
     {
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var task = Task.Delay(TimeSpan.FromMilliseconds(10));
 
         var result = sut.WaitAsync(task, TimeSpan.FromSeconds(1));
@@ -72,9 +76,9 @@ public class DefaultSchedulerTests
     }
 
     [Fact]
-    public async void WaitAsync_of_T_with_timeout()
+    public async Task WaitAsync_of_T_with_timeout()
     {
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var task = StringTask();
 
         var result = sut.WaitAsync(task, TimeSpan.FromSeconds(1));
@@ -91,10 +95,10 @@ public class DefaultSchedulerTests
     }
 
     [Fact]
-    public async void WaitAsync_with_timeout_and_cancellationToken()
+    public async Task WaitAsync_with_timeout_and_cancellationToken()
     {
         using var cts = new CancellationTokenSource();
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var task = Task.Delay(TimeSpan.FromMilliseconds(10));
 
         var result = sut.WaitAsync(task, TimeSpan.FromSeconds(1), cts.Token);
@@ -105,10 +109,10 @@ public class DefaultSchedulerTests
     }
 
     [Fact]
-    public async void WaitAsync_of_T_with_timeout_and_cancellationToken()
+    public async Task WaitAsync_of_T_with_timeout_and_cancellationToken()
     {
         using var cts = new CancellationTokenSource();
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var task = StringTask();
 
         var result = sut.WaitAsync(task, TimeSpan.FromSeconds(1), cts.Token);
@@ -125,9 +129,9 @@ public class DefaultSchedulerTests
     }
 
     [Fact]
-    public async void WaitAsync_with_timeout_throws()
+    public async Task WaitAsync_with_timeout_throws()
     {
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var task = Task.Delay(TimeSpan.FromSeconds(1));
 
         var result = sut.WaitAsync(task, TimeSpan.FromMilliseconds(5));
@@ -139,9 +143,9 @@ public class DefaultSchedulerTests
     }
 
     [Fact]
-    public async void WaitAsync_of_T_with_timeout_throws()
+    public async Task WaitAsync_of_T_with_timeout_throws()
     {
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var task = StringTask();
 
         var result = sut.WaitAsync(task, TimeSpan.FromMilliseconds(5));
@@ -159,10 +163,10 @@ public class DefaultSchedulerTests
     }
 
     [Fact]
-    public async void WaitAsync_with_timeout_and_cancellationToken_throws()
+    public async Task WaitAsync_with_timeout_and_cancellationToken_throws()
     {
         using var cts = new CancellationTokenSource();
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var task = Task.Delay(TimeSpan.FromSeconds(1));
 
         var result = sut.WaitAsync(task, TimeSpan.FromSeconds(2), cts.Token);
@@ -175,10 +179,10 @@ public class DefaultSchedulerTests
     }
 
     [Fact]
-    public async void WaitAsync_of_T_with_timeout_and_cancellationToken_throws()
+    public async Task WaitAsync_of_T_with_timeout_and_cancellationToken_throws()
     {
         using var cts = new CancellationTokenSource();
-        var sut = new DefaultScheduler();
+        var sut = DefaultScheduler.Instance;
         var task = StringTask();
 
         var result = sut.WaitAsync(task, TimeSpan.FromSeconds(2), cts.Token);
@@ -194,5 +198,81 @@ public class DefaultSchedulerTests
             await Task.Delay(TimeSpan.FromSeconds(1));
             return string.Empty;
         }
+    }
+
+    [Fact]
+    public void CancelAfter_throws_ObjectDisposedException()
+    {
+        var cts = new CancellationTokenSource();
+        cts.Dispose();
+        var sut = DefaultScheduler.Instance;
+
+        var throws = () => sut.CancelAfter(cts, TimeSpan.Zero);
+
+        throws.Should().ThrowExactly<ObjectDisposedException>();
+    }
+
+    [Theory]
+    [InlineData(-2)]
+    [InlineData(MaxSupportedTimeout + 1)]
+    public void CancelAfter_throws_ArgumentOutOfRangeException(double timespanInMilliseconds)
+    {
+        using var cts = new CancellationTokenSource();
+        var sut = DefaultScheduler.Instance;
+
+        var throws = () => sut.CancelAfter(cts, TimeSpan.FromMilliseconds(timespanInMilliseconds));
+
+        throws.Should().ThrowExactly<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void CancelAfter_throws_ArgumentNullException()
+    {
+        var sut = DefaultScheduler.Instance;
+
+        var throws = () => sut.CancelAfter(default!, TimeSpan.Zero);
+
+        throws.Should().ThrowExactly<ArgumentNullException>();
+    }
+
+    [Fact]
+    public async Task CancelAfter_cancels_delay_eq_zero()
+    {
+        using var cts = new CancellationTokenSource();
+        var sut = DefaultScheduler.Instance;
+
+        sut.CancelAfter(cts, TimeSpan.Zero);
+
+        await sut.Delay(TimeSpan.FromMilliseconds(50));
+        cts.IsCancellationRequested.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CancelAfter_cancels()
+    {
+        using var cts = new CancellationTokenSource();
+        var sut = DefaultScheduler.Instance;
+        var delay = TimeSpan.FromMilliseconds(30);
+
+        sut.CancelAfter(cts, delay);
+
+        await sut.Delay(delay);
+        cts.IsCancellationRequested.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CancelAfter_reschedule_cancel()
+    {
+        using var cts = new CancellationTokenSource();
+        var sut = DefaultScheduler.Instance;
+        var delay1 = TimeSpan.FromSeconds(1);
+        var delay2 = TimeSpan.FromMilliseconds(50);
+
+        sut.CancelAfter(cts, delay1);
+        sut.CancelAfter(cts, delay2);
+
+        // add extra buffer to ensure cancellation has been processed
+        await sut.Delay(delay2 * 2);
+        cts.IsCancellationRequested.Should().BeTrue();
     }
 }

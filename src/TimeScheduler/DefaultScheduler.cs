@@ -21,6 +21,13 @@ public partial class DefaultScheduler : ITimeScheduler
     public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
 
     /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CancelAfter(CancellationTokenSource cancellationTokenSource, TimeSpan delay)
+    {
+        ArgumentNullException.ThrowIfNull(cancellationTokenSource);
+        cancellationTokenSource.CancelAfter(delay);
+    }
+
     /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task Delay(TimeSpan delay)

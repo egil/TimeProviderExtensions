@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,8 +10,6 @@ namespace TimeScheduler.Testing;
 public sealed partial class TestScheduler
 {
     internal readonly struct VoidTaskResult { }
-    internal const uint MaxSupportedTimeout = 0xfffffffe;
-    internal const uint UnsignedInfinite = unchecked((uint)-1);
 
     /// <inheritdoc/>
     public Task WaitAsync(Task task, TimeSpan timeout)
@@ -20,7 +19,7 @@ public sealed partial class TestScheduler
     public Task WaitAsync(Task task, TimeSpan timeout, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(task);
-        ThrowIfInvalidTimeout(timeout);
+        ThrowIfInvalidUnspportedTimespan(timeout);
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -43,7 +42,7 @@ public sealed partial class TestScheduler
     public Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(task);
-        ThrowIfInvalidTimeout(timeout);
+        ThrowIfInvalidUnspportedTimespan(timeout);
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -101,15 +100,6 @@ public sealed partial class TestScheduler
         else
         {
             return await tcs.Task.ConfigureAwait(false);
-        }
-    }
-
-    private static void ThrowIfInvalidTimeout(TimeSpan timeout)
-    {
-        long totalMilliseconds = (long)timeout.TotalMilliseconds;
-        if (totalMilliseconds < -1 || totalMilliseconds > MaxSupportedTimeout)
-        {
-            throw new ArgumentOutOfRangeException(nameof(timeout), $"The value needs to translate in milliseconds to -1 (signifying an infinite timeout), 0, or a positive integer less than or equal to the maximum allowed timer duration ({MaxSupportedTimeout:N0}).");
         }
     }
 }

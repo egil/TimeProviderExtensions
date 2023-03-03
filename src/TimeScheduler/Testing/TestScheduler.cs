@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 namespace TimeScheduler.Testing;
 
@@ -12,7 +13,11 @@ namespace TimeScheduler.Testing;
 /// </remarks>
 public sealed partial class TestScheduler : ITimeScheduler, IDisposable
 {
+    internal const uint MaxSupportedTimeout = 0xfffffffe;
+    internal const uint UnsignedInfinite = unchecked((uint)-1);
+
     private readonly ConcurrentDictionary<FutureAction, object?> futureActions = new();
+    private readonly ConditionalWeakTable<object, FutureAction> attachedFutureActions = new();
 
     /// <summary>
     /// Returns a DateTimeOffset representing the <see cref="TestScheduler"/>'s
@@ -59,6 +64,22 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
         CompleteDelayedTasks();
     }
 
+    /// <summary>
+    /// Disposing the scheduler will cancel all scheduled tasks that are waiting
+    /// for time to be forwarded.
+    /// </summary>
+    public void Dispose()
+    {
+        attachedFutureActions.Clear();
+
+        foreach (var futureAction in futureActions.Keys)
+        {
+            futureAction.Cleanup();
+        }
+
+        futureActions.Clear();
+    }
+
     private void CompleteDelayedTasks()
     {
         var tasksToComplete = futureActions
@@ -77,13 +98,13 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
         DateTimeOffset completionTime,
         Action complete,
         Action cancel,
-        CancellationToken cleanupToken = default)
+        CancellationToken cleanupToken)
     {
         var futureAction = new FutureAction(
             completionTime,
             complete,
             cancel,
-            futureAction => futureActions.TryRemove(futureAction, out var _),
+            RemoveFutureAction,
             cleanupToken);
 
         // If the cleanup token is already canceled, the cancel        
@@ -96,18 +117,44 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
         return futureAction;
     }
 
-    /// <summary>
-    /// Disposing the scheduler will cancel all scheduled tasks that are waiting
-    /// for time to be forwarded.
-    /// </summary>
-    public void Dispose()
+    private FutureAction RegisterAttachedFutureAction(
+        DateTimeOffset completionTime,
+        object owner,
+        Action complete,
+        Action cancel,
+        CancellationToken cleanupToken)
     {
-        foreach (var futureAction in futureActions.Keys)
+        lock (attachedFutureActions)
         {
-            futureAction.Cancel();
-        }
+            if (attachedFutureActions.TryGetValue(owner, out var futureAction))
+            {
+                futureAction.Cleanup();
+            }
 
-        futureActions.Clear();
+            futureAction = RegisterFutureAction(
+                completionTime,
+                complete,
+                cancel,
+                cleanupToken);
+
+            attachedFutureActions.AddOrUpdate(owner, futureAction);
+
+            return futureAction;
+        }
+    }
+
+    private void RemoveFutureAction(FutureAction futureAction)
+    {
+        futureActions.TryRemove(futureAction, out var _);
+    }
+
+    private static void ThrowIfInvalidUnspportedTimespan(TimeSpan timespan, [CallerArgumentExpression("timespan")] string? paramName = null)
+    {
+        long totalMilliseconds = (long)timespan.TotalMilliseconds;
+        if (totalMilliseconds < -1 || totalMilliseconds > MaxSupportedTimeout)
+        {
+            throw new ArgumentOutOfRangeException(paramName, $"The value needs to translate in milliseconds to -1 (signifying an infinite timeout), 0, or a positive integer less than or equal to the maximum allowed timer duration ({MaxSupportedTimeout:N0}).");
+        }
     }
 
     // TODO: Would perf improve if this was a ref struct?
@@ -134,6 +181,7 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
             this.complete = complete;
             this.cancel = cancel;
             this.cleanup = cleanup;
+
             registration = cancellationToken.UnsafeRegister(static (state, token) =>
             {
                 var futureAction = (FutureAction)state!;
@@ -147,8 +195,7 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
             if (Interlocked.CompareExchange(ref completed, 1, 0) == 0)
             {
                 complete();
-                cleanup(this);
-                registration.Dispose();
+                Cleanup();
             }
         }
 
@@ -158,9 +205,14 @@ public sealed partial class TestScheduler : ITimeScheduler, IDisposable
             if (Interlocked.CompareExchange(ref completed, 2, 0) == 0)
             {
                 cancel();
-                cleanup(this);
-                registration.Dispose();
+                Cleanup();
             }
+        }
+
+        public void Cleanup()
+        {
+            cleanup(this);
+            registration.Dispose();
         }
     }
 }
