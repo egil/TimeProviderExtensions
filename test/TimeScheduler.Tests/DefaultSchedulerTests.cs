@@ -256,8 +256,8 @@ public class DefaultSchedulerTests
 
         sut.CancelAfter(cts, delay);
 
-        await sut.Delay(delay);
-        cts.IsCancellationRequested.Should().BeTrue();
+        var throwsAfterCancel = () => Task.Delay(TimeSpan.FromHours(1), cts.Token);
+        await throwsAfterCancel.Should().ThrowAsync<TaskCanceledException>();
     }
 
     [Fact]
@@ -274,5 +274,5 @@ public class DefaultSchedulerTests
         // add extra buffer to ensure cancellation has been processed
         await sut.Delay(delay2 * 2);
         cts.IsCancellationRequested.Should().BeTrue();
-    }
+    }  
 }

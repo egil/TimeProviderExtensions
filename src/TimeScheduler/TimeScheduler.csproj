@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>    
     <Title>Scheduler</Title>
-    <Version>0.3.0</Version>
+    <Version>0.4.0-preview</Version>
     <Company>Egil Hansen</Company>
     <Authors>Egil Hansen</Authors>
     <Description>A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.</Description>

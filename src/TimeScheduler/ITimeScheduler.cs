@@ -134,4 +134,39 @@ public interface ITimeScheduler
     /// </para>
     /// </remarks>
     void CancelAfter(CancellationTokenSource cancellationTokenSource, TimeSpan delay);
+
+    /// <summary>Creates a new <see cref="ITimer"/> instance, using <see cref="TimeSpan"/> values to measure time intervals.</summary>
+    /// <param name="callback">
+    /// A delegate representing a method to be executed when the timer fires. The method specified for callback should be reentrant,
+    /// as it may be invoked simultaneously on two threads if the timer fires again before or while a previous callback is still being handled.
+    /// </param>
+    /// <param name="state">An object to be passed to the <paramref name="callback"/>. This may be null.</param>
+    /// <param name="dueTime">The amount of time to delay before <paramref name="callback"/> is invoked. Specify <see cref="Timeout.InfiniteTimeSpan"/> to prevent the timer from starting. Specify <see cref="TimeSpan.Zero"/> to start the timer immediately.</param>
+    /// <param name="period">The time interval between invocations of <paramref name="callback"/>. Specify <see cref="Timeout.InfiniteTimeSpan"/> to disable periodic signaling.</param>
+    /// <returns>
+    /// The newly created <see cref="ITimer"/> instance.
+    /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="callback"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The number of milliseconds in the value of <paramref name="dueTime"/> or <paramref name="period"/> is negative and not equal to <see cref="Timeout.Infinite"/>, or is greater than <see cref="int.MaxValue"/>.</exception>
+    /// <remarks>
+    /// <para>
+    /// The delegate specified by the callback parameter is invoked once after <paramref name="dueTime"/> elapses, and thereafter each time the <paramref name="period"/> time interval elapses.
+    /// </para>
+    /// <para>
+    /// If <paramref name="dueTime"/> is zero, the callback is invoked immediately. If <paramref name="dueTime"/> is -1 milliseconds, <paramref name="callback"/> is not invoked; the timer is disabled,
+    /// but can be re-enabled by calling the <see cref="ITimer.Change"/> method.
+    /// </para>
+    /// <para>
+    /// If <paramref name="period"/> is 0 or -1 milliseconds and <paramref name="dueTime"/> is positive, <paramref name="callback"/> is invoked once; the periodic behavior of the timer is disabled,
+    /// but can be re-enabled using the <see cref="ITimer.Change"/> method.
+    /// </para>
+    /// <para>
+    /// The return <see cref="ITimer"/> instance will be implicitly rooted while the timer is still scheduled.
+    /// </para>
+    /// <para>
+    /// <see cref="CreateTimer"/> captures the <see cref="ExecutionContext"/> and stores that with the <see cref="ITimer"/> for use in invoking <paramref name="callback"/>
+    /// each time it's called. That capture can be suppressed with <see cref="ExecutionContext.SuppressFlow"/>.
+    /// </para>
+    /// </remarks>
+    ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period);
 }
