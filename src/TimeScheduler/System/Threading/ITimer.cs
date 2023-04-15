@@ -1,4 +1,4 @@
-﻿namespace TimeScheduler;
+namespace System.Threading;
 
 /// <summary>Represents a timer that can have its due time and period changed.</summary>
 /// <remarks>

@@ -1,9 +1,6 @@
-using TimeScheduler.Testing;
+namespace System.Testing;
 
-namespace TimeScheduler;
-
-[Obsolete] // marked obsolete to stop warnings related to SUT
-public class TestSchedulerCancelAfter
+public class TestTimeProviderCancelAfter
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
 
@@ -13,9 +10,9 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_throws_ArgumentOutOfRangeException(double timespanInMilliseconds)
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
 
-        var throws = () => sut.CancelAfter(cts, TimeSpan.FromMilliseconds(timespanInMilliseconds));
+        var throws = () => cts.CancelAfter(TimeSpan.FromMilliseconds(timespanInMilliseconds), sut);
 
         throws.Should().ThrowExactly<ArgumentOutOfRangeException>();
     }
@@ -23,9 +20,9 @@ public class TestSchedulerCancelAfter
     [Fact]
     public void CancelAfter_throws_ArgumentNullException()
     {
-        using var sut = new TestScheduler();
+        using var cts = new CancellationTokenSource();
 
-        var throws = () => sut.CancelAfter(default!, TimeSpan.Zero);
+        var throws = () => cts.CancelAfter(TimeSpan.Zero, default(TestTimeProvider)!);
 
         throws.Should().ThrowExactly<ArgumentNullException>();
     }
@@ -34,10 +31,10 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_does_nothing_when_cts_already_canceled()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
 
         cts.Cancel();
-        sut.CancelAfter(cts, TimeSpan.Zero);
+        cts.CancelAfter(TimeSpan.Zero, sut);
 
         cts.IsCancellationRequested.Should().BeTrue();
     }
@@ -46,9 +43,9 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_does_nothing_when_delay_eq_zero()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
 
-        sut.CancelAfter(cts, TimeSpan.Zero);
+        cts.CancelAfter(TimeSpan.Zero, sut);
 
         cts.IsCancellationRequested.Should().BeTrue();
     }
@@ -57,9 +54,9 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_does_nothing_when_delay_infinite()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
 
-        sut.CancelAfter(cts, TimeSpan.FromMilliseconds(-1));
+        cts.CancelAfter(TimeSpan.FromMilliseconds(-1), sut);
 
         cts.IsCancellationRequested.Should().BeFalse();
     }
@@ -68,10 +65,10 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_cancels()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
         var delay = TimeSpan.FromMilliseconds(42);
 
-        sut.CancelAfter(cts, delay);
+        cts.CancelAfter(delay, sut);
 
         sut.ForwardTime(delay);
         cts.IsCancellationRequested.Should().BeTrue();
@@ -81,12 +78,12 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_reschedule_longer_cancel()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
         var initialDelay = TimeSpan.FromMilliseconds(100);
         var rescheduledDelay = TimeSpan.FromMilliseconds(1000);
 
-        sut.CancelAfter(cts, initialDelay);
-        sut.CancelAfter(cts, rescheduledDelay);
+        cts.CancelAfter(initialDelay, sut);
+        cts.CancelAfter(rescheduledDelay, sut);
 
         sut.ForwardTime(initialDelay);
         cts.IsCancellationRequested.Should().BeFalse();
@@ -98,12 +95,12 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_reschedule_shorter_cancel()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
         var initialDelay = TimeSpan.FromMilliseconds(1000);
         var rescheduledDelay = TimeSpan.FromMilliseconds(100);
 
-        sut.CancelAfter(cts, initialDelay);
-        sut.CancelAfter(cts, rescheduledDelay);
+        cts.CancelAfter(initialDelay, sut);
+        cts.CancelAfter(rescheduledDelay, sut);
 
         sut.ForwardTime(rescheduledDelay);
         cts.IsCancellationRequested.Should().BeTrue();

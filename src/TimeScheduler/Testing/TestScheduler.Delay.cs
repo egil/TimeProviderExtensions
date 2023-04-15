@@ -1,6 +1,6 @@
 namespace TimeScheduler.Testing;
 
-public sealed partial class TestScheduler
+public partial class TestScheduler
 {
     /// <inheritdoc/>
     public Task Delay(TimeSpan delay)
@@ -14,7 +14,7 @@ public sealed partial class TestScheduler
         var tcs = new TaskCompletionSource();
 
         RegisterFutureAction(
-            UtcNow + delay,
+            GetUtcNow() + delay,
             () => tcs.TrySetResult(),
             () => tcs.TrySetCanceled(),
             cancellationToken);

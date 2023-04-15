@@ -1,7 +1,6 @@
-namespace TimeScheduler.Testing;
+namespace System.Testing;
 
-[Obsolete] // marked obsolete to stop warnings related to SUT
-public class TestSchedulerTimerTests
+public class TestTimeProviderTimerTests
 {
     [Fact]
     public void CreateTimer_with_positive_DueTime_and_infinite_Period()
@@ -9,7 +8,7 @@ public class TestSchedulerTimerTests
         var callbackCount = 0;
         var dueTime = TimeSpan.FromSeconds(1);
         var period = Timeout.InfiniteTimeSpan;
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
         using var timer = sut.CreateTimer(_ => callbackCount++, null, dueTime, period);
 
         sut.ForwardTime(dueTime);
@@ -25,7 +24,7 @@ public class TestSchedulerTimerTests
         var callbackCount = 0;
         var dueTime = TimeSpan.FromSeconds(1);
         var period = TimeSpan.FromSeconds(2);
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
         using var timer = sut.CreateTimer(_ => callbackCount++, null, dueTime, period);
 
         sut.ForwardTime(dueTime);
@@ -44,7 +43,7 @@ public class TestSchedulerTimerTests
         var callbackCount = 0;
         var dueTime = Timeout.InfiniteTimeSpan;
         var period = Timeout.InfiniteTimeSpan;
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
         using var timer = sut.CreateTimer(_ => callbackCount++, null, dueTime, period);
 
         sut.ForwardTime(TimeSpan.FromSeconds(1));
@@ -57,7 +56,7 @@ public class TestSchedulerTimerTests
     {
         // Arrange
         var callbackCount = 0;
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
         using var timer = sut.CreateTimer(_ => callbackCount++, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         var dueTime = TimeSpan.FromSeconds(1);
         var period = TimeSpan.FromSeconds(2);
@@ -81,7 +80,7 @@ public class TestSchedulerTimerTests
     {
         // Arrange
         var callbackCount = 0;
-        using var sut = new TestScheduler();
+        using var sut = new TestTimeProvider();
         var originalDueTime = TimeSpan.FromSeconds(3);
         var period = TimeSpan.FromSeconds(5);
         using var timer = sut.CreateTimer(_ => callbackCount++, null, originalDueTime, period);

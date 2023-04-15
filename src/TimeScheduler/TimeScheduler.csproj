@@ -3,10 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>    
     <Title>Scheduler</Title>
-    <Version>0.4.0-preview</Version>
+    <Version>0.5.0</Version>
     <Company>Egil Hansen</Company>
     <Authors>Egil Hansen</Authors>
-    <Description>A library that wraps common .NET scheduling and time related operations in an abstraction, that enables controlling time during testing.</Description>
+    <Description>
+      This is a shim for the upcoming `System.TimeProvider` API coming in .NET 8. It includes a test version of the `TimeProvider`, named `TestTimeProvider`, that allows you to control the progress of time during testing deterministically.
+      
+      **NOTE:** Originally, this library provided its own abstraction, `ITimeScheduler` and related types, `DefaultScheduler` and `TestScheduler`. These are now considered obsolete.
+    </Description>
     <Copyright>Egil Hansen</Copyright>
     <PackageId>TimeScheduler</PackageId>
     <PackageProjectUrl>https://github.com/egil/TimeScheduler</PackageProjectUrl>
@@ -46,7 +50,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

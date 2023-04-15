@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace TimeScheduler.Testing;
 
-public sealed partial class TestScheduler
+public partial class TestScheduler
 {
     /// <inheritdoc/>
     public void CancelAfter(CancellationTokenSource cancellationTokenSource, TimeSpan delay)
@@ -25,7 +18,7 @@ public sealed partial class TestScheduler
         }
 
         var futureAction = RegisterAttachedFutureAction(
-            UtcNow + delay,
+            GetUtcNow() + delay,
             cancellationTokenSource,
             CancelWithoutExceptions,
             static () => { },

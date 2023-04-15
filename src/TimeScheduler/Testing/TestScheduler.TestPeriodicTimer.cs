@@ -35,7 +35,7 @@ public partial class TestScheduler : ITimeScheduler, IDisposable
                 return ValueTask.FromCanceled<bool>(cancellationToken);
             }
 
-            if (!stopped && owner.UtcNow >= nextSignal)
+            if (!stopped && owner.GetUtcNow() >= nextSignal)
             {
                 SetNextSignalTime();
                 return new ValueTask<bool>(!stopped);
@@ -65,7 +65,7 @@ public partial class TestScheduler : ITimeScheduler, IDisposable
 
         private void SetNextSignalTime()
         {
-            nextSignal = owner.UtcNow + period;
+            nextSignal = owner.GetUtcNow() + period;
         }
 
         protected override void Dispose(bool disposing)

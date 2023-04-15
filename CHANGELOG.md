@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0]
+
+- Implemented a shim for the TimeProvider API coming in .NET 8.
+- Added support for controlling timestamps during testing.
+- Marked the `ITimeScheduler` and related types as obsolete.
+
 ## [0.4.0]
 
 - Added support for timers.

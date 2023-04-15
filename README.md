@@ -1,24 +1,27 @@
-# Time Scheduler
-A library that wraps common .NET scheduling and time related operations in an abstraction, `ITimeScheduler`,
-that enables deterministic control of time during testing using a `ForwardTime` method.
+# Time Scheduler - a TimeProvider shim
 
-Currently, the following .NET `Task` and `DateTimeOffset`-based APIs are supported:
+This is a shim for the upcoming `System.TimeProvider` API coming in .NET 8. It includes a test version of the `TimeProvider`, named `TestTimeProvider`, that allows you to control the progress of time during testing deterministically.
 
-| TimeScheduler method | .NET API it replaces |
+*NOTE: Originally, this library provided its own abstraction, `ITimeScheduler` and related types, `DefaultScheduler` and `TestScheduler`. These are now considered obsolete.*
+
+Currently, the following .NET time-based APIs are supported:
+
+| TimeProvider method | .NET API it replaces |
 |----------------------|----------------------|
-| `UtcNow` property | `DateTimeOffset.UtcNow` property |
+| `GetUtcNow()` method | `DateTimeOffset.UtcNow` property |
+| `CreateTimer()` method | `System.Threading.Timer` type |
+| `CreatePeriodicTimer(TimeSpan)` method | `System.Threading.PeriodicTimer` type |
 | `Delay(TimeSpan, CancellationToken)` method | `Task.Delay(TimeSpan, CancellationToken)` method |
-| `PeriodicTimer(TimeSpan)` method | `System.Threading.PeriodicTimer` type |
-| `WaitAsync(Task, TimeSpan)` method | `Task.WaitAsync(TimeSpan)` method |
-| `WaitAsync(Task, TimeSpan, CancellationToken)` method | `Task.WaitAsync(TimeSpan, CancellationToken)` method |
-| `CancelAfter(CancellationTokenSource, TimeSpan)` method | `CancellationTokenSource.CancelAfter(TimeSpan)` method |
+| `CancellationTokenSource.CancelAfter(TimeSpan, TimeProvider)` method | `CancellationTokenSource.CancelAfter(TimeSpan)` method |
+| `Task.WaitAsync(TimeSpan, TimeProvider)` method | `Task.WaitAsync(TimeSpan)` method |
+| `Task.WaitAsync(TimeSpan, TimeProvider, CancellationToken)` method | `Task.WaitAsync(TimeSpan, CancellationToken)` method |
 
-There are two implementations of `ITimeScheduler` included in the package, `DefaultScheduler` which is
-used in production, and `TestScheduler` which is used during testing.
+The implementations of `TimeProvider` is abstract. An instance of `TimeProvider` for production use is availalbe on the `TimeProvider.System` property,
+and `TestTimeProvider` can be used during testing.
 
-During testing, you can move time forward by calling `TestScheduler.ForwardTime(TimeSpan)`. This allows
+During testing, you can move time forward by calling `ForwardTime(TimeSpan)` or `SetUtcNow(DateTimeOffset)` on `TestTimeProvider`. This allows
 you to write tests that run fast and predictable, even if the system under test pauses execution for
-multiple minutes using e.g. `ITimeScheduler.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
+multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
 
 ## Installation
 
@@ -26,47 +29,47 @@ Get the latest release from https://www.nuget.org/packages/TimeScheduler
 
 ## Set up in production
 
-To use in production, pass in `DefaultScheduler` to the types that depend on `ITimeScheduler`. 
+To use in production, pass in `TimeProvider.System` to the types that depend on `TimeProvider`. 
 This can be done directly, or via an IoC Container, e.g. .NETs built-in `IServiceCollection` like so:
 
 ```c#
-services.AddSingleton<ITimeScheduler>(DefaultScheduler.Instance);
+services.AddSingleton(TimeProvider.System);
 ```
 
-If you do not want to register the `ITimeScheduler` with your IoC container, you can instead create
-an additional constructor in the types that use it, which allow you to pass in a `ITimeScheduler`,
-and in the existing constructor(s) you have, just new up `DefaultScheduler` directly. For example:
+If you do not want to register the `TimeProvider` with your IoC container, you can instead create
+an additional constructor in the types that use it, which allow you to pass in a `TimeProvider`,
+and in the existing constructor(s) you have, just new up `TimeProvider.System` directly. For example:
 
 ```c#
 public class MyService
 {
-    private readonly ITimeScheduler scheduler;
-
-    public MyService() : this(DefaultScheduler.Instance)
-    {
-    }
-
-    public MyService(ITimeScheduler scheduler)
-	{
-		this.scheduler = scheduler;
-	}
+  private readonly TimeProvider timeProvider;
+  
+  public MyService() : this(TimeProvider.System)
+  {
+  }
+  
+  public MyService(TimeProvider timeProvider)
+  {
+    this.timeProvider = timeProvider;
+  }
 }
 ```
 
-This allows you to explicitly pass in an `TestScheduler` during testing.
+This allows you to explicitly pass in an `TestTimeProvider` during testing.
 
 ## Example - control time during tests
 
 If a system under test (SUT) uses things like `Task.Delay`, `DateTimeOffset.UtcNow`, `Task.WaitAsync`, or `PeriodicTimer`, 
 it becomes hard to create tests that runs fast and predictably.
 
-The idea is to replace the use of e.g. `Task.Delay` with an abstraction, the `ITimeScheduler`, that in production
-is represented by the `DefaultScheduler`, that just uses the real `Task.Delay`. During testing it is now possible to
-pass in `TestScheduler`, that allows the test to control the progress of time, making it possible to skip ahead,
+The idea is to replace the use of e.g. `Task.Delay` with an abstraction, the `TimeProvider`, that in production
+is represented by the `TimeProvider.System`, that just uses the real `Task.Delay`. During testing it is now possible to
+pass in `TestTimeProvider`, that allows the test to control the progress of time, making it possible to skip ahead,
 e.g. 10 minutes, and also pause time, leading to fast and predictable tests.
 
 As an example, lets test the "Stuff Service" below that performs a specific tasks every 10 second with an additional 
-1 second delay. We have two versions, one that uses the standard types in .NET, and one that uses the `ITimeScheduler`.
+1 second delay. We have two versions, one that uses the standard types in .NET, and one that uses the `TimeProvider`.
 
 ```c#
 // Version of stuff service that uses the built in DateTimeOffset, PeriodicTimer, and Task.Delay
@@ -92,27 +95,27 @@ public class StuffServiceSystem
   }
 }
 
-// Version of stuff service that uses the built in TimeScheduler
-public class StuffServiceUsingTimeScheduler 
+// Version of stuff service that uses the built in TimeProvider
+public class StuffServiceUsingTimeProvider
 {
   private static readonly TimeSpan doStuffDelay = TimeSpan.FromSeconds(10);
-  private readonly ITimeScheduler scheduler;
+  private readonly TimeProvider timeProvider;
   private readonly List<DateTimeOffset> container;
 
-  public StuffServiceUsingTimeScheduler(ITimeScheduler scheduler, List<DateTimeOffset> container)
+  public StuffServiceUsingTimeProvider(TimeProvider timeProvider, List<DateTimeOffset> container)
   {
-    this.scheduler = scheduler;
+    this.timeProvider = timeProvider;
     this.container = container;
   }
   
   public async Task DoStuff(CancellationToken cancelllationToken)
   {
-    using var periodicTimer = scheduler.PeriodicTimer(doStuffDelay);
+    using var periodicTimer = timeProvider.CreatePeriodicTimer(doStuffDelay);
     
     while (await periodicTimer.WaitForNextTickAsync(cancellationToken))
     {      
-      await scheduler.Delay(TimeSpan.FromSeconds(1));
-      container.Add(scheduler.UtcNow);
+      await timeProvider.Delay(TimeSpan.FromSeconds(1));
+      container.Add(timeProvider.GetUtcNow());
     }
   }
 }
@@ -125,13 +128,13 @@ The test, using xUnit and FluentAssertions, could look like this:
 public void DoStuff_does_stuff_every_11_seconds()
 {
   // Arrange
-  var scheduler = new TestScheduler();
+  var timeProvider = new TestTimeProvider();
   var container = new List<DateTimeOffset>();  
-  var sut = new StuffServiceUsingTimeScheduler(scheduler, container);
+  var sut = new StuffServiceUsingTimeProvider(timeProvider, container);
   
   // Act
   _ = sut.DoStuff(CancellationToken.None);
-  scheduler.ForwardTime(TimeSpan.FromSeconds(11));
+  timeProvider.ForwardTime(TimeSpan.FromSeconds(11));
   
   // Assert
   container
@@ -139,7 +142,7 @@ public void DoStuff_does_stuff_every_11_seconds()
     .ContainSingle()
     .Which
     .Should()
-    .Be(scheduler.UtcNow);
+    .Be(timeProvider.GetUtcNow());
 }
 ```
 

@@ -10,7 +10,8 @@ namespace TimeScheduler;
 /// <remarks>
 /// Learn more at <see href="https://github.com/egil/TimeScheduler"/>.
 /// </remarks>
-public partial class DefaultScheduler : ITimeScheduler
+[Obsolete("Use System.TimeProvider instead. This will allow you to upgrade seamlessly the new TimeProvider API that is part of .NET 8 upon release.")]
+public partial class DefaultScheduler : TimeProvider, ITimeScheduler
 {
     /// <summary>
     /// Gets a singleton instance of the <see cref="DefaultScheduler"/>.
@@ -18,7 +19,12 @@ public partial class DefaultScheduler : ITimeScheduler
     public static DefaultScheduler Instance { get; } = new DefaultScheduler();
 
     /// <inheritdoc/>
+    [Obsolete("Use GetUtcNow() instead. This will allow you to upgrade seamlessly to TimeProvider that will be part of .NET 8.")]
     public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
+
+    /// <inheritdoc/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override DateTimeOffset GetUtcNow() => base.GetUtcNow();
 
     /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,5 +1,6 @@
 namespace TimeScheduler.Testing;
 
+[Obsolete] // marked obsolete to stop warnings related to SUT
 public class TestSchedulerTests
 {
     [Fact]
@@ -10,6 +11,6 @@ public class TestSchedulerTests
 
         sut.ForwardTime(TimeSpan.FromTicks(1));
 
-        sut.UtcNow.Should().Be(startTime + TimeSpan.FromTicks(1));
+        sut.GetUtcNow().Should().Be(startTime + TimeSpan.FromTicks(1));
     }
 }

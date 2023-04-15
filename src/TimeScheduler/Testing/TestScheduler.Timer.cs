@@ -1,16 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TimeScheduler.Testing;
 
 public partial class TestScheduler : ITimeScheduler, IDisposable
 {
     /// <inheritdoc/>
-    public ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+    public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
         => new TestTimer(callback, state, dueTime, period, this);
 
     private sealed class TestTimer : ITimer
@@ -99,7 +94,7 @@ public partial class TestScheduler : ITimeScheduler, IDisposable
         {
             running = true;
             owner.RegisterFutureAction(
-                owner.UtcNow + waitTime,
+                owner.GetUtcNow() + waitTime,
                 TimerElapsed,
                 () => { },
                 stopTimerCts.Token);

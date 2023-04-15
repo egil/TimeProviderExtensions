@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace TimeScheduler.Testing;
 
-public sealed partial class TestScheduler
+public partial class TestScheduler
 {
     internal readonly struct VoidTaskResult { }
 
@@ -62,7 +55,7 @@ public sealed partial class TestScheduler
         var tcs = new TaskCompletionSource();
 
         var timeoutAction = RegisterFutureAction(
-            UtcNow + timeout,
+            GetUtcNow() + timeout,
             () => tcs.TrySetException(new TimeoutException()),
             () => tcs.TrySetCanceled(cancellationToken),
             cancellationToken);
@@ -85,7 +78,7 @@ public sealed partial class TestScheduler
         var tcs = new TaskCompletionSource<TResult>();
 
         var timeoutAction = RegisterFutureAction(
-            UtcNow + timeout,
+            GetUtcNow() + timeout,
             () => tcs.TrySetException(new TimeoutException()),
             () => tcs.TrySetCanceled(cancellationToken),
             cancellationToken);

@@ -1,5 +1,3 @@
-using System;
-
 namespace TimeScheduler;
 
 /// <summary>
@@ -7,14 +5,26 @@ namespace TimeScheduler;
 /// that enables deterministic control of time during testing, and normal operation
 /// in production.
 /// </summary>
+[Obsolete("Use System.TimeProvider instead. This will allow you to upgrade seamlessly the new TimeProvider API that is part of .NET 8 upon release.")]
 public interface ITimeScheduler
 {
     /// <summary>
     /// Returns a DateTimeOffset representing the current date and time.
     /// The resolution of the returned value depends on the system timer.
-    /// Use this property as a replacement for <see cref="System.DateTimeOffset.UtcNow"/>.
+    /// Use this property as a replacement for <see cref="DateTimeOffset.UtcNow"/>.
     /// </summary>
+    [Obsolete("Use GetUtcNow() instead. This will allow you to upgrade seamlessly to TimeProvider that will be part of .NET 8.")]
     DateTimeOffset UtcNow { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DateTimeOffset"/> value whose date and time are set to the current
+    /// Coordinated Universal Time (UTC) date and time and whose offset is Zero,
+    /// all according to this <see cref="TimeProvider"/>'s notion of time.
+    /// </summary>
+    /// <remarks>
+    /// The default implementation returns <see cref="DateTimeOffset.UtcNow"/>.
+    /// </remarks>
+    public virtual DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow;
 
     /// <summary>
     /// Creates a Task that will complete after a time delay.
