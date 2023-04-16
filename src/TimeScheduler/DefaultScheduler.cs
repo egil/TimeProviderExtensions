@@ -10,7 +10,6 @@ namespace TimeScheduler;
 /// <remarks>
 /// Learn more at <see href="https://github.com/egil/TimeScheduler"/>.
 /// </remarks>
-[Obsolete("Use System.TimeProvider instead. This will allow you to upgrade seamlessly the new TimeProvider API that is part of .NET 8 upon release.")]
 public partial class DefaultScheduler : TimeProvider, ITimeScheduler
 {
     /// <summary>

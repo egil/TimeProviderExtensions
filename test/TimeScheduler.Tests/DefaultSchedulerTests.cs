@@ -1,6 +1,5 @@
 namespace TimeScheduler;
 
-[Obsolete] // marked obsolete to stop warnings related to SUT
 public class DefaultSchedulerTests
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;

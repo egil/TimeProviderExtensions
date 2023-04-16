@@ -2,7 +2,6 @@ using TimeScheduler.Testing;
 
 namespace TimeScheduler;
 
-[Obsolete] // marked obsolete to stop warnings related to SUT
 public class TestSchedulerCancelAfter
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;

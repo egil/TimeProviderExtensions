@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>    
     <Title>Scheduler</Title>
-    <Version>0.5.0</Version>
+    <Version>0.5.1</Version>
     <Company>Egil Hansen</Company>
     <Authors>Egil Hansen</Authors>
     <Description>

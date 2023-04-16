@@ -1,6 +1,5 @@
 namespace TimeScheduler.Testing;
 
-[Obsolete] // marked obsolete to stop warnings related to SUT
 public class TestSchedulerPeriodicTimerTests
 {    
     [Fact]
