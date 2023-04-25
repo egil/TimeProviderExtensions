@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace TimeScheduler.Testing;
 
-public partial class TestScheduler : ITimeScheduler, IDisposable
+public partial class TestScheduler : ITimeScheduler
 {
     /// <inheritdoc/>
     public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)

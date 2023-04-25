@@ -12,7 +12,7 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_throws_ArgumentOutOfRangeException(double timespanInMilliseconds)
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         var throws = () => sut.CancelAfter(cts, TimeSpan.FromMilliseconds(timespanInMilliseconds));
 
@@ -22,7 +22,7 @@ public class TestSchedulerCancelAfter
     [Fact]
     public void CancelAfter_throws_ArgumentNullException()
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         var throws = () => sut.CancelAfter(default!, TimeSpan.Zero);
 
@@ -33,7 +33,7 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_does_nothing_when_cts_already_canceled()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         cts.Cancel();
         sut.CancelAfter(cts, TimeSpan.Zero);
@@ -45,7 +45,7 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_does_nothing_when_delay_eq_zero()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         sut.CancelAfter(cts, TimeSpan.Zero);
 
@@ -56,7 +56,7 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_does_nothing_when_delay_infinite()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         sut.CancelAfter(cts, TimeSpan.FromMilliseconds(-1));
 
@@ -67,7 +67,7 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_cancels()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var delay = TimeSpan.FromMilliseconds(42);
 
         sut.CancelAfter(cts, delay);
@@ -80,7 +80,7 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_reschedule_longer_cancel()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var initialDelay = TimeSpan.FromMilliseconds(100);
         var rescheduledDelay = TimeSpan.FromMilliseconds(1000);
 
@@ -97,7 +97,7 @@ public class TestSchedulerCancelAfter
     public void CancelAfter_reschedule_shorter_cancel()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var initialDelay = TimeSpan.FromMilliseconds(1000);
         var rescheduledDelay = TimeSpan.FromMilliseconds(100);
 

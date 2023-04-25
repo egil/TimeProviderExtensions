@@ -7,7 +7,7 @@ public class TestSchedulerDelayTests
     {
         var startTime = DateTimeOffset.UtcNow;
         var future = TimeSpan.FromTicks(1);
-        using var sut = new TestScheduler(startTime);
+        var sut = new TestScheduler(startTime);
         var task = sut.Delay(TimeSpan.FromTicks(1));
 
         sut.ForwardTime(future);
@@ -19,7 +19,7 @@ public class TestSchedulerDelayTests
     public void Delayed_task_is_cancelled()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var task = sut.Delay(TimeSpan.FromTicks(1), cts.Token);
 
         cts.Cancel();

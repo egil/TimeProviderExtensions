@@ -1,6 +1,6 @@
 # Time Scheduler - a TimeProvider shim
 
-This is a shim for the upcoming `System.TimeProvider` API coming in .NET 8. It includes a test version of the `TimeProvider`, named `TestTimeProvider`, that allows you to control the progress of time during testing deterministically.
+This is a shim for the upcoming `System.TimeProvider` API coming in .NET 8. It includes a test version of the `TimeProvider`, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
 
 *NOTE: Originally, this library provided its own abstraction, `ITimeScheduler` and related types, `DefaultScheduler` and `TestScheduler`. These are now considered obsolete.*
 
@@ -17,9 +17,9 @@ Currently, the following .NET time-based APIs are supported:
 | `Task.WaitAsync(TimeSpan, TimeProvider, CancellationToken)` method | `Task.WaitAsync(TimeSpan, CancellationToken)` method |
 
 The implementations of `TimeProvider` is abstract. An instance of `TimeProvider` for production use is availalbe on the `TimeProvider.System` property,
-and `TestTimeProvider` can be used during testing.
+and `ManualTimeProvider` can be used during testing.
 
-During testing, you can move time forward by calling `ForwardTime(TimeSpan)` or `SetUtcNow(DateTimeOffset)` on `TestTimeProvider`. This allows
+During testing, you can move time forward by calling `ForwardTime(TimeSpan)` or `SetUtcNow(DateTimeOffset)` on `ManualTimeProvider`. This allows
 you to write tests that run fast and predictable, even if the system under test pauses execution for
 multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
 
@@ -56,7 +56,7 @@ public class MyService
 }
 ```
 
-This allows you to explicitly pass in an `TestTimeProvider` during testing.
+This allows you to explicitly pass in an `ManualTimeProvider` during testing.
 
 ## Example - control time during tests
 
@@ -65,7 +65,7 @@ it becomes hard to create tests that runs fast and predictably.
 
 The idea is to replace the use of e.g. `Task.Delay` with an abstraction, the `TimeProvider`, that in production
 is represented by the `TimeProvider.System`, that just uses the real `Task.Delay`. During testing it is now possible to
-pass in `TestTimeProvider`, that allows the test to control the progress of time, making it possible to skip ahead,
+pass in `ManualTimeProvider`, that allows the test to control the progress of time, making it possible to skip ahead,
 e.g. 10 minutes, and also pause time, leading to fast and predictable tests.
 
 As an example, lets test the "Stuff Service" below that performs a specific tasks every 10 second with an additional 
@@ -128,7 +128,7 @@ The test, using xUnit and FluentAssertions, could look like this:
 public void DoStuff_does_stuff_every_11_seconds()
 {
   // Arrange
-  var timeProvider = new TestTimeProvider();
+  var timeProvider = new ManualTimeProvider();
   var container = new List<DateTimeOffset>();  
   var sut = new StuffServiceUsingTimeProvider(timeProvider, container);
   

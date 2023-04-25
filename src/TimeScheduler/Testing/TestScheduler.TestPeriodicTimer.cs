@@ -1,6 +1,6 @@
 namespace TimeScheduler.Testing;
 
-public partial class TestScheduler : ITimeScheduler, IDisposable
+public partial class TestScheduler : ITimeScheduler
 {
     /// <inheritdoc/>
     public PeriodicTimer PeriodicTimer(TimeSpan period)

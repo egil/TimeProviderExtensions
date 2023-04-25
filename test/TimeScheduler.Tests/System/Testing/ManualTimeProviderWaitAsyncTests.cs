@@ -1,6 +1,6 @@
 namespace System.Testing;
 
-public class TestTimeProviderWaitAsyncTests
+public class ManualTimeProviderWaitAsyncTests
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     private readonly static TimeSpan DelayedTaskDelay = TimeSpan.FromMilliseconds(2);
@@ -17,8 +17,8 @@ public class TestTimeProviderWaitAsyncTests
         return StringTaskResult;
     }
 
-    public static TheoryData<Func<TestTimeProvider, Task>> NullTaskInvalidInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, Task>>
+    public static TheoryData<Func<ManualTimeProvider, Task>> NullTaskInvalidInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, Task>>
         {
             sut => default(Task)!.WaitAsync(TimeSpan.FromSeconds(1), sut),
             sut => default(Task)!.WaitAsync(TimeSpan.FromSeconds(1), sut, CancellationToken.None),
@@ -27,9 +27,9 @@ public class TestTimeProviderWaitAsyncTests
         };
 
     [Theory, MemberData(nameof(NullTaskInvalidInvocations))]
-    public async Task WaitAsync_task_input_validation(Func<TestTimeProvider, Task> invalidInvocation)
+    public async Task WaitAsync_task_input_validation(Func<ManualTimeProvider, Task> invalidInvocation)
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         await sut.Invoking(invalidInvocation)
             .Should()
@@ -37,8 +37,8 @@ public class TestTimeProviderWaitAsyncTests
             .WithParameterName("task");
     }
 
-    public static TheoryData<Func<TestTimeProvider, Task>> TimeoutInvalidInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, Task>>
+    public static TheoryData<Func<ManualTimeProvider, Task>> TimeoutInvalidInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, Task>>
         {
             sut => DelayedTask(sut).WaitAsync(TimeSpan.FromMilliseconds(-2), sut),
             sut => DelayedTask(sut).WaitAsync(TimeSpan.FromMilliseconds(-2), sut, CancellationToken.None),
@@ -51,9 +51,9 @@ public class TestTimeProviderWaitAsyncTests
         };
 
     [Theory, MemberData(nameof(TimeoutInvalidInvocations))]
-    public async Task WaitAsync_timeout_input_validation(Func<TestTimeProvider, Task> invalidInvocation)
+    public async Task WaitAsync_timeout_input_validation(Func<ManualTimeProvider, Task> invalidInvocation)
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         await sut.Invoking(invalidInvocation)
             .Should()
@@ -62,8 +62,8 @@ public class TestTimeProviderWaitAsyncTests
         //.WithParameterName("timeout"); 
     }
 
-    public static TheoryData<Func<TestTimeProvider, Task>> CompletedInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, Task>>
+    public static TheoryData<Func<ManualTimeProvider, Task>> CompletedInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, Task>>
         {
             sut => Task.CompletedTask.WaitAsync(TimeSpan.FromMilliseconds(1), sut),
             sut => Task.CompletedTask.WaitAsync(TimeSpan.FromMilliseconds(1), sut, CancellationToken.None),
@@ -72,34 +72,34 @@ public class TestTimeProviderWaitAsyncTests
         };
 
     [Theory, MemberData(nameof(CompletedInvocations))]
-    public void WaitAsync_completes_immediately_when_task_is_completed(Func<TestTimeProvider, Task> completedInvocation)
+    public void WaitAsync_completes_immediately_when_task_is_completed(Func<ManualTimeProvider, Task> completedInvocation)
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         var task = completedInvocation(sut);
 
         task.Should().CompletedSuccessfully();
     }
 
-    public static TheoryData<Func<TestTimeProvider, Task>> ImmediatelyCanceledInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, Task>>
+    public static TheoryData<Func<ManualTimeProvider, Task>> ImmediatelyCanceledInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, Task>>
         {
             sut => DelayedTask(sut).WaitAsync(TimeSpan.FromMilliseconds(1), sut,new CancellationToken(canceled: true)),
             sut => DelayedStringTask(sut).WaitAsync(TimeSpan.FromMilliseconds(1), sut,new CancellationToken(canceled: true)),
         };
 
     [Theory, MemberData(nameof(ImmediatelyCanceledInvocations))]
-    public void WaitAsync_canceled_immediately_when_cancellationToken_is_set(Func<TestTimeProvider, Task> canceledInvocation)
+    public void WaitAsync_canceled_immediately_when_cancellationToken_is_set(Func<ManualTimeProvider, Task> canceledInvocation)
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         var task = canceledInvocation(sut);
 
         task.Should().Canceled();
     }
 
-    public static TheoryData<Func<TestTimeProvider, Task>> ImmediateTimedoutInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, Task>>
+    public static TheoryData<Func<ManualTimeProvider, Task>> ImmediateTimedoutInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, Task>>
         {
             sut => DelayedTask(sut).WaitAsync(TimeSpan.Zero, sut),
             sut => DelayedTask(sut).WaitAsync(TimeSpan.Zero, sut, CancellationToken.None),
@@ -108,17 +108,17 @@ public class TestTimeProviderWaitAsyncTests
         };
 
     [Theory, MemberData(nameof(ImmediateTimedoutInvocations))]
-    public async Task WaitAsync_throws_immediately_when_timeout_is_zero(Func<TestTimeProvider, Task> immediateTimedoutInvocation)
+    public async Task WaitAsync_throws_immediately_when_timeout_is_zero(Func<ManualTimeProvider, Task> immediateTimedoutInvocation)
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         await sut.Invoking(immediateTimedoutInvocation)
             .Should()
             .ThrowExactlyAsync<TimeoutException>();
     }
 
-    public static TheoryData<Func<TestTimeProvider, Task>> ValidInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, Task>>
+    public static TheoryData<Func<ManualTimeProvider, Task>> ValidInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, Task>>
         {
             sut => DelayedTask(sut).WaitAsync(TimeSpan.FromSeconds(1), sut),
             sut => DelayedTask(sut).WaitAsync(TimeSpan.FromSeconds(1), sut, CancellationToken.None),
@@ -127,9 +127,9 @@ public class TestTimeProviderWaitAsyncTests
         };
 
     [Theory, MemberData(nameof(ValidInvocations))]
-    public async Task WaitAsync_completes_successfully(Func<TestTimeProvider, Task> validInvocation)
+    public async Task WaitAsync_completes_successfully(Func<ManualTimeProvider, Task> validInvocation)
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
         var task = validInvocation(sut);
 
         sut.ForwardTime(DelayedTaskDelay);
@@ -139,17 +139,17 @@ public class TestTimeProviderWaitAsyncTests
             .CompletedSuccessfullyAsync();
     }
 
-    public static TheoryData<Func<TestTimeProvider, Task<string>>> ValidStringInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, Task<string>>>
+    public static TheoryData<Func<ManualTimeProvider, Task<string>>> ValidStringInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, Task<string>>>
         {
             sut => DelayedStringTask(sut).WaitAsync(TimeSpan.FromSeconds(1), sut),
             sut => DelayedStringTask(sut).WaitAsync(TimeSpan.FromSeconds(1), sut, CancellationToken.None),
         };
 
     [Theory, MemberData(nameof(ValidStringInvocations))]
-    public async Task WaitAsync_of_T_completes_successfully(Func<TestTimeProvider, Task<string>> validInvocation)
+    public async Task WaitAsync_of_T_completes_successfully(Func<ManualTimeProvider, Task<string>> validInvocation)
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
         var task = validInvocation(sut);
 
         sut.ForwardTime(DelayedTaskDelay);
@@ -160,8 +160,8 @@ public class TestTimeProviderWaitAsyncTests
         task.Result.Should().Be(StringTaskResult);
     }
 
-    public static TheoryData<Func<TestTimeProvider, TimeSpan, Task>> TimedoutInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, TimeSpan, Task>>
+    public static TheoryData<Func<ManualTimeProvider, TimeSpan, Task>> TimedoutInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, TimeSpan, Task>>
         {
             (sut, timeout) => DelayedTask(sut).WaitAsync(timeout, sut),
             (sut, timeout) => DelayedTask(sut).WaitAsync(timeout, sut, CancellationToken.None),
@@ -170,9 +170,9 @@ public class TestTimeProviderWaitAsyncTests
         };
 
     [Theory, MemberData(nameof(TimedoutInvocations))]
-    public async Task WaitAsync_throws_when_timeout_is_reached(Func<TestTimeProvider, TimeSpan, Task> invocationWithTime)
+    public async Task WaitAsync_throws_when_timeout_is_reached(Func<ManualTimeProvider, TimeSpan, Task> invocationWithTime)
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
         var task = invocationWithTime(sut, TimeSpan.FromMilliseconds(1));
 
         sut.ForwardTime(TimeSpan.FromMilliseconds(1));
@@ -182,18 +182,18 @@ public class TestTimeProviderWaitAsyncTests
             .ThrowExactlyAsync<TimeoutException>();
     }
 
-    public static TheoryData<Func<TestTimeProvider, CancellationToken, Task>> CancelledInvocations { get; } =
-        new TheoryData<Func<TestTimeProvider, CancellationToken, Task>>
+    public static TheoryData<Func<ManualTimeProvider, CancellationToken, Task>> CancelledInvocations { get; } =
+        new TheoryData<Func<ManualTimeProvider, CancellationToken, Task>>
         {
             (sut, token) => DelayedTask(sut).WaitAsync(TimeSpan.FromMilliseconds(1), sut, token),
             (sut, token) => DelayedStringTask(sut).WaitAsync(TimeSpan.FromMilliseconds(1), sut, token),
         };
 
     [Theory, MemberData(nameof(CancelledInvocations))]
-    public async Task WaitAsync_throws_when_token_is_canceled(Func<TestTimeProvider, CancellationToken, Task> invocationWithCancelToken)
+    public async Task WaitAsync_throws_when_token_is_canceled(Func<ManualTimeProvider, CancellationToken, Task> invocationWithCancelToken)
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
         var task = invocationWithCancelToken(sut, cts.Token);
 
         cts.Cancel();

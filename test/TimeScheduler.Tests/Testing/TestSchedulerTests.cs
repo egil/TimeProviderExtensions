@@ -6,7 +6,7 @@ public class TestSchedulerTests
     public void ForwardTime_updates_UtcNow()
     {
         var startTime = DateTimeOffset.UtcNow;
-        using var sut = new TestScheduler(startTime);
+        var sut = new TestScheduler(startTime);
 
         sut.ForwardTime(TimeSpan.FromTicks(1));
 

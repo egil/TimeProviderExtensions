@@ -6,7 +6,7 @@ public class TestSchedulerPeriodicTimerTests
     public void PeriodicTimer_WaitForNextTickAsync_cancelled_immediately()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         using var periodicTimer = sut.PeriodicTimer(TimeSpan.FromTicks(1));
 
         cts.Cancel();
@@ -18,7 +18,7 @@ public class TestSchedulerPeriodicTimerTests
     [Fact]
     public async Task PeriodicTimer_WaitForNextTickAsync_complete_immediately()
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         using var periodicTimer = sut.PeriodicTimer(TimeSpan.FromTicks(1));
 
         sut.ForwardTime(TimeSpan.FromTicks(1));
@@ -32,7 +32,7 @@ public class TestSchedulerPeriodicTimerTests
     {
         var startTime = DateTimeOffset.UtcNow;
         var future = TimeSpan.FromTicks(1);
-        using var sut = new TestScheduler(startTime);
+        var sut = new TestScheduler(startTime);
         using var periodicTimer = sut.PeriodicTimer(TimeSpan.FromTicks(1));
         var task = periodicTimer.WaitForNextTickAsync();
 
@@ -45,7 +45,7 @@ public class TestSchedulerPeriodicTimerTests
     public async Task PeriodicTimer_WaitForNextTickAsync_completes_after_dispose()
     {
         var startTime = DateTimeOffset.UtcNow;
-        using var sut = new TestScheduler(startTime);
+        var sut = new TestScheduler(startTime);
         var periodicTimer = sut.PeriodicTimer(TimeSpan.FromTicks(1));
         var task = periodicTimer.WaitForNextTickAsync();
 
@@ -58,7 +58,7 @@ public class TestSchedulerPeriodicTimerTests
     public async Task PeriodicTimer_WaitForNextTickAsync_cancelled_with_exception()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         using var periodicTimer = sut.PeriodicTimer(TimeSpan.FromTicks(1));
         var task = periodicTimer.WaitForNextTickAsync(cts.Token);
         cts.CancelAfter(TimeSpan.Zero);
@@ -73,23 +73,75 @@ public class TestSchedulerPeriodicTimerTests
     [Fact]
     public void PeriodicTimer_WaitForNextTickAsync_completes_multiple()
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var calledTimes = 0;
-        var looper = WaitForNextTickInLoop(sut, () => calledTimes++);
+        var interval = TimeSpan.FromSeconds(1);
+        var looper = WaitForNextTickInLoop(sut, () => calledTimes++, interval);
 
-        sut.ForwardTime(TimeSpan.FromSeconds(1));
+        sut.ForwardTime(interval);
         calledTimes.Should().Be(1);
 
-        sut.ForwardTime(TimeSpan.FromSeconds(1));
+        sut.ForwardTime(interval);
         calledTimes.Should().Be(2);
+    }
 
-        static async Task WaitForNextTickInLoop(ITimeScheduler scheduler, Action callback)
+    [Fact]
+    public void PeriodicTimer_WaitForNextTickAsync_completes_multiple_single_forward()
+    {
+        var sut = new TestScheduler();
+        var calledTimes = 0;
+        var interval = TimeSpan.FromSeconds(1);
+        var looper = WaitForNextTickInLoop(sut, () => calledTimes++, interval);
+
+        sut.ForwardTime(interval * 3);
+        calledTimes.Should().Be(3);
+    }
+
+    [Fact]
+    public async void PeriodicTimer_WaitForNextTickAsync_exists_on_timer_Dispose()
+    {
+        var sut = new TestScheduler();
+        var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromSeconds(1));
+        var disposeTask = WaitForNextTickToReturnFalse(periodicTimer);
+        sut.ForwardTime(TimeSpan.FromSeconds(1));
+
+        periodicTimer.Dispose();
+
+        (await disposeTask).Should().BeFalse();
+
+        static async Task<bool> WaitForNextTickToReturnFalse(PeriodicTimer periodicTimer)
         {
-            using var periodicTimer = scheduler.PeriodicTimer(TimeSpan.FromSeconds(1));
             while (await periodicTimer.WaitForNextTickAsync(CancellationToken.None))
             {
-                callback();
             }
+
+            return false;
+        }
+    }
+
+    [Fact]
+    public void GetUtcNow_matches_time_when_WaitForNextTickAsync_is_invoked()
+    {
+        var sut = new TestScheduler();
+        var startTime = sut.GetUtcNow();
+        var callbackTimes = new List<DateTimeOffset>();
+        var interval = TimeSpan.FromSeconds(5);
+        var looper = WaitForNextTickInLoop(sut, () => callbackTimes.Add(sut.GetUtcNow()), interval);
+
+        sut.ForwardTime(interval * 3);
+
+        callbackTimes.Should().Equal(
+            startTime + interval * 1,
+            startTime + interval * 2,
+            startTime + interval * 3);
+    }
+
+    static async Task WaitForNextTickInLoop(TimeProvider scheduler, Action callback, TimeSpan interval)
+    {
+        using var periodicTimer = scheduler.CreatePeriodicTimer(interval);
+        while (await periodicTimer.WaitForNextTickAsync(CancellationToken.None))
+        {
+            callback();
         }
     }
 }

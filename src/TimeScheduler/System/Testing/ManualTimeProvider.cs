@@ -10,27 +10,25 @@ namespace System.Testing;
 /// <remarks>
 /// Learn more at <see href="https://github.com/egil/TimeScheduler"/>.
 /// </remarks>
-public sealed class TestTimeProvider : TimeProvider, IDisposable
+public sealed class ManualTimeProvider : TimeProvider
 {
-    #pragma warning disable CS0618 // Type or member is obsolete
     private readonly TestScheduler testScheduler;
-    #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
-    /// Creates an instance of the <see cref="TestTimeProvider"/> with
+    /// Creates an instance of the <see cref="ManualTimeProvider"/> with
     /// <see cref="DateTimeOffset.UtcNow"/> being the initial value returned by <see cref="GetUtcNow()"/>.
     /// </summary>
-    public TestTimeProvider()
+    public ManualTimeProvider()
         : this(DateTimeOffset.UtcNow)
     {
     }
 
     /// <summary>
-    /// Creates an instance of the <see cref="TestTimeProvider"/> with
+    /// Creates an instance of the <see cref="ManualTimeProvider"/> with
     /// <paramref name="startDateTime"/> being the initial value returned by <see cref="GetUtcNow()"/>.
     /// </summary>
     /// <param name="startDateTime">The initial date and time <see cref="GetUtcNow()"/> will return.</param>
-    public TestTimeProvider(DateTimeOffset startDateTime)
+    public ManualTimeProvider(DateTimeOffset startDateTime)
     {
         testScheduler = new(startDateTime);
     }
@@ -57,7 +55,7 @@ public sealed class TestTimeProvider : TimeProvider, IDisposable
     /// <summary>
     /// Gets a <see cref="DateTimeOffset"/> value whose date and time are set to the current
     /// Coordinated Universal Time (UTC) date and time and whose offset is Zero,
-    /// all according to this <see cref="TestTimeProvider"/>'s notion of time.
+    /// all according to this <see cref="ManualTimeProvider"/>'s notion of time.
     /// </summary>
     /// <remarks>
     /// To advance time, call <see cref="ForwardTime(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/>.
@@ -119,10 +117,4 @@ public sealed class TestTimeProvider : TimeProvider, IDisposable
     /// <param name="time">The span of time to forward <see cref="GetUtcNow()"/> with.</param>
     /// <exception cref="ArgumentException">If <paramref name="time"/> is negative or zero.</exception>
     public void ForwardTime(TimeSpan time) => testScheduler.ForwardTime(time);
-
-    /// <summary>
-    /// Disposing will cancel all scheduled work items/tasks that are waiting
-    /// for time to be forwarded.
-    /// </summary>
-    public void Dispose() => testScheduler.Dispose();
 }

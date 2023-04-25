@@ -4,14 +4,14 @@ using System.Runtime.CompilerServices;
 namespace TimeScheduler.Testing;
 
 /// <summary>
-/// Represents a test implementation of a <see cref="ITimeScheduler"/>,
+/// Represents a test implementation of a <see cref="TimeProvider"/>,
 /// where time stands still until a call to <see cref="ForwardTime(TimeSpan)"/>
 /// is called.
 /// </summary>
 /// <remarks>
 /// Learn more at <see href="https://github.com/egil/TimeScheduler"/>.
 /// </remarks>
-public partial class TestScheduler : TimeProvider, ITimeScheduler, IDisposable
+public partial class TestScheduler : TimeProvider, ITimeScheduler
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     internal const uint UnsignedInfinite = unchecked((uint)-1);
@@ -74,8 +74,7 @@ public partial class TestScheduler : TimeProvider, ITimeScheduler, IDisposable
             throw new ArgumentException("The new UtcNow must be greater than or equal to the current UtcNow.", nameof(newUtcNew));
         }
 
-        utcNow = newUtcNew;
-        CompleteDelayedTasks();
+        CompleteDelayedTasks(newUtcNew);
     }
 
     /// <summary>
@@ -96,20 +95,9 @@ public partial class TestScheduler : TimeProvider, ITimeScheduler, IDisposable
     }
 
     /// <summary>
-    /// Disposing will cancel all scheduled work items/tasks that are waiting
-    /// for time to be forwarded.
+    /// Clean up any future actions waiting to run.
     /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Disposing the scheduler will cancel all scheduled tasks that are waiting
-    /// for time to be forwarded.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
+    ~TestScheduler()
     {
         if (isDisposed) return;
         isDisposed = true;
@@ -124,18 +112,28 @@ public partial class TestScheduler : TimeProvider, ITimeScheduler, IDisposable
         futureActions.Clear();
     }
 
-    private void CompleteDelayedTasks()
+    private void CompleteDelayedTasks(DateTimeOffset targetUtcNow)
     {
-        var tasksToComplete = futureActions
-            .Keys
-            .Where(x => x.CompletionTime <= utcNow)
-            .OrderBy(x => x.CompletionTime);
-
-        foreach (var delayedAction in tasksToComplete)
+        while (utcNow < targetUtcNow)
         {
-            futureActions.TryRemove(delayedAction, out var _);
-            delayedAction.Complete();
+            var futureAction = futureActions
+                .Keys
+                .Where(x => x.CompletionTime <= targetUtcNow)
+                .OrderBy(x => x.CompletionTime)
+                .FirstOrDefault();
+
+            if (futureAction is null)
+            {
+                break;
+            }
+
+            utcNow = futureAction.CompletionTime;
+
+            futureActions.TryRemove(futureAction, out var _);
+            futureAction.Complete();
         }
+
+        utcNow = targetUtcNow;
     }
 
     private FutureAction RegisterFutureAction(

@@ -1,13 +1,11 @@
-using System;
-using Xunit;
 namespace System.Testing;
 
-public class TestTimeProviderTimestampTests
+public class ManualTimeProviderTimestampTests
 {
     [Fact]
     public void TimestampFrequency_ten_mill()
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         sut.TimestampFrequency.Should().Be(10_000_000);
     }
@@ -15,7 +13,7 @@ public class TestTimeProviderTimestampTests
     [Fact]
     public void GetTimestamp_increments_by_ticks()
     {
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
         var timestamp = sut.GetTimestamp();
 
         sut.ForwardTime(TimeSpan.FromTicks(1));

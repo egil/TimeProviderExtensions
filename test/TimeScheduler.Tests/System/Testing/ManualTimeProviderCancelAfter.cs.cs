@@ -1,6 +1,6 @@
 namespace System.Testing;
 
-public class TestTimeProviderCancelAfter
+public class ManualTimeProviderCancelAfter
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
 
@@ -10,7 +10,7 @@ public class TestTimeProviderCancelAfter
     public void CancelAfter_throws_ArgumentOutOfRangeException(double timespanInMilliseconds)
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         var throws = () => cts.CancelAfter(TimeSpan.FromMilliseconds(timespanInMilliseconds), sut);
 
@@ -22,7 +22,7 @@ public class TestTimeProviderCancelAfter
     {
         using var cts = new CancellationTokenSource();
 
-        var throws = () => cts.CancelAfter(TimeSpan.Zero, default(TestTimeProvider)!);
+        var throws = () => cts.CancelAfter(TimeSpan.Zero, default(ManualTimeProvider)!);
 
         throws.Should().ThrowExactly<ArgumentNullException>();
     }
@@ -31,7 +31,7 @@ public class TestTimeProviderCancelAfter
     public void CancelAfter_does_nothing_when_cts_already_canceled()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         cts.Cancel();
         cts.CancelAfter(TimeSpan.Zero, sut);
@@ -43,7 +43,7 @@ public class TestTimeProviderCancelAfter
     public void CancelAfter_does_nothing_when_delay_eq_zero()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         cts.CancelAfter(TimeSpan.Zero, sut);
 
@@ -54,7 +54,7 @@ public class TestTimeProviderCancelAfter
     public void CancelAfter_does_nothing_when_delay_infinite()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
 
         cts.CancelAfter(TimeSpan.FromMilliseconds(-1), sut);
 
@@ -65,7 +65,7 @@ public class TestTimeProviderCancelAfter
     public void CancelAfter_cancels()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
         var delay = TimeSpan.FromMilliseconds(42);
 
         cts.CancelAfter(delay, sut);
@@ -78,7 +78,7 @@ public class TestTimeProviderCancelAfter
     public void CancelAfter_reschedule_longer_cancel()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
         var initialDelay = TimeSpan.FromMilliseconds(100);
         var rescheduledDelay = TimeSpan.FromMilliseconds(1000);
 
@@ -95,7 +95,7 @@ public class TestTimeProviderCancelAfter
     public void CancelAfter_reschedule_shorter_cancel()
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestTimeProvider();
+        var sut = new ManualTimeProvider();
         var initialDelay = TimeSpan.FromMilliseconds(1000);
         var rescheduledDelay = TimeSpan.FromMilliseconds(100);
 

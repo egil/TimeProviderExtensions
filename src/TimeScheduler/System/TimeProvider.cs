@@ -3,7 +3,6 @@
 // Originally copied from: https://github.com/dotnet/runtime/blob/2d9cb2d33f6f89f0a1a01782f2e474051bb2894a/src/libraries/Common/src/System/TimeProvider.cs
 
 using System.Diagnostics;
-using TimeScheduler;
 
 namespace System;
 

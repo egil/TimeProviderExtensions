@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0]
+
+- Changed `TestTimeProvider` to `ManualTimeProvider`.
+- `ManualTimeProvider` no longer implements on `IDisposable`.
+- Moving time forward using `ManualTimeProvider` will now move time forward in steps, stopping at each scheduled timer/callback time, set the internal "UtcNow" clock returned from `GetUtcNow()` invoke the callback, and then progress to the next scheduled timer, until the target "UtcNow" is reached.
+
 ## [0.5.0]
 
 - Implemented a shim for the TimeProvider API coming in .NET 8.

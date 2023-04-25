@@ -29,7 +29,7 @@ public class TestSchedulerWaitAsyncTests
     [Theory, MemberData(nameof(NullTaskInvalidInvocations))]
     public async Task WaitAsync_task_input_validation(Func<TestScheduler, Task> invalidInvocation)
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         await sut.Invoking(invalidInvocation)
             .Should()
@@ -53,7 +53,7 @@ public class TestSchedulerWaitAsyncTests
     [Theory, MemberData(nameof(TimeoutInvalidInvocations))]
     public async Task WaitAsync_timeout_input_validation(Func<TestScheduler, Task> invalidInvocation)
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         await sut.Invoking(invalidInvocation)
             .Should()
@@ -73,7 +73,7 @@ public class TestSchedulerWaitAsyncTests
     [Theory, MemberData(nameof(CompletedInvocations))]
     public void WaitAsync_completes_immediately_when_task_is_completed(Func<TestScheduler, Task> completedInvocation)
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         var task = completedInvocation(sut);
 
@@ -90,7 +90,7 @@ public class TestSchedulerWaitAsyncTests
     [Theory, MemberData(nameof(ImmediatelyCanceledInvocations))]
     public void WaitAsync_canceled_immediately_when_cancellationToken_is_set(Func<TestScheduler, Task> canceledInvocation)
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         var task = canceledInvocation(sut);
 
@@ -109,7 +109,7 @@ public class TestSchedulerWaitAsyncTests
     [Theory, MemberData(nameof(ImmediateTimedoutInvocations))]
     public async Task WaitAsync_throws_immediately_when_timeout_is_zero(Func<TestScheduler, Task> immediateTimedoutInvocation)
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
 
         await sut.Invoking(immediateTimedoutInvocation)
             .Should()
@@ -129,7 +129,7 @@ public class TestSchedulerWaitAsyncTests
     [Theory, MemberData(nameof(ValidInvocations))]
     public async Task WaitAsync_completes_successfully(Func<TestScheduler, Task> validInvocation)
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var task = validInvocation(sut);
 
         sut.ForwardTime(DelayedTaskDelay);
@@ -149,7 +149,7 @@ public class TestSchedulerWaitAsyncTests
     [Theory, MemberData(nameof(ValidStringInvocations))]
     public async Task WaitAsync_of_T_completes_successfully(Func<TestScheduler, Task<string>> validInvocation)
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var task = validInvocation(sut);
 
         sut.ForwardTime(DelayedTaskDelay);
@@ -172,7 +172,7 @@ public class TestSchedulerWaitAsyncTests
     [Theory, MemberData(nameof(TimedoutInvocations))]
     public async Task WaitAsync_throws_when_timeout_is_reached(Func<TestScheduler, TimeSpan, Task> invocationWithTime)
     {
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var task = invocationWithTime(sut, TimeSpan.FromMilliseconds(1));
 
         sut.ForwardTime(TimeSpan.FromMilliseconds(1));
@@ -193,7 +193,7 @@ public class TestSchedulerWaitAsyncTests
     public async Task WaitAsync_throws_when_token_is_canceled(Func<TestScheduler, CancellationToken, Task> invocationWithCancelToken)
     {
         using var cts = new CancellationTokenSource();
-        using var sut = new TestScheduler();
+        var sut = new TestScheduler();
         var task = invocationWithCancelToken(sut, cts.Token);
 
         cts.Cancel();

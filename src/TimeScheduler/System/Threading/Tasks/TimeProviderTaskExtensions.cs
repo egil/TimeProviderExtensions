@@ -16,14 +16,22 @@ public static class TimeProviderTaskExtensions
 {
     private sealed class DelayState : TaskCompletionSource<bool>
     {
-        public DelayState() : base(TaskCreationOptions.RunContinuationsAsynchronously) { }
+        // The original code passed TaskCreationOptions.RunContinuationsAsynchronously to the base constructor,
+        // that has been removed for testing purposes since running code asynchronously makes testing more difficult.
+        // When continuations are invoked synchronously, the test code can be written in a more linear fashion,
+        // without having to add an `Task.Delay(1)` after a call to `ForwardTime` to ensure that the continuation.
+        public DelayState() : base() { }
         public ITimer Timer { get; set; }
         public CancellationTokenRegistration Registration { get; set; }
     }
 
     private sealed class WaitAsyncState : TaskCompletionSource<bool>
     {
-        public WaitAsyncState() : base(TaskCreationOptions.RunContinuationsAsynchronously) { }
+        // The original code passed TaskCreationOptions.RunContinuationsAsynchronously to the base constructor,
+        // that has been removed for testing purposes since running code asynchronously makes testing more difficult.
+        // When continuations are invoked synchronously, the test code can be written in a more linear fashion,
+        // without having to add an `Task.Delay(1)` after a call to `ForwardTime` to ensure that the continuation.
+        public WaitAsyncState() : base() { }
         public readonly CancellationTokenSource ContinuationCancellation = new CancellationTokenSource();
         public CancellationTokenRegistration Registration;
         public ITimer? Timer;

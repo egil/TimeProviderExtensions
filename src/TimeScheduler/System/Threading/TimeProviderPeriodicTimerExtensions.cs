@@ -1,6 +1,5 @@
 using System.Testing;
 using TimeScheduler;
-using TimeScheduler.Testing;
 
 namespace System.Threading;
 

@@ -1,12 +1,12 @@
 namespace System.Testing;
 
-public class TestTimeProviderTests
+public class ManualTimeProviderTests
 {
     [Fact]
     public void ForwardTime_updates_UtcNow()
     {
         var startTime = DateTimeOffset.UtcNow;
-        using var sut = new TestTimeProvider(startTime);
+        var sut = new ManualTimeProvider(startTime);
 
         sut.ForwardTime(TimeSpan.FromTicks(1));
 
@@ -17,7 +17,7 @@ public class TestTimeProviderTests
     public void SetUtcNow_updates_UtcNow()
     {
         var startTime = DateTimeOffset.UtcNow;
-        using var sut = new TestTimeProvider(startTime);
+        var sut = new ManualTimeProvider(startTime);
 
         sut.SetUtcNow(startTime + TimeSpan.FromTicks(1));
 
