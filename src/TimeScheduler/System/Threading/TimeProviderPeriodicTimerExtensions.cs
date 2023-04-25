@@ -1,3 +1,4 @@
+#if NET6_0_OR_GREATER
 using System.Testing;
 using TimeScheduler;
 
@@ -30,3 +31,4 @@ public static class TimeProviderPeriodicTimerExtensions
         return new TestPeriodicTimer(period, timeProvider);
     }
 }
+#endif

@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>    
+    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <Title>Scheduler</Title>
-    <Version>0.6.0</Version>
+    <Version>0.7.0</Version>
     <Company>Egil Hansen</Company>
     <Authors>Egil Hansen</Authors>
     <Description>
       This is a shim for the upcoming `System.TimeProvider` API coming in .NET 8. It includes a test version of the `TimeProvider`, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
-      
+
       **NOTE:** Originally, this library provided its own abstraction, `ITimeScheduler` and related types, `DefaultScheduler` and `TestScheduler`. These are now considered obsolete.
     </Description>
     <Copyright>Egil Hansen</Copyright>
@@ -16,7 +16,7 @@
     <PackageProjectUrl>https://github.com/egil/TimeScheduler</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/egil/TimeScheduler</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>    
+    <RepositoryType>git</RepositoryType>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReleaseNotes>Release notes: https://github.com/egil/TimeScheduler/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -27,11 +27,11 @@
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
-  
+
   <PropertyGroup Label="Compile settings">
     <Deterministic>true</Deterministic>
     <Nullable>enable</Nullable>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
@@ -51,6 +51,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
   <ItemGroup>

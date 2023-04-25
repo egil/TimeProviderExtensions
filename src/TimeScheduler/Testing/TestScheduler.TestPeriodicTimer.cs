@@ -1,3 +1,4 @@
+#if NET6_0_OR_GREATER
 namespace TimeScheduler.Testing;
 
 public partial class TestScheduler : ITimeScheduler
@@ -76,3 +77,4 @@ public partial class TestScheduler : ITimeScheduler
         }
     }
 }
+#endif

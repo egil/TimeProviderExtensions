@@ -23,7 +23,7 @@ public interface ITimeScheduler
     /// <remarks>
     /// The default implementation returns <see cref="DateTimeOffset.UtcNow"/>.
     /// </remarks>
-    public virtual DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow;
+    DateTimeOffset GetUtcNow();
 
     /// <summary>
     /// Creates a Task that will complete after a time delay.
@@ -60,6 +60,7 @@ public interface ITimeScheduler
     /// </remarks>
     Task Delay(TimeSpan delay, CancellationToken cancellationToken);
 
+#if NET6_0_OR_GREATER
     /// <summary>
     /// Factory method that creates a periodic timer that enables waiting asynchronously for timer ticks.
     /// Use this factory method as a replacement for instantiating a <see cref="System.Threading.PeriodicTimer"/>.
@@ -115,6 +116,7 @@ public interface ITimeScheduler
     /// <exception cref="ArgumentNullException">The <paramref name="task"/> is null.</exception>
     /// <returns>The <see cref="Task{TResult}"/> representing the asynchronous wait. It may or may not be the same instance as the current instance.</returns>
     Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout, CancellationToken cancellationToken);
+#endif
 
     /// <summary>
     /// Schedules a Cancel operation on the <paramref name="cancellationTokenSource"/>.

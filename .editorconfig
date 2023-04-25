@@ -235,3 +235,4 @@ dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
 [*.{cs,vb}]
 dotnet_diagnostic.CA1014.severity = none
+dotnet_diagnostic.CA1510.severity = none # disabled because we are multi targeting frameworks that does not have ANE.ThrowIfNull

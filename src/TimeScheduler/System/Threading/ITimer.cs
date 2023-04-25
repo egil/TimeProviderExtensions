@@ -1,11 +1,22 @@
 namespace System.Threading;
 
+#if NET6_0_OR_GREATER
 /// <summary>Represents a timer that can have its due time and period changed.</summary>
 /// <remarks>
 /// Implementations of <see cref="Change"/>, <see cref="IDisposable.Dispose"/>, and <see cref="IAsyncDisposable.DisposeAsync"/>
 /// must all be thread-safe such that the timer instance may be accessed concurrently from multiple threads.
 /// </remarks>
-public interface ITimer : IDisposable, IAsyncDisposable
+#else
+/// <summary>Represents a timer that can have its due time and period changed.</summary>
+/// <remarks>
+/// Implementations of <see cref="Change"/> and <see cref="IDisposable.Dispose"/>
+/// must all be thread-safe such that the timer instance may be accessed concurrently from multiple threads.
+/// </remarks>
+#endif
+public interface ITimer : IDisposable
+#if NET6_0_OR_GREATER
+    , IAsyncDisposable
+#endif
 {
     /// <summary>Changes the start time and the interval between method invocations for a timer, using <see cref="TimeSpan"/> values to measure time intervals.</summary>
     /// <param name="dueTime">

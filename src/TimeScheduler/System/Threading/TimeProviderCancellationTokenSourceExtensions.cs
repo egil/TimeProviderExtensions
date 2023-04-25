@@ -42,8 +42,15 @@ public static class TimeProviderCancellationTokenSourceExtensions
     /// </remarks>
     public static void CancelAfter(this CancellationTokenSource cancellationTokenSource, TimeSpan delay, TimeProvider timeProvider)
     {
-        ArgumentNullException.ThrowIfNull(cancellationTokenSource);
-        ArgumentNullException.ThrowIfNull(timeProvider);
+        if (cancellationTokenSource is null)
+        {
+            throw new ArgumentNullException(nameof(cancellationTokenSource));
+        }
+
+        if (timeProvider is null)
+        {
+            throw new ArgumentNullException(nameof(timeProvider));
+        }
 
         if (timeProvider == TimeProvider.System)
         {

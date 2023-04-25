@@ -139,7 +139,11 @@ public abstract class TimeProvider
     /// </remarks>
     public virtual ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
     {
-        ArgumentNullException.ThrowIfNull(callback);
+        if (callback is null)
+        {
+            throw new ArgumentNullException(nameof(callback));
+        }
+
         return new TimerWrapper(callback, state, dueTime, period);
     }
 
@@ -156,7 +160,9 @@ public abstract class TimeProvider
 
         public void Dispose() => timer.Dispose();
 
+#if NET6_0_OR_GREATER
         public ValueTask DisposeAsync() => timer.DisposeAsync();
+#endif
     }
 
     /// <summary>

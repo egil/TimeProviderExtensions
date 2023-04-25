@@ -1,3 +1,4 @@
+#if NET6_0_OR_GREATER
 namespace System.Testing;
 
 internal sealed class TestPeriodicTimer : TimeScheduler.PeriodicTimer
@@ -62,3 +63,4 @@ internal sealed class TestPeriodicTimer : TimeScheduler.PeriodicTimer
         base.Dispose(disposing);
     }
 }
+#endif

@@ -28,6 +28,7 @@ public class DefaultSchedulerTests
             precision: TimeSpan.FromMilliseconds(50));
     }
 
+#if NET6_0_OR_GREATER
     [Fact]
     public async Task PeriodicTimer()
     {
@@ -197,6 +198,7 @@ public class DefaultSchedulerTests
             return string.Empty;
         }
     }
+#endif
 
     [Fact]
     public void CancelAfter_throws_ObjectDisposedException()
@@ -270,7 +272,7 @@ public class DefaultSchedulerTests
         sut.CancelAfter(cts, delay2);
 
         // add extra buffer to ensure cancellation has been processed
-        await sut.Delay(delay2 * 2);
+        await sut.Delay(delay2 + delay2);
         cts.IsCancellationRequested.Should().BeTrue();
     }  
 }

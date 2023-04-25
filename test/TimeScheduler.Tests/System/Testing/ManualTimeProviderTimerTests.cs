@@ -123,11 +123,11 @@ public class ManualTimeProviderTimerTests
         var interval = TimeSpan.FromSeconds(3);
         using var timer = sut.CreateTimer(_ => callbackTimes.Add(sut.GetUtcNow()), null, interval, interval);
 
-        sut.ForwardTime(interval * 3);
+        sut.ForwardTime(interval + interval + interval);
 
         callbackTimes.Should().Equal(
-            startTime + interval * 1,
-            startTime + interval * 2,
-            startTime + interval * 3);
+            startTime + interval,
+            startTime + interval + interval,
+            startTime + interval + interval + interval);
     }
 }

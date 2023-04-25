@@ -5,7 +5,11 @@ public partial class TestScheduler
     /// <inheritdoc/>
     public void CancelAfter(CancellationTokenSource cancellationTokenSource, TimeSpan delay)
     {
-        ArgumentNullException.ThrowIfNull(cancellationTokenSource);
+        if (cancellationTokenSource is null)
+        {
+            throw new ArgumentNullException(nameof(cancellationTokenSource));
+        }
+
         ThrowIfInvalidUnspportedTimespan(delay);
 
         if (cancellationTokenSource.IsCancellationRequested || delay.TotalMilliseconds == UnsignedInfinite)

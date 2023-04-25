@@ -102,7 +102,9 @@ public partial class TestScheduler : TimeProvider, ITimeScheduler
         if (isDisposed) return;
         isDisposed = true;
 
+#if NET6_0_OR_GREATER
         attachedFutureActions.Clear();
+#endif
 
         foreach (var futureAction in futureActions.Keys)
         {
@@ -179,7 +181,15 @@ public partial class TestScheduler : TimeProvider, ITimeScheduler
                 cancel,
                 cleanupToken);
 
+#if NET6_0_OR_GREATER
             attachedFutureActions.AddOrUpdate(owner, futureAction);
+#else            
+            if (attachedFutureActions.TryGetValue(owner, out _))
+            {
+                attachedFutureActions.Remove(owner);
+            }
+            attachedFutureActions.Add(owner, futureAction);
+#endif
 
             return futureAction;
         }
@@ -224,11 +234,19 @@ public partial class TestScheduler : TimeProvider, ITimeScheduler
             this.cancel = cancel;
             this.cleanup = cleanup;
 
+#if NET6_0_OR_GREATER
             registration = cancellationToken.UnsafeRegister(static (state, token) =>
             {
                 var futureAction = (FutureAction)state!;
                 futureAction.Cancel();
             }, this);
+#else
+            registration = cancellationToken.Register(static (state) =>
+            {
+                var futureAction = (FutureAction)state!;
+                futureAction.Cancel();
+            }, this);
+#endif
         }
 
         public void Complete()

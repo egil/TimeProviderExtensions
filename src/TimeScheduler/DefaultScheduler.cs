@@ -29,7 +29,11 @@ public partial class DefaultScheduler : TimeProvider, ITimeScheduler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void CancelAfter(CancellationTokenSource cancellationTokenSource, TimeSpan delay)
     {
-        ArgumentNullException.ThrowIfNull(cancellationTokenSource);
+        if (cancellationTokenSource is null)
+        {
+            throw new ArgumentNullException(nameof(cancellationTokenSource));
+        }
+
         cancellationTokenSource.CancelAfter(delay);
     }
 
@@ -43,6 +47,7 @@ public partial class DefaultScheduler : TimeProvider, ITimeScheduler
     public Task Delay(TimeSpan delay, CancellationToken cancellationToken)
         => Task.Delay(delay, cancellationToken);
 
+#if NET6_0_OR_GREATER
     /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public PeriodicTimer PeriodicTimer(TimeSpan period)
@@ -52,7 +57,11 @@ public partial class DefaultScheduler : TimeProvider, ITimeScheduler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task WaitAsync(Task task, TimeSpan timeout)
     {
-        ArgumentNullException.ThrowIfNull(task);
+        if (task is null)
+        {
+            throw new ArgumentNullException(nameof(task));
+        }
+
         return task.WaitAsync(timeout);
     }
 
@@ -60,7 +69,11 @@ public partial class DefaultScheduler : TimeProvider, ITimeScheduler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task WaitAsync(Task task, TimeSpan timeout, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(task);
+        if (task is null)
+        {
+            throw new ArgumentNullException(nameof(task));
+        }
+
         return task.WaitAsync(timeout, cancellationToken);
     }
 
@@ -68,7 +81,11 @@ public partial class DefaultScheduler : TimeProvider, ITimeScheduler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout)
     {
-        ArgumentNullException.ThrowIfNull(task);
+        if (task is null)
+        {
+            throw new ArgumentNullException(nameof(task));
+        }
+
         return task.WaitAsync(timeout);
     }
 
@@ -76,7 +93,12 @@ public partial class DefaultScheduler : TimeProvider, ITimeScheduler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Task<TResult> WaitAsync<TResult>(Task<TResult> task, TimeSpan timeout, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(task);
+        if (task is null)
+        {
+            throw new ArgumentNullException(nameof(task));
+        }
+
         return task.WaitAsync(timeout, cancellationToken);
     }
+#endif
 }

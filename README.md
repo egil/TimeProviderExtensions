@@ -1,6 +1,6 @@
 # Time Scheduler - a TimeProvider shim
 
-This is a shim for the upcoming `System.TimeProvider` API coming in .NET 8. It includes a test version of the `TimeProvider`, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
+This is a shim for the upcoming `System.TimeProvider` API coming in .NET 8. It includes a test version of the `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
 
 *NOTE: Originally, this library provided its own abstraction, `ITimeScheduler` and related types, `DefaultScheduler` and `TestScheduler`. These are now considered obsolete.*
 
@@ -10,11 +10,11 @@ Currently, the following .NET time-based APIs are supported:
 |----------------------|----------------------|
 | `GetUtcNow()` method | `DateTimeOffset.UtcNow` property |
 | `CreateTimer()` method | `System.Threading.Timer` type |
-| `CreatePeriodicTimer(TimeSpan)` method | `System.Threading.PeriodicTimer` type |
+| `CreatePeriodicTimer(TimeSpan)` method (only .NET 6) | `System.Threading.PeriodicTimer` type |
 | `Delay(TimeSpan, CancellationToken)` method | `Task.Delay(TimeSpan, CancellationToken)` method |
 | `CancellationTokenSource.CancelAfter(TimeSpan, TimeProvider)` method | `CancellationTokenSource.CancelAfter(TimeSpan)` method |
-| `Task.WaitAsync(TimeSpan, TimeProvider)` method | `Task.WaitAsync(TimeSpan)` method |
-| `Task.WaitAsync(TimeSpan, TimeProvider, CancellationToken)` method | `Task.WaitAsync(TimeSpan, CancellationToken)` method |
+| `Task.WaitAsync(TimeSpan, TimeProvider)` method (only .NET 6)| `Task.WaitAsync(TimeSpan)` method |
+| `Task.WaitAsync(TimeSpan, TimeProvider, CancellationToken)` method (only .NET 6)| `Task.WaitAsync(TimeSpan, CancellationToken)` method |
 
 The implementations of `TimeProvider` is abstract. An instance of `TimeProvider` for production use is availalbe on the `TimeProvider.System` property,
 and `ManualTimeProvider` can be used during testing.

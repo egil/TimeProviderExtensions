@@ -1,3 +1,4 @@
+#if NET6_0_OR_GREATER
 namespace TimeScheduler;
 
 internal sealed class PeriodicTimerWrapper : PeriodicTimer
@@ -18,3 +19,4 @@ internal sealed class PeriodicTimerWrapper : PeriodicTimer
         base.Dispose(disposing);
     }
 }
+#endif

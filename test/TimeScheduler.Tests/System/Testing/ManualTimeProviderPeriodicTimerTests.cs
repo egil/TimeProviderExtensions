@@ -1,3 +1,4 @@
+#if NET6_0_OR_GREATER
 namespace System.Testing;
 
 public class ManualTimeProviderPeriodicTimerTests
@@ -157,3 +158,4 @@ public class ManualTimeProviderPeriodicTimerTests
         }
     }
 }
+#endif
