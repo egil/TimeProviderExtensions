@@ -34,7 +34,7 @@ internal sealed class TestPeriodicTimer : TimeScheduler.PeriodicTimer
         cancellationRegistration?.Unregister();
         cancellationRegistration = cancellationToken.Register(() =>
         {
-            completionSource.TrySetCanceled(cancellationToken);
+            completionSource?.TrySetCanceled(cancellationToken);
         });
 
         return new ValueTask<bool>(completionSource.Task);

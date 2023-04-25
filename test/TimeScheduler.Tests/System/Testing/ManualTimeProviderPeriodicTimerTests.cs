@@ -149,6 +149,29 @@ public class ManualTimeProviderPeriodicTimerTests
             startTime + interval * 3);
     }
 
+    [Fact]
+    public async void Cancelling_token_after_WaitForNextTickAsync_safe()
+    {
+        var sut = new ManualTimeProvider();
+        var interval = TimeSpan.FromSeconds(3);
+        using var cts = new CancellationTokenSource();
+        var periodicTimer = sut.CreatePeriodicTimer(interval);
+        var cleanCancelTask = CancelAfterWaitForNextTick(periodicTimer, cts);
+
+        sut.ForwardTime(interval);
+
+        await cleanCancelTask;
+
+        static async Task CancelAfterWaitForNextTick(TimeScheduler.PeriodicTimer periodicTimer, CancellationTokenSource cts)
+        {
+            while (await periodicTimer.WaitForNextTickAsync(cts.Token))
+            {
+                break;
+            }
+            cts.Cancel();
+        }
+    }
+
     static async Task WaitForNextTickInLoop(TimeProvider scheduler, Action callback, TimeSpan interval)
     {
         using var periodicTimer = scheduler.CreatePeriodicTimer(interval);

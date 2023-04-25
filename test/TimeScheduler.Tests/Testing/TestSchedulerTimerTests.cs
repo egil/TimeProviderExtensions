@@ -130,4 +130,15 @@ public class TestSchedulerTimerTests
             startTime + interval + interval,
             startTime + interval + interval + interval);
     }
+
+    [Fact]
+    public void Disposing_timer_in_callback()
+    {
+        var interval = TimeSpan.FromSeconds(3);
+        var sut = new TestScheduler();
+        ITimer timer = default!;
+        timer = sut.CreateTimer(_ => timer!.Dispose(), null, interval, interval);
+
+        sut.ForwardTime(interval);
+    }
 }

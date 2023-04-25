@@ -72,6 +72,7 @@ public partial class TestScheduler : ITimeScheduler
             {
                 return;
             }
+
             isDisposed = true;
             callback = null;
             stopTimerCts.Dispose();
@@ -98,6 +99,11 @@ public partial class TestScheduler : ITimeScheduler
 
         private void ScheduleCallback(TimeSpan waitTime)
         {
+            if (isDisposed)
+            {
+                return;
+            }
+
             running = true;
             owner.RegisterFutureAction(
                 owner.GetUtcNow() + waitTime,
