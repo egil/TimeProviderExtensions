@@ -73,12 +73,12 @@ As an example, lets test the "Stuff Service" below that performs a specific task
 
 ```c#
 // Version of stuff service that uses the built in DateTimeOffset, PeriodicTimer, and Task.Delay
-public class StuffServiceSystem
+public class StuffService
 {
   private static readonly TimeSpan doStuffDelay = TimeSpan.FromSeconds(10);
   private readonly List<DateTimeOffset> container;
 
-  public StuffServiceSystem(List<DateTimeOffset> container)
+  public StuffService(List<DateTimeOffset> container)
   {
     this.container = container;
   }
@@ -146,7 +146,9 @@ public void DoStuff_does_stuff_every_11_seconds()
 }
 ```
 
-Writing a similar test for `StuffServiceSystem` is both more simple and runs much slower.
+This test will run in nanoseconds, and is deterministic.
+
+Compare that to the similar test below for `StuffService` that needs to wait for 11 seconds before it can safely assert that the expectation has been met.
 
 ```c#
 [Fact]
@@ -154,7 +156,7 @@ public async Task DoStuff_does_stuff_every_11_seconds()
 {
   // Arrange
   var container = new List<DateTimeOffset>();  
-  var sut = new StuffServiceSystem(container);
+  var sut = new StuffService(container);
   
   // Act
   _ = sut.DoStuff(CancellationToken.None);
