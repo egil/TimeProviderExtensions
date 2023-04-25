@@ -25,6 +25,7 @@ public static class TimeProviderTaskExtensions
         public CancellationTokenRegistration Registration { get; set; }
     }
 
+#if NET6_0_OR_GREATER
     private sealed class WaitAsyncState : TaskCompletionSource<bool>
     {
         // The original code passed TaskCreationOptions.RunContinuationsAsynchronously to the base constructor,
@@ -36,6 +37,7 @@ public static class TimeProviderTaskExtensions
         public CancellationTokenRegistration Registration;
         public ITimer? Timer;
     }
+#endif
 
     /// <summary>Creates a task that completes after a specified time interval.</summary>
     /// <param name="timeProvider">The <see cref="TimeProvider"/> with which to interpret <paramref name="delay"/>.</param>
@@ -105,6 +107,8 @@ public static class TimeProviderTaskExtensions
 
         return state.Task;
     }
+
+#if NET6_0_OR_GREATER
 
     /// <summary>
     /// Gets a <see cref="Task"/> that will complete when this <see cref="Task"/> completes, when the specified timeout expires, or when the specified <see cref="CancellationToken"/> has cancellation requested.
@@ -223,6 +227,8 @@ public static class TimeProviderTaskExtensions
         return task.Result;
 #pragma warning restore CA1849 // Call async methods when in an async method
     }
+
+#endif
 }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

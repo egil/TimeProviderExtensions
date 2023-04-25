@@ -1,3 +1,4 @@
+#if NET6_0_OR_GREATER
 namespace System.Testing;
 
 public class ManualTimeProviderWaitAsyncTests
@@ -203,3 +204,4 @@ public class ManualTimeProviderWaitAsyncTests
             .ThrowExactlyAsync<TaskCanceledException>();
     }
 }
+#endif

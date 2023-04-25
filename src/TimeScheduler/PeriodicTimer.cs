@@ -1,3 +1,4 @@
+#if NET6_0_OR_GREATER
 namespace TimeScheduler;
 
 /// <summary>Provides a periodic timer that enables waiting asynchronously for timer ticks.</summary>
@@ -44,3 +45,4 @@ public abstract class PeriodicTimer : IDisposable
     {
     }
 }
+#endif
