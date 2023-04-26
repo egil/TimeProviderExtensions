@@ -261,6 +261,16 @@ public class TimeProviderTests
     }
 
     [Fact]
+    public async Task CreateCancellationTokenSource_cancels()
+    {
+        var delay = TimeSpan.FromMilliseconds(30);
+        using var cts = TimeProvider.System.CreateCancellationTokenSource(delay);
+
+        var throwsAfterCancel = () => Task.Delay(TimeSpan.FromHours(1), cts.Token);
+        await throwsAfterCancel.Should().ThrowAsync<TaskCanceledException>();
+    }
+
+    [Fact]
     public async Task CancelAfter_reschedule_cancel()
     {
         using var cts = new CancellationTokenSource();

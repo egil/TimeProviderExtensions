@@ -10,9 +10,9 @@ Currently, the following .NET time-based APIs are supported:
 |----------------------|----------------------|
 | `GetUtcNow()` method | `DateTimeOffset.UtcNow` property |
 | `CreateTimer()` method | `System.Threading.Timer` type |
-| `CreatePeriodicTimer(TimeSpan)` method (only .NET 6) | `System.Threading.PeriodicTimer` type |
+| `TimeProvider.CreatePeriodicTimer(TimeSpan)` method (only .NET 6) | `System.Threading.PeriodicTimer` type |
 | `Delay(TimeSpan, CancellationToken)` method | `Task.Delay(TimeSpan, CancellationToken)` method |
-| `CancellationTokenSource.CancelAfter(TimeSpan, TimeProvider)` method | `CancellationTokenSource.CancelAfter(TimeSpan)` method |
+| `CancellationTokenSource.CancelAfter(TimeSpan, TimeProvider)` and `TimeProvider.CreateCancellationTokenSource(TimeSpan delay)` methods | `CancellationTokenSource.CancelAfter(TimeSpan)` method |
 | `Task.WaitAsync(TimeSpan, TimeProvider)` method (only .NET 6)| `Task.WaitAsync(TimeSpan)` method |
 | `Task.WaitAsync(TimeSpan, TimeProvider, CancellationToken)` method (only .NET 6)| `Task.WaitAsync(TimeSpan, CancellationToken)` method |
 

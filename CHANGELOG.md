@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.8.0]
 
 - Added `TimeProvider.GetElapsedTime(long startingTimestamp)`
+- Added `TimeProvider.CreateCancellationTokenSource(TimeSpan delay)`
 
 ## [0.7.0]
 
