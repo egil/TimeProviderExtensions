@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0]
+
+- Added `TimeProvider.GetElapsedTime(long startingTimestamp)`
+
 ## [0.7.0]
 
 - Add support for libraries that target netstandard 2.0.
