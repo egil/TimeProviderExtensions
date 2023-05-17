@@ -1,4 +1,4 @@
-namespace System.Testing;
+namespace TimeProviderExtensions;
 
 public class ManualTimeProviderTimestampTests
 {

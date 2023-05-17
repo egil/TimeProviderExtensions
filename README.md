@@ -1,8 +1,6 @@
-# Time Scheduler - a TimeProvider shim
+# TimeProvider Extensions
 
-This is a shim for the upcoming `System.TimeProvider` API coming in .NET 8. It includes a test version of the `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
-
-*NOTE: Originally, this library provided its own abstraction, `ITimeScheduler` and related types, `DefaultScheduler` and `TestScheduler`. These are now considered obsolete.*
+Extensions for `System.TimeProvider` API. It includes a test version of the `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
 
 Currently, the following .NET time-based APIs are supported:
 
@@ -25,7 +23,7 @@ multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for 
 
 ## Installation
 
-Get the latest release from https://www.nuget.org/packages/TimeScheduler
+Get the latest release from https://www.nuget.org/packages/TimeProviderExtensions
 
 ## Set up in production
 

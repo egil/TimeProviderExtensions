@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0;netcoreapp3.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <RootNamespace>TimeScheduler</RootNamespace>
+    <RootNamespace>TimeProviderExtensions</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TimeScheduler\TimeScheduler.csproj" />
+    <ProjectReference Include="..\..\src\TimeProviderExtensions\TimeProviderExtensions.csproj" />
   </ItemGroup>
 
 </Project>

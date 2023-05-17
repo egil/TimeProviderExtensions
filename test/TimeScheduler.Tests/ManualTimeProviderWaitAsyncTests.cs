@@ -1,5 +1,7 @@
 #if NET6_0_OR_GREATER
-namespace System.Testing;
+using TimeProviderExtensions;
+
+namespace TimeProviderExtensions.Testing;
 
 public class ManualTimeProviderWaitAsyncTests
 {
@@ -7,14 +9,14 @@ public class ManualTimeProviderWaitAsyncTests
     private readonly static TimeSpan DelayedTaskDelay = TimeSpan.FromMilliseconds(2);
     private readonly static string StringTaskResult = Guid.NewGuid().ToString();
 
-    private static async Task DelayedTask(TimeProvider scheduler)
+    private static async Task DelayedTask(TimeProvider provider)
     {
-        await scheduler.Delay(DelayedTaskDelay);
+        await provider.Delay(DelayedTaskDelay);
     }
 
-    private static async Task<string> DelayedStringTask(TimeProvider scheduler)
+    private static async Task<string> DelayedStringTask(TimeProvider provider)
     {
-        await scheduler.Delay(DelayedTaskDelay);
+        await provider.Delay(DelayedTaskDelay);
         return StringTaskResult;
     }
 
@@ -27,7 +29,7 @@ public class ManualTimeProviderWaitAsyncTests
             sut => default(Task<string>)!.WaitAsync(TimeSpan.FromSeconds(1), sut, CancellationToken.None),
         };
 
-    [Theory, MemberData(nameof(NullTaskInvalidInvocations))]
+    [Theory(Skip = "Not implemented in Microsofts implementation"), MemberData(nameof(NullTaskInvalidInvocations))]
     public async Task WaitAsync_task_input_validation(Func<ManualTimeProvider, Task> invalidInvocation)
     {
         var sut = new ManualTimeProvider();
@@ -108,7 +110,7 @@ public class ManualTimeProviderWaitAsyncTests
             sut => DelayedStringTask(sut).WaitAsync(TimeSpan.Zero, sut, CancellationToken.None),
         };
 
-    [Theory, MemberData(nameof(ImmediateTimedoutInvocations))]
+    [Theory(Skip = "Not implemented in Microsofts implementation"), MemberData(nameof(ImmediateTimedoutInvocations))]
     public async Task WaitAsync_throws_immediately_when_timeout_is_zero(Func<ManualTimeProvider, Task> immediateTimedoutInvocation)
     {
         var sut = new ManualTimeProvider();

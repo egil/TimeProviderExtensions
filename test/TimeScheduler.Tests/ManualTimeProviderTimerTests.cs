@@ -1,4 +1,4 @@
-namespace System.Testing;
+namespace TimeProviderExtensions;
 
 public class ManualTimeProviderTimerTests
 {
@@ -140,5 +140,28 @@ public class ManualTimeProviderTimerTests
         timer = sut.CreateTimer(_ => timer!.Dispose(), null, interval, interval);
 
         sut.ForwardTime(interval);
+    }
+
+    [Fact]
+    public void Multiple_timers_invokes_callback_in_order()
+    {
+        var callbacks = new List<(int TimerNumber, TimeSpan CallbackTime)>();
+        var sut = new ManualTimeProvider();
+        var startTime = sut.GetTimestamp();
+        using var timer1 = sut.CreateTimer(_ => callbacks.Add((1, sut.GetElapsedTime(startTime))), null, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2));
+        using var timer2 = sut.CreateTimer(_ => callbacks.Add((2, sut.GetElapsedTime(startTime))), null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3));
+
+        sut.ForwardTime(TimeSpan.FromSeconds(10));
+
+        var oneSec = TimeSpan.FromSeconds(1);
+        callbacks.Should().Equal(
+            (1, oneSec * 2),
+            (2, oneSec * 3),
+            (1, oneSec * 4),
+            (2, oneSec * 6),
+            (1, oneSec * 6),
+            (1, oneSec * 8),
+            (2, oneSec * 9),
+            (1, oneSec * 10));
     }
 }

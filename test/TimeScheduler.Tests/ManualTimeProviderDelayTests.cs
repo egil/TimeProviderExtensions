@@ -1,14 +1,14 @@
-namespace TimeScheduler.Testing;
+namespace TimeProviderExtensions;
 
-public class TestSchedulerDelayTests
+public class ManualTimeProviderDelayTests
 {
     [Fact]
     public void Delayed_task_is_completes()
     {
         var startTime = DateTimeOffset.UtcNow;
-        var future = TimeSpan.FromTicks(1);
-        var sut = new TestScheduler(startTime);
-        var task = sut.Delay(TimeSpan.FromTicks(1));
+        var future = TimeSpan.FromMilliseconds(1);
+        var sut = new ManualTimeProvider(startTime);
+        var task = sut.Delay(TimeSpan.FromMilliseconds(1));
 
         sut.ForwardTime(future);
 
@@ -19,8 +19,8 @@ public class TestSchedulerDelayTests
     public void Delayed_task_is_cancelled()
     {
         using var cts = new CancellationTokenSource();
-        var sut = new TestScheduler();
-        var task = sut.Delay(TimeSpan.FromTicks(1), cts.Token);
+        var sut = new ManualTimeProvider();
+        var task = sut.Delay(TimeSpan.FromMilliseconds(1), cts.Token);
 
         cts.Cancel();
 

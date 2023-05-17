@@ -4,30 +4,6 @@ public class TimeProviderTests
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
 
-    [Fact]
-    public void GetUtcNow_returns()
-    {
-        var sut = TimeProvider.System;
-
-        sut.GetUtcNow().Should().BeCloseTo(
-            nearbyTime: DateTimeOffset.UtcNow,
-            precision: TimeSpan.FromMilliseconds(50));
-    }
-
-    [Fact]
-    public async Task Delay_waits_for_n_seconds()
-    {
-        var sut = TimeProvider.System;
-        var timer = Stopwatch.StartNew();
-
-        await sut.Delay(TimeSpan.FromSeconds(1));
-
-        timer.Stop();
-        timer.Elapsed.Should().BeCloseTo(
-            nearbyTime: TimeSpan.FromSeconds(1),
-            precision: TimeSpan.FromMilliseconds(50));
-    }
-
 #if NET6_0_OR_GREATER
     [Fact]
     public async Task PeriodicTimer()
@@ -58,144 +34,6 @@ public class TimeProviderTests
         {
             using var periodTimer = sut.CreatePeriodicTimer(TimeSpan.FromSeconds(1));
             await periodTimer.WaitForNextTickAsync(cancellationToken);
-        }
-    }
-
-    [Fact]
-    public async Task WaitAsync_with_timeout()
-    {
-        var sut = TimeProvider.System;
-        var task = Task.Delay(TimeSpan.FromMilliseconds(10));
-
-        var result = task.WaitAsync(TimeSpan.FromSeconds(1), sut);
-
-        await result
-            .Should()
-            .CompletedSuccessfullyAsync();
-    }
-
-    [Fact]
-    public async Task WaitAsync_of_T_with_timeout()
-    {
-        var sut = TimeProvider.System;
-        var task = StringTask();
-
-        var result = task.WaitAsync(TimeSpan.FromSeconds(1), sut);
-
-        await result
-            .Should()
-            .CompletedSuccessfullyAsync();
-
-        async Task<string> StringTask()
-        {
-            await Task.Delay(TimeSpan.FromMilliseconds(10));
-            return string.Empty;
-        }
-    }
-
-    [Fact]
-    public async Task WaitAsync_with_timeout_and_cancellationToken()
-    {
-        using var cts = new CancellationTokenSource();
-        var sut = TimeProvider.System;
-        var task = Task.Delay(TimeSpan.FromMilliseconds(10));
-
-        var result = task.WaitAsync(TimeSpan.FromSeconds(1), sut, cts.Token);
-
-        await result
-            .Should()
-            .CompletedSuccessfullyAsync();
-    }
-
-    [Fact]
-    public async Task WaitAsync_of_T_with_timeout_and_cancellationToken()
-    {
-        using var cts = new CancellationTokenSource();
-        var sut = TimeProvider.System;
-        var task = StringTask();
-
-        var result = task.WaitAsync(TimeSpan.FromSeconds(1), sut, cts.Token);
-
-        await result
-            .Should()
-            .CompletedSuccessfullyAsync();
-
-        async Task<string> StringTask()
-        {
-            await Task.Delay(TimeSpan.FromMilliseconds(10));
-            return string.Empty;
-        }
-    }
-
-    [Fact]
-    public async Task WaitAsync_with_timeout_throws()
-    {
-        var sut = TimeProvider.System;
-        var task = Task.Delay(TimeSpan.FromSeconds(1));
-
-        var result = task.WaitAsync(TimeSpan.FromMilliseconds(5), sut);
-
-        await result
-            .Awaiting(x => x)
-            .Should()
-            .ThrowExactlyAsync<TimeoutException>();
-    }
-
-    [Fact]
-    public async Task WaitAsync_of_T_with_timeout_throws()
-    {
-        var sut = TimeProvider.System;
-        var task = StringTask();
-
-        var result = task.WaitAsync(TimeSpan.FromMilliseconds(5), sut);
-
-        await result
-            .Awaiting(x => x)
-            .Should()
-            .ThrowExactlyAsync<TimeoutException>();
-
-        async Task<string> StringTask()
-        {
-            await Task.Delay(TimeSpan.FromSeconds(1));
-            return string.Empty;
-        }
-    }
-
-    [Fact]
-    public async Task WaitAsync_with_timeout_and_cancellationToken_throws()
-    {
-        using var cts = new CancellationTokenSource();
-        var sut = TimeProvider.System;
-        var task = Task.Delay(TimeSpan.FromSeconds(1));
-
-        var result = task.WaitAsync(TimeSpan.FromSeconds(2), sut, cts.Token);
-        cts.Cancel();
-
-        await result
-            .Awaiting(x => x)
-            .Should()
-            .ThrowExactlyAsync<TaskCanceledException>();
-    }
-
-    [Fact]
-    public async Task WaitAsync_of_T_with_timeout_and_cancellationToken_throws()
-    {
-        using var cts = new CancellationTokenSource();
-        var sut = TimeProvider.System;
-        var task = StringTask();
-
-        var result = task.WaitAsync(TimeSpan.FromSeconds(2), sut, cts.Token);
-        cts.Cancel();
-
-        await result
-            .Awaiting(x => x)
-            .Should()
-            .ThrowExactlyAsync<TaskCanceledException>();
-
-        async Task<string> StringTask()
-        {
-            await Task.Delay(TimeSpan.FromSeconds(1));
-            return string.Empty;
         }
     }
 #endif
@@ -275,8 +113,8 @@ public class TimeProviderTests
     {
         using var cts = new CancellationTokenSource();
         var sut = TimeProvider.System;
-        var delay1 = TimeSpan.FromSeconds(1);
-        var delay2 = TimeSpan.FromMilliseconds(50);
+        var delay1 = TimeSpan.FromSeconds(100);
+        var delay2 = TimeSpan.FromMilliseconds(20);
 
         cts.CancelAfter(delay1, sut);
         cts.CancelAfter(delay2, sut);

@@ -1,4 +1,4 @@
-namespace System.Testing;
+namespace TimeProviderExtensions;
 
 public class ManualTimeProviderTests
 {
@@ -25,7 +25,7 @@ public class ManualTimeProviderTests
     }
 
     [Fact]
-    public void Callbacks_runs_synchronously()
+    public void Delay_callbacks_runs_synchronously()
     {
         // arrange
         var sut = new ManualTimeProvider();
@@ -42,6 +42,33 @@ public class ManualTimeProviderTests
         {
             await timeProvider.Delay(TimeSpan.FromSeconds(10));
             callback();
+        }
+    }
+
+    [Fact]
+    public void WaitAsync_callbacks_runs_synchronously()
+    {
+        // arrange
+        var sut = new ManualTimeProvider();
+        var callbackCount = 0;
+        _ = Continuation(sut, () => callbackCount++);
+
+        // act
+        sut.ForwardTime(TimeSpan.FromSeconds(10));
+
+        // assert
+        callbackCount.Should().Be(1);
+
+        static async Task Continuation(TimeProvider timeProvider, Action callback)
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromDays(1)).WaitAsync(TimeSpan.FromSeconds(10), timeProvider);
+            }
+            catch (TimeoutException)
+            {
+                callback();
+            }
         }
     }
 }

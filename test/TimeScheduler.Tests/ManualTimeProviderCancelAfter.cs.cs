@@ -1,4 +1,4 @@
-namespace System.Testing;
+namespace TimeProviderExtensions;
 
 public class ManualTimeProviderCancelAfter
 {
@@ -47,7 +47,7 @@ public class ManualTimeProviderCancelAfter
 
         cts.CancelAfter(TimeSpan.Zero, sut);
 
-        cts.IsCancellationRequested.Should().BeTrue();
+        cts.IsCancellationRequested.Should().BeFalse();
     }
 
     [Fact]

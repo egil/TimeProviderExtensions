@@ -14,9 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeScheduler", "src\TimeScheduler\TimeScheduler.csproj", "{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeProviderExtensions.Tests", "test\TimeScheduler.Tests\TimeProviderExtensions.Tests.csproj", "{F475F44C-35A3-408D-824A-177EA43A8E2A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeScheduler.Tests", "test\TimeScheduler.Tests\TimeScheduler.Tests.csproj", "{F475F44C-35A3-408D-824A-177EA43A8E2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeProviderExtensions", "src\TimeProviderExtensions\TimeProviderExtensions.csproj", "{E36A99D1-69FC-4418-A1EF-C9C38F8832F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,21 +24,21 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F475F44C-35A3-408D-824A-177EA43A8E2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F475F44C-35A3-408D-824A-177EA43A8E2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F475F44C-35A3-408D-824A-177EA43A8E2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F475F44C-35A3-408D-824A-177EA43A8E2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E36A99D1-69FC-4418-A1EF-C9C38F8832F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E36A99D1-69FC-4418-A1EF-C9C38F8832F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E36A99D1-69FC-4418-A1EF-C9C38F8832F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E36A99D1-69FC-4418-A1EF-C9C38F8832F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2E7DDB3B-1C84-4714-A907-2FABE6A426B2} = {695B57CD-9E0E-4648-8A48-9E8A358B014B}
 		{F475F44C-35A3-408D-824A-177EA43A8E2A} = {7C987338-A88E-4AB5-98CE-39A93F4CDC94}
+		{E36A99D1-69FC-4418-A1EF-C9C38F8832F4} = {695B57CD-9E0E-4648-8A48-9E8A358B014B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A7780397-0E8F-4C60-8D68-569022905162}
