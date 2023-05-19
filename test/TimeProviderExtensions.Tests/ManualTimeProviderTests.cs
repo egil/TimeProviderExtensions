@@ -23,7 +23,7 @@ public class ManualTimeProviderTests
 
         sut.GetUtcNow().Should().Be(startTime + TimeSpan.FromTicks(1));
     }
-
+#if NET8_0_OR_GREATER
     [Fact]
     public async Task Delay_callbacks_runs_synchronously()
     {
@@ -74,4 +74,5 @@ public class ManualTimeProviderTests
             }
         }
     }
+#endif
 }
