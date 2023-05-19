@@ -33,6 +33,11 @@ jobs:
     # Install the .NET SDK indicated in the global.json file
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          3.1.x
+          6.0.x
+          8.0.x
 
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
     - run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }}
@@ -73,8 +78,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
+    # Install the .NET SDK indicated in the global.json file
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          3.1.x
+          6.0.x
+          8.0.x
+
     - name: Run tests
       run: dotnet test --configuration Release
 
