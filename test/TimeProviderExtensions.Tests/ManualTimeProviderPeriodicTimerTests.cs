@@ -1,5 +1,5 @@
 #if NET6_0_OR_GREATER
-namespace TimeProviderExtensions.Testing;
+namespace TimeProviderExtensions;
 
 public class ManualTimeProviderPeriodicTimerTests
 {
@@ -98,16 +98,20 @@ public class ManualTimeProviderPeriodicTimerTests
         calledTimes.Should().Be(2);
     }
 
-    [Fact]
-    public void PeriodicTimer_WaitForNextTickAsync_completes_multiple_single_forward()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void PeriodicTimer_WaitForNextTickAsync_completes_iterations(int expectedCallbacks)
     {
         var sut = new ManualTimeProvider();
         var calledTimes = 0;
         var interval = TimeSpan.FromSeconds(1);
         var looper = WaitForNextTickInLoop(sut, () => calledTimes++, interval);
 
-        sut.ForwardTime(interval * 3);
-        calledTimes.Should().Be(3);
+        sut.ForwardTime(interval * expectedCallbacks);
+
+        calledTimes.Should().Be(expectedCallbacks);
     }
 
     [Fact]
@@ -179,7 +183,7 @@ public class ManualTimeProviderPeriodicTimerTests
         }
     }
 
-    static async Task WaitForNextTickInLoop(TimeProvider scheduler, Action callback, TimeSpan interval)
+    private static async Task WaitForNextTickInLoop(TimeProvider scheduler, Action callback, TimeSpan interval)
     {
         using var periodicTimer = scheduler.CreatePeriodicTimer(interval);
         while (await periodicTimer.WaitForNextTickAsync(CancellationToken.None).ConfigureAwait(false))

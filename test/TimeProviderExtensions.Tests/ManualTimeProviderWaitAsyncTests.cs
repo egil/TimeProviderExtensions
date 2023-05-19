@@ -1,7 +1,5 @@
 #if NET6_0_OR_GREATER
-using TimeProviderExtensions;
-
-namespace TimeProviderExtensions.Testing;
+namespace TimeProviderExtensions;
 
 public class ManualTimeProviderWaitAsyncTests
 {
