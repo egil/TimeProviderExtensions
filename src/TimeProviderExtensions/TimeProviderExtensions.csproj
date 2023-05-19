@@ -17,7 +17,6 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReleaseNotes>Release notes: https://github.com/egil/TimeProviderExtensions/blob/main/CHANGELOG.md</PackageReleaseNotes>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<IncludeSymbols>true</IncludeSymbols>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<MinVerTagPrefix>v</MinVerTagPrefix>
 	</PropertyGroup>
@@ -33,10 +32,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
-
-		<!-- Used by code coverage -->
-		<DebugType>full</DebugType>
-		<DebugSymbols>true</DebugSymbols>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Analyzer settings">
@@ -52,7 +48,6 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
 		<PackageReference Include="MinVer" Version="4.3.0" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.Bcl.TimeProvider" Version="8.0.0-preview.*" />
 	</ItemGroup>
