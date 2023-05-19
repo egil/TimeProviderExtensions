@@ -44,5 +44,23 @@ public abstract class PeriodicTimer : IDisposable
     protected virtual void Dispose(bool disposing)
     {
     }
+
+    /// <summary>Tries to extract the number of milliseconds from <paramref name="value"/>.</summary>
+    /// <returns>
+    /// true if the number of milliseconds is extracted and stored into <paramref name="milliseconds"/>;
+    /// false if the number of milliseconds would be out of range of a timer.
+    /// </returns>
+    protected static bool TryGetMilliseconds(TimeSpan value, out uint milliseconds)
+    {
+        long ms = (long)value.TotalMilliseconds;
+        if ((ms >= 1 && ms <= ManualTimeProvider.MaxSupportedTimeout) || value == Timeout.InfiniteTimeSpan)
+        {
+            milliseconds = (uint)ms;
+            return true;
+        }
+
+        milliseconds = 0;
+        return false;
+    }
 }
 #endif

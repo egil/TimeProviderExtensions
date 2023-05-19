@@ -62,13 +62,13 @@ public class ManualTimeProviderPeriodicTimerTests
         var sut = new ManualTimeProvider();
         using var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromMilliseconds(1));
         var task = periodicTimer.WaitForNextTickAsync(cts.Token);
-        cts.CancelAfter(TimeSpan.Zero);
+        cts.Cancel();
 
         var throws = async () => await task;
 
         await throws
             .Should()
-            .ThrowExactlyAsync<TaskCanceledException>();
+            .ThrowAsync<OperationCanceledException>();
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public class ManualTimeProviderPeriodicTimerTests
     static async Task WaitForNextTickInLoop(TimeProvider scheduler, Action callback, TimeSpan interval)
     {
         using var periodicTimer = scheduler.CreatePeriodicTimer(interval);
-        while (await periodicTimer.WaitForNextTickAsync(CancellationToken.None))
+        while (await periodicTimer.WaitForNextTickAsync(CancellationToken.None).ConfigureAwait(false))
         {
             callback();
         }

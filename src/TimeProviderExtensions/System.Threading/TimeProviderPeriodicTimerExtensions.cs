@@ -15,7 +15,11 @@ public static class TimeProviderPeriodicTimerExtensions
     /// may be in flight at any given moment. <see cref="System.Threading.PeriodicTimer.Dispose()"/> may be used concurrently with an active <see cref="System.Threading.PeriodicTimer.WaitForNextTickAsync"/>
     /// to interrupt it and cause it to return false.
     /// </remarks>
-    /// <returns>A new <see cref="TimeProviderExtensions.PeriodicTimer"/>. Note, this is a wrapper around a <see cref="System.Threading.PeriodicTimer"/>.</returns>
+    /// <returns>
+    /// A new <see cref="TimeProviderExtensions.PeriodicTimer"/>.
+    /// Note, this is a wrapper around a <see cref="System.Threading.PeriodicTimer"/>,
+    /// and will behave exactly the same as the original.
+    /// </returns>
     public static TimeProviderExtensions.PeriodicTimer CreatePeriodicTimer(this TimeProvider timeProvider, TimeSpan period)
     {
         if (timeProvider == TimeProvider.System)

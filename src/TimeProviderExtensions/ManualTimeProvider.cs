@@ -225,7 +225,6 @@ public class ManualTimeProvider : TimeProvider
         {
             ValidateTimeSpanRange(dueTime);
             ValidateTimeSpanRange(period);
-
             this.callback = callback;
             this.state = state;
             currentDueTime = dueTime;
@@ -283,6 +282,7 @@ public class ManualTimeProvider : TimeProvider
                 return;
 
             running = false;
+
             callback?.Invoke(state);
 
             if (currentPeriod != Timeout.InfiniteTimeSpan)
