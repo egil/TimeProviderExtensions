@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-preview.1]
+
+This release adds a dependency on [Microsoft.Bcl.TimeProvider](https://www.nuget.org/packages/Microsoft.Bcl.TimeProvider) and utilizes the types built-in to that to do much of the work.
+
+When using the `ManualTimeProvider` during testing, be aware of these outstanding issues: https://github.com/dotnet/runtime/issues/85326
+
+- Removed `CancelAfter` extension methods. Instead create a CancellationTokenSource via the method `TimeProvider.CreateCancellationTokenSource(TimeSpan delay)` or in .NET 8, using `new CancellationTokenSource(TimeSpan delay, TimeProvider timeProvider). 
+
+  **NOTE:** If running on .NET versions earlier than .NET 8.0, there is a constraint when invoking `CancellationTokenSource.CancelAfter(TimeSpan)` on the resultant object. This action will not terminate the initial timer indicated by `delay`. However, this restriction does not apply on .NET 8.0 and later versions.
+
 ## [0.8.0]
 
 - Added `TimeProvider.GetElapsedTime(long startingTimestamp)`

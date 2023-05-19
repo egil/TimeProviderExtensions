@@ -127,7 +127,7 @@ public class ManualTimeProviderPeriodicTimerTests
         (await disposeTask).Should().BeFalse();
 
 #if NET6_0_OR_GREATER && !NET8_0_OR_GREATER
-        static async Task<bool> WaitForNextTickToReturnFalse(TimeProviderExtensions.PeriodicTimer periodicTimer)
+        static async Task<bool> WaitForNextTickToReturnFalse(PeriodicTimerWrapper periodicTimer)
 #else
         static async Task<bool> WaitForNextTickToReturnFalse(System.Threading.PeriodicTimer periodicTimer)
 #endif
@@ -170,7 +170,7 @@ public class ManualTimeProviderPeriodicTimerTests
 
         await cleanCancelTask;
 #if NET6_0_OR_GREATER && !NET8_0_OR_GREATER
-        static async Task CancelAfterWaitForNextTick(TimeProviderExtensions.PeriodicTimer periodicTimer, CancellationTokenSource cts)
+        static async Task CancelAfterWaitForNextTick(PeriodicTimerWrapper periodicTimer, CancellationTokenSource cts)
 #else
         static async Task CancelAfterWaitForNextTick(System.Threading.PeriodicTimer periodicTimer, CancellationTokenSource cts)
 #endif

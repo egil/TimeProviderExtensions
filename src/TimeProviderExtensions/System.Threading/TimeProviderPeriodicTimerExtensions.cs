@@ -1,3 +1,5 @@
+using TimeProviderExtensions;
+
 namespace System.Threading;
 
 /// <summary>
@@ -16,20 +18,16 @@ public static class TimeProviderPeriodicTimerExtensions
     /// to interrupt it and cause it to return false.
     /// </remarks>
     /// <returns>
-    /// A new <see cref="TimeProviderExtensions.PeriodicTimer"/>.
+    /// A new <see cref="PeriodicTimerWrapper"/>.
     /// Note, this is a wrapper around a <see cref="System.Threading.PeriodicTimer"/>,
     /// and will behave exactly the same as the original.
     /// </returns>
-    public static TimeProviderExtensions.PeriodicTimer CreatePeriodicTimer(this TimeProvider timeProvider, TimeSpan period)
+    public static PeriodicTimerWrapper CreatePeriodicTimer(this TimeProvider timeProvider, TimeSpan period)
     {
-        if (timeProvider == TimeProvider.System)
-        {
-            return new PeriodicTimerWrapper(period);
-        }
-
         ArgumentNullException.ThrowIfNull(timeProvider);
-
-        return new ManualPeriodicTimer(period, timeProvider);
+        return timeProvider == TimeProvider.System
+            ? new PeriodicTimerWrapper.PeriodicTimerOrgWrapper(new PeriodicTimer(period))
+            : new PeriodicTimerWrapper.PeriodicTimerPortWrapper(new PeriodicTimerPort(period, timeProvider));
     }
 #endif
 #if NET8_0_OR_GREATER
