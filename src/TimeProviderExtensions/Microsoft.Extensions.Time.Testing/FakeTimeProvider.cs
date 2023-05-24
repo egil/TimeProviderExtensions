@@ -1,3 +1,4 @@
+#if !RELEASE
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
@@ -12,7 +13,7 @@ namespace Microsoft.Extensions.Time.Testing;
 /// <summary>
 /// A synthetic clock used to provide deterministic behavior in tests.
 /// </summary>
-internal class FakeTimeProvider : TimeProvider
+public class FakeTimeProvider : TimeProvider
 {
     internal static readonly DateTimeOffset Epoch = new(2000, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
 
@@ -183,3 +184,4 @@ internal class FakeTimeProvider : TimeProvider
         }
     }
 }
+#endif

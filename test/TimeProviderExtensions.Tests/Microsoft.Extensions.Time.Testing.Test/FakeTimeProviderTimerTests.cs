@@ -1,4 +1,4 @@
-#if TargetMicrosoftTestTimeProvider
+#if TargetMicrosoftTestTimeProvider && !RELEASE
 using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
 #else
 using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
@@ -182,7 +182,7 @@ public class FakeTimeProviderTimerTests
         });
     }
 
-#if TargetMicrosoftTestTimeProvider
+#if TargetMicrosoftTestTimeProvider && !RELEASE
 
     [Fact]
     public void TimerChangeDueTimeOutOfRangeThrows()
@@ -244,40 +244,5 @@ public class FakeTimeProviderTimerTests
         Assert.Equal(2, timer2Counter);
         Assert.Equal(1, waitersCountAfter);
     }
-
-#if RELEASE // In Release only since this might not work if the timer reference being tracked by the debugger
-    [Fact]
-    public void WaiterRemovedWhenCollectedWithoutDispose()
-    {
-        var timer1Counter = 0;
-        var timer2Counter = 0;
-
-        var timeProvider = new SutTimeProvider();
-        var waitersCountStart = timeProvider.Waiters.Count;
-
-        var timer1 = timeProvider.CreateTimer(_ => timer1Counter++, null, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(1));
-        var timer2 = timeProvider.CreateTimer(_ => timer2Counter++, null, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(1));
-
-        var waitersCountDuring = timeProvider.Waiters.Count;
-
-        timeProvider.Advance(TimeSpan.FromMilliseconds(1));
-
-        // Force the finalizer on timer1 to ensure Dispose is releasing the waiter object
-        // even when a Timer is not disposed
-        timer1 = null;
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-
-        timeProvider.Advance(TimeSpan.FromMilliseconds(1));
-
-        var waitersCountAfter = timeProvider.Waiters.Count;
-
-        Assert.Equal(0, waitersCountStart);
-        Assert.Equal(2, waitersCountDuring);
-        Assert.Equal(1, timer1Counter);
-        Assert.Equal(2, timer2Counter);
-        Assert.Equal(1, waitersCountAfter);
-    }
-#endif
 #endif
 }

@@ -1,4 +1,4 @@
-#if TargetMicrosoftTestTimeProvider
+#if TargetMicrosoftTestTimeProvider && !RELEASE
 using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
 #else
 using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;

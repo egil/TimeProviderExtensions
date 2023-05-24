@@ -1,5 +1,5 @@
 #if NET6_0_OR_GREATER
-#if TargetMicrosoftTestTimeProvider
+#if TargetMicrosoftTestTimeProvider && !RELEASE
 using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
 #else
 using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
@@ -7,7 +7,7 @@ using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
 
 namespace TimeProviderExtensions;
 
-internal class ManualTimeProviderWaitAsyncTests
+public class ManualTimeProviderWaitAsyncTests
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     private readonly static TimeSpan DelayedTaskDelay = TimeSpan.FromMilliseconds(2);
