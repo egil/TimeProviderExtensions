@@ -24,6 +24,7 @@ public class ManualTimeProvider : TimeProvider
 
     private readonly List<ManualTimerScheduledCallback> futureCallbacks = new();
     private DateTimeOffset utcNow;
+    private TimeZoneInfo localTimeZone = TimeZoneInfo.Utc;
 
     /// <summary>
     /// Gets the frequency of <see cref="GetTimestamp"/> of high-frequency value per second.
@@ -34,14 +35,21 @@ public class ManualTimeProvider : TimeProvider
     /// </remarks>
     public override long TimestampFrequency { get; } = 10_000_000;
 
+    /// <inheritdoc />
+    public override TimeZoneInfo LocalTimeZone => localTimeZone;
+
     /// <summary>
     /// Creates an instance of the <see cref="ManualTimeProvider"/> with
     /// <see cref="DateTimeOffset.UtcNow"/> being the initial value returned by <see cref="GetUtcNow()"/>.
     /// </summary>
     public ManualTimeProvider()
         : this(System.GetUtcNow())
+    /// <param name="localTimeZone">Optional local time zone to use during testing. Defaults to <see cref="TimeZoneInfo.Utc"/>.</param>
+    public ManualTimeProvider(TimeZoneInfo? localTimeZone = null)
+        : this(Epoch)
     {
         
+        this.localTimeZone = localTimeZone ?? TimeZoneInfo.Utc;
     }
 
     /// <summary>
@@ -52,6 +60,18 @@ public class ManualTimeProvider : TimeProvider
     public ManualTimeProvider(DateTimeOffset startDateTime)
     {
         utcNow = startDateTime;
+    }
+
+    /// <summary>
+    /// Creates an instance of the <see cref="ManualTimeProvider"/> with
+    /// <paramref name="startDateTime"/> being the initial value returned by <see cref="GetUtcNow()"/>.
+    /// </summary>
+    /// <param name="startDateTime">The initial date and time <see cref="GetUtcNow()"/> will return.</param>
+    /// <param name="localTimeZone">Optional local time zone to use during testing. Defaults to <see cref="TimeZoneInfo.Utc"/>.</param>
+    public ManualTimeProvider(DateTimeOffset startDateTime, TimeZoneInfo? localTimeZone = null)
+    {
+        utcNow = startDateTime;
+        this.localTimeZone = localTimeZone ?? TimeZoneInfo.Utc;
     }
 
     /// <summary>
@@ -126,6 +146,15 @@ public class ManualTimeProvider : TimeProvider
             throw new ArgumentException("The timespan to forward time by must be positive.", nameof(delta));
 
         SetUtcNow(utcNow + delta);
+    }
+
+    /// <summary>
+    /// Sets the local time zone.
+    /// </summary>
+    /// <param name="localTimeZone">The local time zone.</param>
+    public void SetLocalTimeZone(TimeZoneInfo localTimeZone)
+    {
+        this.localTimeZone = localTimeZone;
     }
 
     /// <summary>
