@@ -67,4 +67,9 @@
 		</None>
 	</ItemGroup>
 
+	<ItemGroup>
+		<!-- Makes internal types in libraries visible to their test projects -->
+		<InternalsVisibleTo Include="$(AssemblyName).Tests" />
+	</ItemGroup>
+
 </Project>

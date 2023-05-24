@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.Time.Testing;
 /// <summary>
 /// A synthetic clock used to provide deterministic behavior in tests.
 /// </summary>
-public class FakeTimeProvider : TimeProvider
+internal class FakeTimeProvider : TimeProvider
 {
     internal static readonly DateTimeOffset Epoch = new(2000, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
 

@@ -7,7 +7,7 @@ using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
 
 namespace TimeProviderExtensions;
 
-public class ManualTimeProviderWaitAsyncTests
+internal class ManualTimeProviderWaitAsyncTests
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     private readonly static TimeSpan DelayedTaskDelay = TimeSpan.FromMilliseconds(2);
