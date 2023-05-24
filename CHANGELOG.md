@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed ManualTestProvider sets the local time zone to UTC by default, provides method for overriding during testing.
 - Changed `ManualTestProvider` sets the local time zone to UTC by default, provides method for overriding during testing.
 
+- Changed `ManualTestProvider.ToString()` method to return current date time.
 ## [1.0.0-preview.1]
 
 This release adds a dependency on [Microsoft.Bcl.TimeProvider](https://www.nuget.org/packages/Microsoft.Bcl.TimeProvider) and utilizes the types built-in to that to do much of the work.

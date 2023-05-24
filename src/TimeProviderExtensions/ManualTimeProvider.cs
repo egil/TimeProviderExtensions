@@ -210,6 +210,13 @@ public class ManualTimeProvider : TimeProvider
         }
     }
 
+    /// <summary>
+    /// Returns a string representation this clock's current time.
+    /// </summary>
+    /// <returns>A string representing the clock's current time.</returns>
+    public override string ToString()
+        => GetUtcNow().ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture);
+
     private void ScheduleCallback(ManualTimer timer, TimeSpan waitTime)
     {
         lock (futureCallbacks)
