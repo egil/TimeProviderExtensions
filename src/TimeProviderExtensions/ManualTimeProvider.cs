@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -21,6 +22,7 @@ public class ManualTimeProvider : TimeProvider
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     internal const uint UnsignedInfinite = unchecked((uint)-1);
+    internal static readonly DateTimeOffset Epoch = new(2000, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
 
     private readonly List<ManualTimerScheduledCallback> futureCallbacks = new();
     private DateTimeOffset utcNow;
@@ -40,15 +42,12 @@ public class ManualTimeProvider : TimeProvider
 
     /// <summary>
     /// Creates an instance of the <see cref="ManualTimeProvider"/> with
-    /// <see cref="DateTimeOffset.UtcNow"/> being the initial value returned by <see cref="GetUtcNow()"/>.
+    /// <c>UtcNow</c> set to <c>2000-01-01 00:00:00.000</c>.
     /// </summary>
-    public ManualTimeProvider()
-        : this(System.GetUtcNow())
     /// <param name="localTimeZone">Optional local time zone to use during testing. Defaults to <see cref="TimeZoneInfo.Utc"/>.</param>
     public ManualTimeProvider(TimeZoneInfo? localTimeZone = null)
         : this(Epoch)
     {
-        
         this.localTimeZone = localTimeZone ?? TimeZoneInfo.Utc;
     }
 
@@ -225,7 +224,9 @@ public class ManualTimeProvider : TimeProvider
             var insertPosition = futureCallbacks.FindIndex(x => x.CallbackTime > mtsc.CallbackTime);
 
             if (insertPosition == -1)
+            {
                 futureCallbacks.Add(mtsc);
+            }
             else
             {
                 futureCallbacks.Insert(insertPosition, mtsc);
@@ -341,7 +342,7 @@ public class ManualTimeProvider : TimeProvider
 
             callback?.Invoke(state);
 
-            if (currentPeriod != Timeout.InfiniteTimeSpan)
+            if (currentPeriod != Timeout.InfiniteTimeSpan && currentPeriod != TimeSpan.Zero)
                 ScheduleCallback(currentPeriod);
         }
 
@@ -351,7 +352,15 @@ public class ManualTimeProvider : TimeProvider
                 return;
 
             running = true;
-            owner.ScheduleCallback(this, waitTime);
+
+            if (waitTime == TimeSpan.Zero)
+            {
+                TimerElapsed();
+            }
+            else
+            {
+                owner.ScheduleCallback(this, waitTime);
+            }
         }
 
         private static void ValidateTimeSpanRange(TimeSpan time, [CallerArgumentExpression("time")] string? parameter = null)
