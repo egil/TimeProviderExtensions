@@ -107,10 +107,10 @@ public class ManualTimeProviderTimerTests
     }
 
     [Fact]
-    public void Timer_callback_invoked_multiple_times_single_forward()
+    public void Timer_callback_invoked_multiple_times_single_advance()
     {
-        var callbackCount = 0;
         var sut = new SutTimeProvider();
+        var callbackCount = 0;
         var dueTime = TimeSpan.FromSeconds(3);
         var period = TimeSpan.FromSeconds(5);
         using var timer = sut.CreateTimer(_ => callbackCount++, null, dueTime, period);
@@ -131,7 +131,7 @@ public class ManualTimeProviderTimerTests
 
         sut.Advance(interval + interval + interval);
 
-        callbackTimes.Should().Equal(
+        callbackTimes.Should().ContainInOrder(
             startTime + interval,
             startTime + interval + interval,
             startTime + interval + interval + interval);

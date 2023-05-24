@@ -2,6 +2,7 @@
 using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
 #else
 using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
+using TimeProviderExtensions;
 #endif
 
 // Licensed to the .NET Foundation under one or more agreements.

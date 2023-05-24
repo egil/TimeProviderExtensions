@@ -5,6 +5,10 @@ All notable changes to TimeScheduler will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-preview.4]
+
+- Added 'StartTime' to `ManualTestProvider`, which represents the initial date/time when the `ManualtTimeProvider` was initialized.
+
 ## [1.0.0-preview.3]
 
 - Changed `ManualTestProvider` sets the local time zone to UTC by default, provides method for overriding during testing.

@@ -27,6 +27,11 @@ public class ManualTimeProvider : TimeProvider
     private TimeZoneInfo localTimeZone = TimeZoneInfo.Utc;
 
     /// <summary>
+    /// Gets the date and time which was set when this <see cref="TimeProvider"/> was initialized.
+    /// </summary>
+    public DateTimeOffset StartTime { get; }
+
+    /// <summary>
     /// Gets the frequency of <see cref="GetTimestamp"/> of high-frequency value per second.
     /// </summary>
     /// <remarks>
@@ -44,9 +49,8 @@ public class ManualTimeProvider : TimeProvider
     /// </summary>
     /// <param name="localTimeZone">Optional local time zone to use during testing. Defaults to <see cref="TimeZoneInfo.Utc"/>.</param>
     public ManualTimeProvider(TimeZoneInfo? localTimeZone = null)
-        : this(Epoch)
-    {
-        this.localTimeZone = localTimeZone ?? TimeZoneInfo.Utc;
+        : this(Epoch, localTimeZone)
+    {     
     }
 
     /// <summary>
@@ -55,8 +59,8 @@ public class ManualTimeProvider : TimeProvider
     /// </summary>
     /// <param name="startDateTime">The initial date and time <see cref="GetUtcNow()"/> will return.</param>
     public ManualTimeProvider(DateTimeOffset startDateTime)
+        : this(startDateTime, TimeZoneInfo.Utc)
     {
-        utcNow = startDateTime;
     }
 
     /// <summary>
@@ -68,6 +72,7 @@ public class ManualTimeProvider : TimeProvider
     public ManualTimeProvider(DateTimeOffset startDateTime, TimeZoneInfo? localTimeZone = null)
     {
         utcNow = startDateTime;
+        StartTime = startDateTime;
         this.localTimeZone = localTimeZone ?? TimeZoneInfo.Utc;
     }
 
@@ -164,13 +169,6 @@ public class ManualTimeProvider : TimeProvider
     {
         SetUtcNow(utcNow + delta);
     }
-
-    /// <summary>
-    /// Advance the date and time represented by <see cref="GetUtcNow()"/>
-    /// by one millisecond, and triggers any scheduled items that are waiting for time to be forwarded.
-    /// </summary>
-    public void Advance()
-        => Advance(TimeSpan.FromMilliseconds(1));
 
     /// <summary>
     /// Sets the date and time returned by <see cref="GetUtcNow()"/> to <paramref name="newUtcNew"/> and triggers any
