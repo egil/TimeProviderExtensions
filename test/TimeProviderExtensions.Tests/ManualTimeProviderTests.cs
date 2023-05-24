@@ -1,14 +1,20 @@
+#if TargetMicrosoftTestTimeProvider
+using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
+#else
+using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
+#endif
+
 namespace TimeProviderExtensions;
 
 public class ManualTimeProviderTests
 {
     [Fact]
-    public void ForwardTime_updates_UtcNow()
+    public void Advance_updates_UtcNow()
     {
         var startTime = DateTimeOffset.UtcNow;
-        var sut = new ManualTimeProvider(startTime);
+        var sut = new SutTimeProvider(startTime);
 
-        sut.ForwardTime(TimeSpan.FromTicks(1));
+        sut.Advance(TimeSpan.FromTicks(1));
 
         sut.GetUtcNow().Should().Be(startTime + TimeSpan.FromTicks(1));
     }
@@ -17,7 +23,7 @@ public class ManualTimeProviderTests
     public void SetUtcNow_updates_UtcNow()
     {
         var startTime = DateTimeOffset.UtcNow;
-        var sut = new ManualTimeProvider(startTime);
+        var sut = new SutTimeProvider(startTime);
 
         sut.SetUtcNow(startTime + TimeSpan.FromTicks(1));
 
@@ -28,12 +34,12 @@ public class ManualTimeProviderTests
     public async Task Delay_callbacks_runs_synchronously()
     {
         // arrange
-        var sut = new ManualTimeProvider();
+        var sut = new SutTimeProvider();
         var callbackCount = 0;
         var continuationTask = Continuation(sut, () => callbackCount++);
 
         // act
-        sut.ForwardTime(TimeSpan.FromSeconds(10));
+        sut.Advance(TimeSpan.FromSeconds(10));
 
         // assert
         callbackCount.Should().Be(1);
@@ -50,12 +56,12 @@ public class ManualTimeProviderTests
     public async Task WaitAsync_callbacks_runs_synchronously()
     {
         // arrange
-        var sut = new ManualTimeProvider();
+        var sut = new SutTimeProvider();
         var callbackCount = 0;
         var continuationTask = Continuation(sut, () => callbackCount++);
 
         // act
-        sut.ForwardTime(TimeSpan.FromSeconds(10));
+        sut.Advance(TimeSpan.FromSeconds(10));
 
         // assert
         callbackCount.Should().Be(1);

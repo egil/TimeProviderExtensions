@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Microsoft.Extensions.Time.Testing;
+using static Microsoft.Extensions.Time.Testing.FakeTimeProviderTimer;
 
 namespace TimeProviderExtensions;
 
@@ -39,7 +41,7 @@ public class ManualTimeProvider : TimeProvider
     public ManualTimeProvider()
         : this(System.GetUtcNow())
     {
-
+        
     }
 
     /// <summary>
@@ -113,18 +115,36 @@ public class ManualTimeProvider : TimeProvider
 
     /// <summary>
     /// Forward the date and time represented by <see cref="GetUtcNow()"/>
-    /// by the specified <paramref name="time"/>, and triggers any
+    /// by the specified <paramref name="delta"/>, and triggers any
     /// scheduled items that are waiting for time to be forwarded.
     /// </summary>
-    /// <param name="time">The span of time to forward <see cref="GetUtcNow()"/> with.</param>
-    /// <exception cref="ArgumentException">If <paramref name="time"/> is negative or zero.</exception>
-    public void ForwardTime(TimeSpan time)
+    /// <param name="delta">The span of time to forward <see cref="GetUtcNow()"/> with.</param>
+    /// <exception cref="ArgumentException">If <paramref name="delta"/> is negative or zero.</exception>
+    public void ForwardTime(TimeSpan delta)
     {
-        if (time <= TimeSpan.Zero)
-            throw new ArgumentException("The timespan to forward time by must be positive.", nameof(time));
+        if (delta <= TimeSpan.Zero)
+            throw new ArgumentException("The timespan to forward time by must be positive.", nameof(delta));
 
-        SetUtcNow(utcNow + time);
+        SetUtcNow(utcNow + delta);
     }
+
+    /// <summary>
+    /// Advance the date and time represented by <see cref="GetUtcNow()"/>
+    /// by the specified <paramref name="delta"/>, and triggers any
+    /// scheduled items that are waiting for time to be forwarded.
+    /// </summary>
+    /// <param name="delta">The amount of time to advance the clock by.</param>
+    public void Advance(TimeSpan delta)
+    {
+        SetUtcNow(utcNow + delta);
+    }
+
+    /// <summary>
+    /// Advance the date and time represented by <see cref="GetUtcNow()"/>
+    /// by one millisecond, and triggers any scheduled items that are waiting for time to be forwarded.
+    /// </summary>
+    public void Advance()
+        => Advance(TimeSpan.FromMilliseconds(1));
 
     /// <summary>
     /// Sets the date and time returned by <see cref="GetUtcNow()"/> to <paramref name="newUtcNew"/> and triggers any

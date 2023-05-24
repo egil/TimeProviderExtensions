@@ -1,3 +1,9 @@
+#if TargetMicrosoftTestTimeProvider
+using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
+#else
+using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
+#endif
+
 namespace TimeProviderExtensions;
 
 public class ManualTimeProviderCancelAfter
@@ -6,10 +12,10 @@ public class ManualTimeProviderCancelAfter
     public void CancelAfter_cancels()
     {
         var delay = TimeSpan.FromMilliseconds(42);
-        var sut = new ManualTimeProvider();
+        var sut = new SutTimeProvider();
         using var cts = sut.CreateCancellationTokenSource(delay);
 
-        sut.ForwardTime(delay);
+        sut.Advance(delay);
 
         cts.IsCancellationRequested.Should().BeTrue();
     }
@@ -21,15 +27,15 @@ public class ManualTimeProviderCancelAfter
     {
         var initialDelay = TimeSpan.FromMilliseconds(100);
         var rescheduledDelay = TimeSpan.FromMilliseconds(1000);
-        var sut = new ManualTimeProvider();
+        var sut = new SutTimeProvider();
         using var cts = sut.CreateCancellationTokenSource(initialDelay);
 
         cts.CancelAfter(rescheduledDelay);
 
-        sut.ForwardTime(initialDelay);
+        sut.Advance(initialDelay);
         cts.IsCancellationRequested.Should().BeFalse();
 
-        sut.ForwardTime(rescheduledDelay - initialDelay);
+        sut.Advance(rescheduledDelay - initialDelay);
         cts.IsCancellationRequested.Should().BeTrue();
     }
 
@@ -38,12 +44,12 @@ public class ManualTimeProviderCancelAfter
     {
         var initialDelay = TimeSpan.FromMilliseconds(1000);
         var rescheduledDelay = TimeSpan.FromMilliseconds(100);
-        var sut = new ManualTimeProvider();
+        var sut = new SutTimeProvider();
         using var cts = sut.CreateCancellationTokenSource(initialDelay);
 
         cts.CancelAfter(rescheduledDelay);
 
-        sut.ForwardTime(rescheduledDelay);
+        sut.Advance(rescheduledDelay);
         await Task.Delay(1000);
 
         cts.IsCancellationRequested.Should().BeTrue();
