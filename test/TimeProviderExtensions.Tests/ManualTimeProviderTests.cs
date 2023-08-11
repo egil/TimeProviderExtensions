@@ -110,4 +110,18 @@ public class ManualTimeProviderTests
         }
     }
 #endif
+
+    [Fact]
+    public void Timer_callback_GetUtcNow_AutoAdvance()
+    {
+        var oneSecond = TimeSpan.FromSeconds(1);
+        var timeProvider = new ManualTimeProvider() { AutoAdvanceAmount = oneSecond };
+
+        var t1 = timeProvider.CreateTimer(_ =>
+        {
+            timeProvider.GetUtcNow();
+        }, null, TimeSpan.Zero, oneSecond);
+
+        timeProvider.GetUtcNow().Should().Be(timeProvider.Start + oneSecond);
+    }
 }

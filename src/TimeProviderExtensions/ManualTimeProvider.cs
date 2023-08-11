@@ -384,11 +384,7 @@ public class ManualTimeProvider : TimeProvider
         public ValueTask DisposeAsync()
         {
             Dispose();
-#if NETSTANDARD2_0
-            return default;
-#else
             return ValueTask.CompletedTask;
-#endif
         }
 
         internal void TimerElapsed()
