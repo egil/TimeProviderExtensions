@@ -5,6 +5,14 @@ All notable changes to TimeScheduler will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-preview.5]
+
+Aligned the public API surface of `ManualTimeProvider` with `Microsoft.Extensions.Time.Testing.FakeTimeProvider`. This means:
+
+  - The `StartTime` property is now called `Start`.
+  - The `ForwardTime` method has been removed (use `Advance` instead).
+  - The `AutoAdvanceAmount` property has been introduced, which will advance time with the specified amount every time `GetUtcNow()` is called. It defaults to `TimeSpan.Zero`, which disables auto-advancing.
+
 ## [1.0.0-preview.4]
 
 - Added 'StartTime' to `ManualTestProvider`, which represents the initial date/time when the `ManualtTimeProvider` was initialized.
