@@ -1,21 +1,20 @@
+// This file originally copied from the following URL, and only modified
+// to allow the original tests to run against the ManualTimeProvider.
+// https://github.com/dotnet/extensions/blob/285e8a05274da583a557f66715f7773dc67e3799/test/Libraries/Microsoft.Extensions.TimeProvider.Testing.Tests/FakeTimeProviderTests.cs
 
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Time.Testing;
-using Xunit;
+using FakeTimeProvider = TimeProviderExtensions.ManualTimeProvider;
 
 namespace Microsoft.Extensions.Time.Testing.Test;
 
-public class FakeTimeProviderTests
+public class ManualTimeProviderTests
 {
     [Fact]
     public void DefaultCtor()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
 
         var now = timeProvider.GetUtcNow();
         var timestamp = timeProvider.GetTimestamp();
@@ -30,26 +29,21 @@ public class FakeTimeProviderTests
         Assert.Equal(0, now.Millisecond);
         Assert.Equal(TimeSpan.Zero, now.Offset);
         Assert.Equal(10_000_000, frequency);
+        Assert.Equal(TimeSpan.Zero, timeProvider.AutoAdvanceAmount);
 
         var timestamp2 = timeProvider.GetTimestamp();
         var frequency2 = timeProvider.TimestampFrequency;
-        now = timeProvider.GetUtcNow();
+        var now2 = timeProvider.GetUtcNow();
 
-        Assert.Equal(2000, now.Year);
-        Assert.Equal(1, now.Month);
-        Assert.Equal(1, now.Day);
-        Assert.Equal(0, now.Hour);
-        Assert.Equal(0, now.Minute);
-        Assert.Equal(0, now.Second);
-        Assert.Equal(0, now.Millisecond);
-        Assert.Equal(10_000_000, frequency2);
-        Assert.Equal(timestamp2, timestamp);
+        Assert.Equal(now, now2);
+        Assert.Equal(frequency, frequency2);
+        Assert.Equal(timestamp, timestamp2);
     }
 
     [Fact]
     public void RichCtor()
     {
-        var timeProvider = new SutTimeProvider(new DateTimeOffset(2001, 2, 3, 4, 5, 6, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2001, 2, 3, 4, 5, 6, TimeSpan.Zero));
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(8));
         var pnow = timeProvider.GetTimestamp();
@@ -65,6 +59,7 @@ public class FakeTimeProviderTests
         Assert.Equal(TimeSpan.Zero, now.Offset);
         Assert.Equal(8, now.Millisecond);
         Assert.Equal(10_000_000, frequency);
+        Assert.Equal(TimeSpan.Zero, timeProvider.AutoAdvanceAmount);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(8));
         var pnow2 = timeProvider.GetTimestamp();
@@ -78,23 +73,36 @@ public class FakeTimeProviderTests
         Assert.Equal(5, now.Minute);
         Assert.Equal(6, now.Second);
         Assert.Equal(16, now.Millisecond);
-        Assert.Equal(10_000_000, frequency2);
+        Assert.Equal(frequency, frequency2);
         Assert.True(pnow2 > pnow);
     }
 
     [Fact]
     public void LocalTimeZoneIsUtc()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
         var localTimeZone = timeProvider.LocalTimeZone;
 
         Assert.Equal(TimeZoneInfo.Utc, localTimeZone);
     }
 
     [Fact]
+    public void SetLocalTimeZoneWorks()
+    {
+        var timeProvider = new FakeTimeProvider();
+
+        var localTimeZone = timeProvider.LocalTimeZone;
+        Assert.Equal(TimeZoneInfo.Utc, localTimeZone);
+
+        var tz = TimeZoneInfo.CreateCustomTimeZone("DUMMY", TimeSpan.FromHours(2), null, null);
+        timeProvider.SetLocalTimeZone(tz);
+        Assert.Equal(timeProvider.LocalTimeZone, tz);
+    }
+
+    [Fact]
     public void GetTimestampSyncWithUtcNow()
     {
-        var timeProvider = new SutTimeProvider(new DateTimeOffset(2001, 2, 3, 4, 5, 6, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2001, 2, 3, 4, 5, 6, TimeSpan.Zero));
 
         var initialTimeUtcNow = timeProvider.GetUtcNow();
         var initialTimestamp = timeProvider.GetTimestamp();
@@ -118,7 +126,7 @@ public class FakeTimeProviderTests
     [Fact]
     public void AdvanceGoesForward()
     {
-        var timeProvider = new SutTimeProvider(new DateTimeOffset(2001, 2, 3, 4, 5, 6, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2001, 2, 3, 4, 5, 6, TimeSpan.Zero));
 
         var initialTimeUtcNow = timeProvider.GetUtcNow();
         var initialTimestamp = timeProvider.GetTimestamp();
@@ -140,11 +148,20 @@ public class FakeTimeProviderTests
     }
 
     [Fact]
+    public void TimeCannotGoBackwards()
+    {
+        var timeProvider = new FakeTimeProvider();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeProvider.Advance(TimeSpan.FromTicks(-1)));
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeProvider.SetUtcNow(timeProvider.GetUtcNow() - TimeSpan.FromTicks(1)));
+    }
+
+    [Fact]
     public void ToStr()
     {
         var dto = new DateTimeOffset(new DateTime(2022, 1, 2, 3, 4, 5, 6), TimeSpan.Zero);
 
-        var timeProvider = new SutTimeProvider(dto);
+        var timeProvider = new FakeTimeProvider(dto);
         Assert.Equal("2022-01-02T03:04:05.006", timeProvider.ToString());
     }
 
@@ -153,7 +170,7 @@ public class FakeTimeProviderTests
     [Fact]
     public void Delay_InvalidArgs()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
         _ = Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => timeProvider.Delay(TimeSpan.FromTicks(-1), CancellationToken.None));
         _ = Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => timeProvider.Delay(_infiniteTimeout, CancellationToken.None));
     }
@@ -161,7 +178,7 @@ public class FakeTimeProviderTests
     [Fact]
     public async Task Delay_Zero()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
         var t = timeProvider.Delay(TimeSpan.Zero, CancellationToken.None);
         await t;
 
@@ -171,10 +188,10 @@ public class FakeTimeProviderTests
     [Fact]
     public async Task Delay_Timeout()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
 
         var delay = timeProvider.Delay(TimeSpan.FromMilliseconds(1), CancellationToken.None);
-        timeProvider.Advance();
+        timeProvider.Advance(TimeSpan.FromMilliseconds(1));
         await delay;
 
         Assert.True(delay.IsCompleted);
@@ -185,7 +202,7 @@ public class FakeTimeProviderTests
     [Fact]
     public async Task Delay_Cancelled()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
 
         using var cs = new CancellationTokenSource();
         var delay = timeProvider.Delay(_infiniteTimeout, cs.Token);
@@ -201,10 +218,10 @@ public class FakeTimeProviderTests
     [Fact]
     public async Task CreateSource()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
 
         using var cts = timeProvider.CreateCancellationTokenSource(TimeSpan.FromMilliseconds(1));
-        timeProvider.Advance();
+        timeProvider.Advance(TimeSpan.FromMilliseconds(1));
 
         await Assert.ThrowsAsync<TaskCanceledException>(() => timeProvider.Delay(TimeSpan.FromTicks(1), cts.Token));
     }
@@ -212,7 +229,7 @@ public class FakeTimeProviderTests
     [Fact]
     public async Task WaitAsync()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
         var source = new TaskCompletionSource<bool>();
 
 #if NET8_0_OR_GREATER
@@ -225,7 +242,7 @@ public class FakeTimeProviderTests
         var t = source.Task.WaitAsync(TimeSpan.FromSeconds(100000), timeProvider, CancellationToken.None);
         while (!t.IsCompleted)
         {
-            timeProvider.Advance();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(1));
             await Task.Delay(1);
             _ = source.TrySetResult(true);
         }
@@ -238,13 +255,13 @@ public class FakeTimeProviderTests
     [Fact]
     public async Task WaitAsync_InfiniteTimeout()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
         var source = new TaskCompletionSource<bool>();
 
         var t = source.Task.WaitAsync(_infiniteTimeout, timeProvider, CancellationToken.None);
         while (!t.IsCompleted)
         {
-            timeProvider.Advance();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(1));
             await Task.Delay(1);
             _ = source.TrySetResult(true);
         }
@@ -257,13 +274,13 @@ public class FakeTimeProviderTests
     [Fact]
     public async Task WaitAsync_Timeout()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
         var source = new TaskCompletionSource<bool>();
 
         var t = source.Task.WaitAsync(TimeSpan.FromMilliseconds(1), timeProvider, CancellationToken.None);
         while (!t.IsCompleted)
         {
-            timeProvider.Advance();
+            timeProvider.Advance(TimeSpan.FromMilliseconds(1));
             await Task.Delay(1);
         }
 
@@ -275,7 +292,7 @@ public class FakeTimeProviderTests
     [Fact]
     public async Task WaitAsync_Cancel()
     {
-        var timeProvider = new SutTimeProvider();
+        var timeProvider = new FakeTimeProvider();
         var source = new TaskCompletionSource<bool>();
         using var cts = new CancellationTokenSource();
 
@@ -286,4 +303,46 @@ public class FakeTimeProviderTests
         await Assert.ThrowsAsync<TaskCanceledException>(() => t).ConfigureAwait(false);
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
     }
+
+    [Fact]
+    public void AutoAdvance()
+    {
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow)
+        {
+            AutoAdvanceAmount = TimeSpan.FromSeconds(1)
+        };
+
+        var first = timeProvider.GetUtcNow();
+        var second = timeProvider.GetUtcNow();
+        var third = timeProvider.GetUtcNow();
+
+        Assert.Equal(timeProvider.Start, first);
+        Assert.Equal(timeProvider.Start + TimeSpan.FromSeconds(1), second);
+        Assert.Equal(timeProvider.Start + TimeSpan.FromSeconds(2), third);
+    }
+
+    [Fact]
+    public void ToString_AutoAdvance_off()
+    {
+        var timeProvider = new FakeTimeProvider();
+
+        _ = timeProvider.ToString();
+
+        Assert.Equal(timeProvider.Start, timeProvider.GetUtcNow());
+    }
+
+    [Fact]
+    public void ToString_AutoAdvance_on()
+    {
+        var timeProvider = new FakeTimeProvider
+        {
+            AutoAdvanceAmount = TimeSpan.FromSeconds(1)
+        };
+
+        _ = timeProvider.ToString();
+
+        timeProvider.AutoAdvanceAmount = TimeSpan.Zero;
+        Assert.Equal(timeProvider.Start, timeProvider.GetUtcNow());
+    }
 }
+

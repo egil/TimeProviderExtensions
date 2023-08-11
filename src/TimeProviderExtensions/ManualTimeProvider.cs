@@ -5,71 +5,104 @@ using System.Runtime.CompilerServices;
 namespace TimeProviderExtensions;
 
 /// <summary>
-/// Represents a test implementation of a <see cref="TimeProvider"/>,
-/// where time stands still until you call <see cref="ForwardTime(TimeSpan)"/>
-/// or <see cref="SetUtcNow(DateTimeOffset)"/>.
+/// Represents a synthetic time provider that can be used to enable deterministic behavior in tests.
 /// </summary>
 /// <remarks>
 /// Learn more at <see href="https://github.com/egil/TimeProviderExtensions"/>.
 /// </remarks>
+[DebuggerDisplay("{ToString()}. Scheduled callback count: {ScheduledCallbackCount}")]
 public class ManualTimeProvider : TimeProvider
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     internal const uint UnsignedInfinite = unchecked((uint)-1);
-    internal static readonly DateTimeOffset Epoch = new(2000, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
+    internal static readonly DateTimeOffset DefaultStartDateTime = new(2000, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
 
-    private readonly List<ManualTimerScheduledCallback> futureCallbacks = new();
+    private readonly List<ManualTimerScheduledCallback> callbacks = new();
     private DateTimeOffset utcNow;
-    private TimeZoneInfo localTimeZone = TimeZoneInfo.Utc;
+    private TimeZoneInfo localTimeZone;
+    private TimeSpan autoAdvanceAmount = TimeSpan.Zero;
 
     /// <summary>
-    /// Gets the date and time which was set when this <see cref="TimeProvider"/> was initialized.
+    /// Gets the number of callbacks that are scheduled to be triggered in the future.
     /// </summary>
-    public DateTimeOffset StartTime { get; }
+    internal int ScheduledCallbackCount => callbacks.Count;
 
     /// <summary>
-    /// Gets the frequency of <see cref="GetTimestamp"/> of high-frequency value per second.
+    /// Gets the starting date and time for this provider.
+    /// </summary>
+    public DateTimeOffset Start { get; }
+
+    /// <summary>
+    /// Gets or sets the amount of time by which time advances whenever the clock is read via <see cref="GetUtcNow"/>.
     /// </summary>
     /// <remarks>
-    /// This implementation bases timestamp on <see cref="DateTimeOffset.UtcTicks"/>, which is 10,000 ticks per millisecond,
-    /// since the progression of time is represented by the date and time returned from <see cref="GetUtcNow()" />.
+    /// Set to <see cref="TimeSpan.Zero"/> to disable auto advance. The default value is <see cref="TimeSpan.Zero"/>.
     /// </remarks>
-    public override long TimestampFrequency { get; } = 10_000_000;
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value than <see cref="TimeSpan.Zero"/>.</exception>
+    public TimeSpan AutoAdvanceAmount
+    {
+        get => autoAdvanceAmount;
+        set
+        {
+            if (value < TimeSpan.Zero)
+            {
+                throw new ArgumentOutOfRangeException(nameof(AutoAdvanceAmount), "Auto advance amount cannot be less than zero. ");
+            }
+
+            autoAdvanceAmount = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets the amount by which the value from <see cref="GetTimestamp"/> increments per second.
+    /// </summary>
+    /// <remarks>
+    /// This is fixed to the value of <see cref="TimeSpan.TicksPerSecond"/>.
+    /// </remarks>
+    public override long TimestampFrequency { get; } = TimeSpan.TicksPerSecond;
 
     /// <inheritdoc />
     public override TimeZoneInfo LocalTimeZone => localTimeZone;
 
     /// <summary>
-    /// Creates an instance of the <see cref="ManualTimeProvider"/> with
-    /// <c>UtcNow</c> set to <c>2000-01-01 00:00:00.000</c>.
+    /// Initializes a new instance of the <see cref="ManualTimeProvider"/> class.
     /// </summary>
-    /// <param name="localTimeZone">Optional local time zone to use during testing. Defaults to <see cref="TimeZoneInfo.Utc"/>.</param>
-    public ManualTimeProvider(TimeZoneInfo? localTimeZone = null)
-        : this(Epoch, localTimeZone)
-    {     
+    /// <remarks>
+    /// This creates a provider whose time is initially set to midnight January 1st 2000 and
+    /// with the local time zone set to <see cref="TimeZoneInfo.Utc"/>.
+    /// The provider is set to not automatically advance time each time it is read.
+    /// </remarks>
+    public ManualTimeProvider()
+        : this(DefaultStartDateTime, TimeZoneInfo.Utc)
+    {
     }
 
     /// <summary>
-    /// Creates an instance of the <see cref="ManualTimeProvider"/> with
-    /// <paramref name="startDateTime"/> being the initial value returned by <see cref="GetUtcNow()"/>.
+    /// Initializes a new instance of the <see cref="ManualTimeProvider"/> class.
     /// </summary>
-    /// <param name="startDateTime">The initial date and time <see cref="GetUtcNow()"/> will return.</param>
+    /// <param name="startDateTime">The initial time and date reported by the provider.</param>
+    /// <remarks>
+    /// The local time zone set to <see cref="TimeZoneInfo.Utc"/>.
+    /// The provider is set to not automatically advance time each time it is read.
+    /// </remarks>
     public ManualTimeProvider(DateTimeOffset startDateTime)
         : this(startDateTime, TimeZoneInfo.Utc)
     {
     }
 
     /// <summary>
-    /// Creates an instance of the <see cref="ManualTimeProvider"/> with
-    /// <paramref name="startDateTime"/> being the initial value returned by <see cref="GetUtcNow()"/>.
+    /// Initializes a new instance of the <see cref="ManualTimeProvider"/> class.
     /// </summary>
-    /// <param name="startDateTime">The initial date and time <see cref="GetUtcNow()"/> will return.</param>
+    /// <param name="startDateTime">The initial time and date reported by the provider.</param>
     /// <param name="localTimeZone">Optional local time zone to use during testing. Defaults to <see cref="TimeZoneInfo.Utc"/>.</param>
-    public ManualTimeProvider(DateTimeOffset startDateTime, TimeZoneInfo? localTimeZone = null)
+    /// <remarks>
+    /// The provider is set to not automatically advance time each time it is read.
+    /// </remarks>
+    public ManualTimeProvider(DateTimeOffset startDateTime, TimeZoneInfo localTimeZone)
     {
         utcNow = startDateTime;
-        StartTime = startDateTime;
-        this.localTimeZone = localTimeZone ?? TimeZoneInfo.Utc;
+        this.localTimeZone = localTimeZone;
+        Start = startDateTime;
     }
 
     /// <summary>
@@ -80,7 +113,7 @@ public class ManualTimeProvider : TimeProvider
     /// This implementation bases timestamp on <see cref="DateTimeOffset.UtcTicks"/>,
     /// since the progression of time is represented by the date and time returned from <see cref="GetUtcNow()" />.
     /// </remarks>
-    public override long GetTimestamp() => GetUtcNow().UtcTicks;
+    public override long GetTimestamp() => utcNow.UtcTicks;
 
     /// <summary>
     /// Gets a <see cref="DateTimeOffset"/> value whose date and time are set to the current
@@ -88,9 +121,23 @@ public class ManualTimeProvider : TimeProvider
     /// all according to this <see cref="ManualTimeProvider"/>'s notion of time.
     /// </summary>
     /// <remarks>
-    /// To advance time, call <see cref="ForwardTime(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/>.
+    /// If <see cref="AutoAdvanceAmount"/> is greater than <see cref="TimeSpan.Zero"/>, calling this
+    /// method will move time forward by the amount specified by <see cref="AutoAdvanceAmount"/>.
+    /// The <see cref="DateTimeOffset"/> returned from this method will reflect the time before
+    /// the auto advance was applied, if any.
     /// </remarks>
-    public override DateTimeOffset GetUtcNow() => utcNow;
+    public override DateTimeOffset GetUtcNow()
+    {
+        DateTimeOffset result;
+
+        lock (callbacks)
+        {
+            result = utcNow;
+            Advance(AutoAdvanceAmount);
+        }
+
+        return result;
+    }
 
     /// <summary>Creates a new <see cref="ITimer"/> instance, using <see cref="TimeSpan"/> values to measure time intervals.</summary>
     /// <param name="callback">
@@ -125,25 +172,14 @@ public class ManualTimeProvider : TimeProvider
     /// each time it's called. That capture can be suppressed with <see cref="ExecutionContext.SuppressFlow"/>.
     /// </para>
     /// <para>
-    /// To advance time, call <see cref="ForwardTime(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/>.
+    /// To move time forward for the returned <see cref="ITimer"/>, call <see cref="Advance(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/> on this time provider.
     /// </para>
     /// </remarks>
     public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
-        => new ManualTimer(callback, state, dueTime, period, this);
-
-    /// <summary>
-    /// Forward the date and time represented by <see cref="GetUtcNow()"/>
-    /// by the specified <paramref name="delta"/>, and triggers any
-    /// scheduled items that are waiting for time to be forwarded.
-    /// </summary>
-    /// <param name="delta">The span of time to forward <see cref="GetUtcNow()"/> with.</param>
-    /// <exception cref="ArgumentException">If <paramref name="delta"/> is negative or zero.</exception>
-    public void ForwardTime(TimeSpan delta)
     {
-        if (delta <= TimeSpan.Zero)
-            throw new ArgumentException("The timespan to forward time by must be positive.", nameof(delta));
-
-        SetUtcNow(utcNow + delta);
+        var result = new ManualTimer(callback, state, this);
+        result.Change(dueTime, period);
+        return result;
     }
 
     /// <summary>
@@ -156,45 +192,68 @@ public class ManualTimeProvider : TimeProvider
     }
 
     /// <summary>
-    /// Advance the date and time represented by <see cref="GetUtcNow()"/>
-    /// by the specified <paramref name="delta"/>, and triggers any
-    /// scheduled items that are waiting for time to be forwarded.
+    /// Advances time by a specific amount.
     /// </summary>
     /// <param name="delta">The amount of time to advance the clock by.</param>
+    /// <remarks>
+    /// Advancing time affects the timers created from this provider, and all other operations that are directly or
+    /// indirectly using this provider as a time source. Whereas when using <see cref="TimeProvider.System"/>, time
+    /// marches forward automatically in hardware, for the manual time provider the application is responsible for
+    /// doing this explicitly by calling this method.
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="delta"/> is negative. Going back in time is not supported.</exception>
     public void Advance(TimeSpan delta)
     {
+        if (delta < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(delta), "Going back in time is not supported. ");
+        }
+
+        if (delta == TimeSpan.Zero)
+        {
+            return;
+        }
+
         SetUtcNow(utcNow + delta);
     }
 
     /// <summary>
-    /// Sets the date and time returned by <see cref="GetUtcNow()"/> to <paramref name="newUtcNew"/> and triggers any
+    /// Sets the date and time returned by <see cref="GetUtcNow()"/> to <paramref name="value"/> and triggers any
     /// scheduled items that are waiting for time to be forwarded.
     /// </summary>
-    /// <param name="newUtcNew">The new UtcNow time.</param>
-    /// <exception cref="ArgumentException">If <paramref name="newUtcNew"/> is less than the value returned by <see cref="GetUtcNow()"/>.</exception>
-    public void SetUtcNow(DateTimeOffset newUtcNew)
+    /// <param name="value">The new UtcNow time.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="value"/> is less than the value returned by <see cref="GetUtcNow()"/>. Going back in time is not supported.</exception>
+    public void SetUtcNow(DateTimeOffset value)
     {
-        if (newUtcNew < utcNow)
-            throw new ArgumentException("The new UtcNow must be greater than or equal to the current UtcNow.", nameof(newUtcNew));
-
-        while (utcNow <= newUtcNew && TryGetNext(newUtcNew) is ManualTimerScheduledCallback mtsc)
+        if (value < utcNow)
         {
-            utcNow = mtsc.CallbackTime;
-            mtsc.Timer.TimerElapsed();
+            throw new ArgumentOutOfRangeException(nameof(value), $"The new UtcNow must be greater than or equal to the curren time {utcNow}. Going back in time is not supported.");
         }
 
-        utcNow = newUtcNew;
+        lock (callbacks)
+        {
+            // Double check in case another thread already advanced time.
+            if (value <= utcNow)
+            {
+                return;
+            }
+
+            while (utcNow <= value && TryGetNext(value) is ManualTimerScheduledCallback mtsc)
+            {
+                utcNow = mtsc.CallbackTime;
+                mtsc.Timer.TimerElapsed();
+            }
+
+            utcNow = value;
+        }
 
         ManualTimerScheduledCallback? TryGetNext(DateTimeOffset targetUtcNow)
         {
-            lock (futureCallbacks)
+            if (callbacks.Count > 0 && callbacks[0].CallbackTime <= targetUtcNow)
             {
-                if (futureCallbacks.Count > 0 && futureCallbacks[0].CallbackTime <= targetUtcNow)
-                {
-                    var callback = futureCallbacks[0];
-                    futureCallbacks.RemoveAt(0);
-                    return callback;
-                }
+                var callback = callbacks[0];
+                callbacks.RemoveAt(0);
+                return callback;
             }
 
             return null;
@@ -205,34 +264,33 @@ public class ManualTimeProvider : TimeProvider
     /// Returns a string representation this clock's current time.
     /// </summary>
     /// <returns>A string representing the clock's current time.</returns>
-    public override string ToString()
-        => GetUtcNow().ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture);
+    public override string ToString() => utcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture);
 
     private void ScheduleCallback(ManualTimer timer, TimeSpan waitTime)
     {
-        lock (futureCallbacks)
+        lock (callbacks)
         {
-            var mtsc = new ManualTimerScheduledCallback(timer, utcNow + waitTime);
-            var insertPosition = futureCallbacks.FindIndex(x => x.CallbackTime > mtsc.CallbackTime);
+            var timerCallback = new ManualTimerScheduledCallback(timer, utcNow + waitTime);
+            var insertPosition = callbacks.FindIndex(x => x.CallbackTime > timerCallback.CallbackTime);
 
             if (insertPosition == -1)
             {
-                futureCallbacks.Add(mtsc);
+                callbacks.Add(timerCallback);
             }
             else
             {
-                futureCallbacks.Insert(insertPosition, mtsc);
+                callbacks.Insert(insertPosition, timerCallback);
             }
         }
     }
 
     private void RemoveCallback(ManualTimer timer)
     {
-        lock (futureCallbacks)
+        lock (callbacks)
         {
-            var existingIndexOf = futureCallbacks.FindIndex(0, x => ReferenceEquals(x.Timer, timer));
+            var existingIndexOf = callbacks.FindIndex(0, x => ReferenceEquals(x.Timer, timer));
             if (existingIndexOf >= 0)
-                futureCallbacks.RemoveAt(existingIndexOf);
+                callbacks.RemoveAt(existingIndexOf);
         }
     }
 
@@ -241,6 +299,7 @@ public class ManualTimeProvider : TimeProvider
         IComparable<ManualTimerScheduledCallback>
     {
         public readonly ManualTimer Timer { get; }
+
         public readonly DateTimeOffset CallbackTime { get; }
 
         public ManualTimerScheduledCallback(ManualTimer timer, DateTimeOffset callbackTime)
@@ -261,7 +320,7 @@ public class ManualTimeProvider : TimeProvider
 
     private sealed class ManualTimer : ITimer
     {
-        private readonly ManualTimeProvider owner;
+        private ManualTimeProvider? timeProvider;
         private bool isDisposed;
         private bool running;
 
@@ -270,18 +329,11 @@ public class ManualTimeProvider : TimeProvider
         private object? state;
         private TimerCallback? callback;
 
-        public ManualTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period, ManualTimeProvider owner)
+        public ManualTimer(TimerCallback callback, object? state, ManualTimeProvider timeProvider)
         {
-            ValidateTimeSpanRange(dueTime);
-            ValidateTimeSpanRange(period);
+            this.timeProvider = timeProvider;
             this.callback = callback;
             this.state = state;
-            currentDueTime = dueTime;
-            currentPeriod = period;
-            this.owner = owner;
-
-            if (currentDueTime != Timeout.InfiniteTimeSpan)
-                ScheduleCallback(dueTime);
         }
 
         public bool Change(TimeSpan dueTime, TimeSpan period)
@@ -289,37 +341,51 @@ public class ManualTimeProvider : TimeProvider
             ValidateTimeSpanRange(dueTime);
             ValidateTimeSpanRange(period);
 
+            if (isDisposed || timeProvider is null)
+            {
+                return false;
+            }
+
             if (running)
-                owner.RemoveCallback(this);
+            {
+                timeProvider.RemoveCallback(this);
+            }
 
             currentDueTime = dueTime;
             currentPeriod = period;
 
             if (currentDueTime != Timeout.InfiniteTimeSpan)
+            {
                 ScheduleCallback(dueTime);
+            }
 
             return true;
         }
 
         public void Dispose()
         {
-            if (isDisposed)
+            if (isDisposed || timeProvider is null)
+            {
                 return;
+            }
 
             isDisposed = true;
 
             if (running)
-                owner.RemoveCallback(this);
+            {
+                timeProvider.RemoveCallback(this);
+            }
 
             callback = null;
             state = null;
+            timeProvider = null;
         }
 
         public ValueTask DisposeAsync()
         {
             Dispose();
 #if NETSTANDARD2_0
-            return new ValueTask(Task.CompletedTask);
+            return default;
 #else
             return ValueTask.CompletedTask;
 #endif
@@ -327,21 +393,27 @@ public class ManualTimeProvider : TimeProvider
 
         internal void TimerElapsed()
         {
-            if (isDisposed)
+            if (isDisposed || timeProvider is null)
+            {
                 return;
+            }
 
             running = false;
 
             callback?.Invoke(state);
 
             if (currentPeriod != Timeout.InfiniteTimeSpan && currentPeriod != TimeSpan.Zero)
+            {
                 ScheduleCallback(currentPeriod);
+            }
         }
 
         private void ScheduleCallback(TimeSpan waitTime)
         {
-            if (isDisposed)
+            if (isDisposed || timeProvider is null)
+            {
                 return;
+            }
 
             running = true;
 
@@ -351,7 +423,7 @@ public class ManualTimeProvider : TimeProvider
             }
             else
             {
-                owner.ScheduleCallback(this, waitTime);
+                timeProvider.ScheduleCallback(this, waitTime);
             }
         }
 
@@ -359,10 +431,14 @@ public class ManualTimeProvider : TimeProvider
         {
             long tm = (long)time.TotalMilliseconds;
             if (tm < -1)
+            {
                 throw new ArgumentOutOfRangeException(parameter, $"{parameter}.TotalMilliseconds must be greater than -1.");
+            }
 
             if (tm > MaxSupportedTimeout)
+            {
                 throw new ArgumentOutOfRangeException(parameter, $"{parameter}.TotalMilliseconds must be less than than {MaxSupportedTimeout}.");
+            }
         }
     }
 }
