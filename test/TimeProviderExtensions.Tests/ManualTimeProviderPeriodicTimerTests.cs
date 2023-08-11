@@ -1,9 +1,4 @@
 #if NET6_0_OR_GREATER
-#if TargetMicrosoftTestTimeProvider && !RELEASE
-using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
-#else
-using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
-#endif
 
 namespace TimeProviderExtensions;
 
@@ -13,7 +8,7 @@ public class ManualTimeProviderPeriodicTimerTests
     public void PeriodicTimer_WaitForNextTickAsync_cancelled_immediately()
     {
         using var cts = new CancellationTokenSource();
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromMilliseconds(1));
 
         cts.Cancel();
@@ -25,7 +20,7 @@ public class ManualTimeProviderPeriodicTimerTests
     [Fact]
     public async Task PeriodicTimer_WaitForNextTickAsync_complete_immediately()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromMilliseconds(1));
 
         sut.Advance(TimeSpan.FromMilliseconds(1));
@@ -39,7 +34,7 @@ public class ManualTimeProviderPeriodicTimerTests
     {
         var startTime = DateTimeOffset.UtcNow;
         var future = TimeSpan.FromMilliseconds(1);
-        var sut = new SutTimeProvider(startTime);
+        var sut = new ManualTimeProvider(startTime);
         using var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromMilliseconds(1));
         var task = periodicTimer.WaitForNextTickAsync();
 
@@ -52,7 +47,7 @@ public class ManualTimeProviderPeriodicTimerTests
     public async Task PeriodicTimer_WaitForNextTickAsync_completes_after_dispose()
     {
         var startTime = DateTimeOffset.UtcNow;
-        var sut = new SutTimeProvider(startTime);
+        var sut = new ManualTimeProvider(startTime);
         var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromMilliseconds(1));
         var task = periodicTimer.WaitForNextTickAsync();
 
@@ -65,7 +60,7 @@ public class ManualTimeProviderPeriodicTimerTests
     public async Task PeriodicTimer_WaitForNextTickAsync_cancelled_with_exception()
     {
         using var cts = new CancellationTokenSource();
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromMilliseconds(1));
         var task = periodicTimer.WaitForNextTickAsync(cts.Token);
         cts.Cancel();
@@ -80,7 +75,7 @@ public class ManualTimeProviderPeriodicTimerTests
     [Fact]
     public void PeriodicTimer_WaitForNextTickAsync_twice_throws()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromMilliseconds(1));
 
         _ = periodicTimer.WaitForNextTickAsync();
@@ -92,7 +87,7 @@ public class ManualTimeProviderPeriodicTimerTests
     [Fact]
     public void PeriodicTimer_WaitForNextTickAsync_completes_multiple()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var calledTimes = 0;
         var interval = TimeSpan.FromSeconds(1);
         var looper = WaitForNextTickInLoop(sut, () => calledTimes++, interval);
@@ -110,7 +105,7 @@ public class ManualTimeProviderPeriodicTimerTests
     [InlineData(3)]
     public void PeriodicTimer_WaitForNextTickAsync_completes_iterations(int expectedCallbacks)
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var calledTimes = 0;
         var interval = TimeSpan.FromSeconds(1);
         var looper = WaitForNextTickInLoop(sut, () => calledTimes++, interval);
@@ -123,7 +118,7 @@ public class ManualTimeProviderPeriodicTimerTests
     [Fact]
     public async void PeriodicTimer_WaitForNextTickAsync_exists_on_timer_Dispose()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromSeconds(1));
         var disposeTask = WaitForNextTickToReturnFalse(periodicTimer);
         sut.Advance(TimeSpan.FromSeconds(1));
@@ -149,7 +144,7 @@ public class ManualTimeProviderPeriodicTimerTests
     [Fact]
     public void GetUtcNow_matches_time_when_WaitForNextTickAsync_is_invoked()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var startTime = sut.GetUtcNow();
         var callbackTimes = new List<DateTimeOffset>();
         var interval = TimeSpan.FromSeconds(5);
@@ -166,7 +161,7 @@ public class ManualTimeProviderPeriodicTimerTests
     [Fact]
     public async void Cancelling_token_after_WaitForNextTickAsync_safe()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var interval = TimeSpan.FromSeconds(3);
         using var cts = new CancellationTokenSource();
         var periodicTimer = sut.CreatePeriodicTimer(interval);

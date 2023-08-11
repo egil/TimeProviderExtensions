@@ -1,8 +1,4 @@
-#if TargetMicrosoftTestTimeProvider && !RELEASE
-using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
-#else
-using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
-#endif
+using FluentAssertions.Extensions;
 
 namespace TimeProviderExtensions;
 
@@ -12,7 +8,7 @@ public class ManualTimeProviderTests
     public void Advance_updates_UtcNow()
     {
         var startTime = DateTimeOffset.UtcNow;
-        var sut = new SutTimeProvider(startTime);
+        var sut = new ManualTimeProvider(startTime);
 
         sut.Advance(TimeSpan.FromTicks(1));
 
@@ -23,7 +19,7 @@ public class ManualTimeProviderTests
     public void SetUtcNow_updates_UtcNow()
     {
         var startTime = DateTimeOffset.UtcNow;
-        var sut = new SutTimeProvider(startTime);
+        var sut = new ManualTimeProvider(startTime);
 
         sut.SetUtcNow(startTime + TimeSpan.FromTicks(1));
 
@@ -34,7 +30,7 @@ public class ManualTimeProviderTests
     public async Task Delay_callbacks_runs_synchronously()
     {
         // arrange
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var callbackCount = 0;
         var continuationTask = Continuation(sut, () => callbackCount++);
 
@@ -56,7 +52,7 @@ public class ManualTimeProviderTests
     public async Task WaitAsync_callbacks_runs_synchronously()
     {
         // arrange
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var callbackCount = 0;
         var continuationTask = Continuation(sut, () => callbackCount++);
 
@@ -86,7 +82,7 @@ public class ManualTimeProviderTests
     [Fact]
     public async Task Callbacks_happens_in_schedule_order()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromSeconds(10));
         var startTime = sut.GetUtcNow();
         var callbacks = new List<DateTimeOffset>();

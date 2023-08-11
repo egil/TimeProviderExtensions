@@ -1,9 +1,3 @@
-#if TargetMicrosoftTestTimeProvider && !RELEASE
-using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
-#else
-using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
-using TimeProviderExtensions;
-#endif
 
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.

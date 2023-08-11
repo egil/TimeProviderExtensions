@@ -1,9 +1,3 @@
-#if TargetMicrosoftTestTimeProvider && !RELEASE
-using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
-#else
-using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
-#endif
-
 namespace TimeProviderExtensions;
 
 public class ManualTimeProviderCancelAfter
@@ -12,7 +6,7 @@ public class ManualTimeProviderCancelAfter
     public void CancelAfter_cancels()
     {
         var delay = TimeSpan.FromMilliseconds(42);
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var cts = sut.CreateCancellationTokenSource(delay);
 
         sut.Advance(delay);
@@ -27,7 +21,7 @@ public class ManualTimeProviderCancelAfter
     {
         var initialDelay = TimeSpan.FromMilliseconds(100);
         var rescheduledDelay = TimeSpan.FromMilliseconds(1000);
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var cts = sut.CreateCancellationTokenSource(initialDelay);
 
         cts.CancelAfter(rescheduledDelay);
@@ -44,7 +38,7 @@ public class ManualTimeProviderCancelAfter
     {
         var initialDelay = TimeSpan.FromMilliseconds(1000);
         var rescheduledDelay = TimeSpan.FromMilliseconds(100);
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var cts = sut.CreateCancellationTokenSource(initialDelay);
 
         cts.CancelAfter(rescheduledDelay);

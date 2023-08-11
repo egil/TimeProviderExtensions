@@ -1,9 +1,3 @@
-#if TargetMicrosoftTestTimeProvider && !RELEASE
-using SutTimeProvider = Microsoft.Extensions.Time.Testing.FakeTimeProvider;
-#else
-using SutTimeProvider = TimeProviderExtensions.ManualTimeProvider;
-#endif
-
 namespace TimeProviderExtensions;
 
 public class ManualTimeProviderTimerTests
@@ -14,7 +8,7 @@ public class ManualTimeProviderTimerTests
         var callbackCount = 0;
         var dueTime = TimeSpan.FromSeconds(1);
         var period = Timeout.InfiniteTimeSpan;
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var timer = sut.CreateTimer(_ => callbackCount++, null, dueTime, period);
 
         sut.Advance(dueTime);
@@ -30,7 +24,7 @@ public class ManualTimeProviderTimerTests
         var callbackCount = 0;
         var dueTime = TimeSpan.FromSeconds(1);
         var period = TimeSpan.FromSeconds(2);
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var timer = sut.CreateTimer(_ => callbackCount++, null, dueTime, period);
 
         sut.Advance(dueTime);
@@ -49,7 +43,7 @@ public class ManualTimeProviderTimerTests
         var callbackCount = 0;
         var dueTime = Timeout.InfiniteTimeSpan;
         var period = Timeout.InfiniteTimeSpan;
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var timer = sut.CreateTimer(_ => callbackCount++, null, dueTime, period);
 
         sut.Advance(TimeSpan.FromSeconds(1));
@@ -62,7 +56,7 @@ public class ManualTimeProviderTimerTests
     {
         // Arrange
         var callbackCount = 0;
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         using var timer = sut.CreateTimer(_ => callbackCount++, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         var dueTime = TimeSpan.FromSeconds(1);
         var period = TimeSpan.FromSeconds(2);
@@ -86,7 +80,7 @@ public class ManualTimeProviderTimerTests
     {
         // Arrange
         var callbackCount = 0;
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var originalDueTime = TimeSpan.FromSeconds(3);
         var period = TimeSpan.FromSeconds(5);
         using var timer = sut.CreateTimer(_ => callbackCount++, null, originalDueTime, period);
@@ -109,7 +103,7 @@ public class ManualTimeProviderTimerTests
     [Fact]
     public void Timer_callback_invoked_multiple_times_single_advance()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var callbackCount = 0;
         var dueTime = TimeSpan.FromSeconds(3);
         var period = TimeSpan.FromSeconds(5);
@@ -123,7 +117,7 @@ public class ManualTimeProviderTimerTests
     [Fact]
     public void GetUtcNow_matches_time_at_callback_time()
     {
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var startTime = sut.GetUtcNow();
         var callbackTimes = new List<DateTimeOffset>();
         var interval = TimeSpan.FromSeconds(3);
@@ -141,7 +135,7 @@ public class ManualTimeProviderTimerTests
     public void Disposing_timer_in_callback()
     {
         var interval = TimeSpan.FromSeconds(3);
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         ITimer timer = default!;
         timer = sut.CreateTimer(_ => timer!.Dispose(), null, interval, interval);
 
@@ -152,7 +146,7 @@ public class ManualTimeProviderTimerTests
     public void Multiple_timers_invokes_callback_in_order()
     {
         var callbacks = new List<(int TimerNumber, TimeSpan CallbackTime)>();
-        var sut = new SutTimeProvider();
+        var sut = new ManualTimeProvider();
         var startTime = sut.GetTimestamp();
         using var timer1 = sut.CreateTimer(_ => callbacks.Add((1, sut.GetElapsedTime(startTime))), null, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2));
         using var timer2 = sut.CreateTimer(_ => callbacks.Add((2, sut.GetElapsedTime(startTime))), null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3));
