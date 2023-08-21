@@ -4,19 +4,19 @@ Extensions for [`System.TimeProvider`](https://learn.microsoft.com/en-us/dotnet/
 
 An instance of `TimeProvider` for production use is available on the `TimeProvider.System` property, and `ManualTimeProvider` can be used during testing.
 
-During testing, you can move time forward by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` on `ManualTimeProvider`. This allows you to write tests that run fast and predictable, even if the system under test pauses execution for multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
+During testing, you can move time forward by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` on `ManualTimeProvider`. This allows you to write tests that run fast and predictably, even if the system under test pauses execution for multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
 
 ## Difference between `ManualTimeProvider` and `FakeTimeProvider`
 
-The .NET team has published a similar test specific time provider, the [`Microsoft.Extensions.Time.Testing.FakeTimeProvider`](https://www.nuget.org/packages/Microsoft.Extensions.Time.Testing.FakeTimeProvider/).
+The .NET team has published a similar test-specific time provider, the [`Microsoft.Extensions.Time.Testing.FakeTimeProvider`](https://www.nuget.org/packages/Microsoft.Extensions.Time.Testing.FakeTimeProvider/).
 
-The public API of both `FakeTimeProvider` and `ManualTimeProvider` are identical, but there are some differences in when time is set before timer callbacks. Lets illustrate this with an example:
+The public API of both `FakeTimeProvider` and `ManualTimeProvider` are identical, but there are some differences in when time is set before timer callbacks. Let's illustrate this with an example:
 
-For example, if we create a `ITimer` with a *due time* and *period* set to **1 second**, the `DateTimeOffset` returned from `GetUtcNow()` during the timer callback may be different depending on the amount passed to `Advance()` (or `SetUtcNow()`).
+For example, if we create an `ITimer` with a *due time* and *period* set to **1 second**, the `DateTimeOffset` returned from `GetUtcNow()` during the timer callback may be different depending on the amount passed to `Advance()` (or `SetUtcNow()`).
 
-If we call `Advance(TimeSpan.FromSeconds(1))` three times, effectively moving time forward by three seconds, the timer callback will be invoked once at time 00:01`, `00:02`, and `00:03`, as illustarted in the drawing below. Both `FakeTimeProvider` and `ManualTimeProvider` behaves like this:
+If we call `Advance(TimeSpan.FromSeconds(1))` three times, effectively moving time forward by three seconds, the timer callback will be invoked once at times `00:01`, `00:02`, and `00:03`, as illustrated in the drawing below. Both `FakeTimeProvider` and `ManualTimeProvider` behaves like this:
 
-![Advancing time by three seconds in one second increments.](docs/advance-1-second.svg)
+![Advancing time by three seconds in one-second increments.](docs/advance-1-second.svg)
 
 However, if we instead call `Advance(TimeSpan.FromSeconds(3))` once, the two implementations behave differently. `ManualTimeProvider` will invoke the timer callback at the same time as if we had called `Advance(TimeSpan.FromSeconds(1))` three times, as illustrated in the drawing below:
 
@@ -26,13 +26,13 @@ However, `FakeTimeProvider` will invoke the timer callback at time `00:03` three
 
 ![Advancing time by three seconds in one step using FakeTimeProvider.](docs/FakeTimeProvider-advance-3-seconds.svg)
 
-Technically, both implementations are correct. The `ITimer` abstractions only promises to invoke the callback timer *on or after the duetime/period has elapsed*, never before.
+Technically, both implementations are correct since the `ITimer` abstractions only promise to invoke the callback timer *on or after the due time/period has elapsed*, never before.
 
-However, I strongly prefer the `ManualTimeProvider` approach since it behaves consistently independent of how time is moved forward. It seeems much more in the spirit of how a deterministic time provider should behave and avoids users being surprised when writing tests. I imaging users may get stuck for a while trying to debug why time is not set as expected due the suttle difference in behavior of `FakeTimeProvider`.
+However, I strongly prefer the `ManualTimeProvider` approach since it behaves consistently independent of how time is moved forward. It seems much more in the spirit of how a deterministic time provider should behave and avoids users being surprised when writing tests. I imagine users may get stuck for a while trying to debug why the time reported by `GetUtcNow()` is not set as expected due to the subtle difference in behavior of `FakeTimeProvider`.
 
 ## Known limitations:
 
-- If running on .NET versions earlier than .NET 8.0, there is a constraint when invoking `CancellationTokenSource.CancelAfter(TimeSpan)` on the `CancellationTokenSource` object returned by `CreateCancellationTokenSource(TimeSpan delay)`. This action will not terminate the initial timer indicated by the `delay` argument initially passed the `CreateCancellationTokenSource` method. However, this restriction does not apply on .NET 8.0 and later versions.
+- If running on .NET versions earlier than .NET 8.0, there is a constraint when invoking `CancellationTokenSource.CancelAfter(TimeSpan)` on the `CancellationTokenSource` object returned by `CreateCancellationTokenSource(TimeSpan delay)`. This action will not terminate the initial timer indicated by the `delay` argument initially passed the `CreateCancellationTokenSource` method. However, this restriction does not apply to .NET 8.0 and later versions.
 - To enable controlling `PeriodicTimer` via `TimeProvider` in versions of .NET earlier than .NET 8.0, the `TimeProvider.CreatePeriodicTimer` returns a `PeriodicTimerWrapper` object instead of a `PeriodicTimer` object. The `PeriodicTimerWrapper` type is just a lightweight wrapper around the original `System.Threading.PeriodicTimer` and will behave identically to it. 
 
 ## Installation
@@ -42,7 +42,7 @@ Get the latest release from https://www.nuget.org/packages/TimeProviderExtension
 ## Set up in production
 
 To use in production, pass in `TimeProvider.System` to the types that depend on `TimeProvider`. 
-This can be done directly or via an IoC Container, e.g. .NETs built-in `IServiceCollection` like so:
+This can be done directly or via an IoC Container, e.g., .NETs built-in `IServiceCollection` like so:
 
 ```c#
 services.AddSingleton(TimeProvider.System);
@@ -84,7 +84,7 @@ As an example, let us test the "Stuff Service" below that performs specific task
 1-second delay. We have two versions, one that uses the standard types in .NET, and one that uses the `TimeProvider`.
 
 ```c#
-// Version of stuff service that uses the built in DateTimeOffset, PeriodicTimer, and Task.Delay
+// Version of stuff service that uses the built-in DateTimeOffset, PeriodicTimer, and Task.Delay
 public class StuffService
 {
   private static readonly TimeSpan doStuffDelay = TimeSpan.FromSeconds(10);
