@@ -19,26 +19,6 @@ public class ManualTimeProviderWaitAsyncTests
         return StringTaskResult;
     }
 
-    public static TheoryData<Func<ManualTimeProvider, Task>> NullTaskInvalidInvocations { get; } =
-        new TheoryData<Func<ManualTimeProvider, Task>>
-        {
-            sut => default(Task)!.WaitAsync(TimeSpan.FromSeconds(1), sut),
-            sut => default(Task)!.WaitAsync(TimeSpan.FromSeconds(1), sut, CancellationToken.None),
-            sut => default(Task<string>)!.WaitAsync(TimeSpan.FromSeconds(1), sut),
-            sut => default(Task<string>)!.WaitAsync(TimeSpan.FromSeconds(1), sut, CancellationToken.None),
-        };
-
-    [Theory(Skip = "Not implemented in Microsofts implementation"), MemberData(nameof(NullTaskInvalidInvocations))]
-    public async Task WaitAsync_task_input_validation(Func<ManualTimeProvider, Task> invalidInvocation)
-    {
-        var sut = new ManualTimeProvider();
-
-        await sut.Invoking(invalidInvocation)
-            .Should()
-            .ThrowAsync<ArgumentNullException>()
-            .WithParameterName("task");
-    }
-
     public static TheoryData<Func<ManualTimeProvider, Task>> TimeoutInvalidInvocations { get; } =
         new TheoryData<Func<ManualTimeProvider, Task>>
         {
@@ -109,7 +89,7 @@ public class ManualTimeProviderWaitAsyncTests
             sut => DelayedStringTask(sut).WaitAsync(TimeSpan.Zero, sut, CancellationToken.None),
         };
 
-    [Theory(Skip = "Not implemented in Microsofts implementation"), MemberData(nameof(ImmediateTimedoutInvocations))]
+    [Theory, MemberData(nameof(ImmediateTimedoutInvocations))]
     public async Task WaitAsync_throws_immediately_when_timeout_is_zero(Func<ManualTimeProvider, Task> immediateTimedoutInvocation)
     {
         var sut = new ManualTimeProvider();
