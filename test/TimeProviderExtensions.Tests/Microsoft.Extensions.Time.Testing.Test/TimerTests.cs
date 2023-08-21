@@ -233,7 +233,7 @@ public class TimerTests
     }
 
 #if RELEASE // In Release only since this might not work if the timer reference being tracked by the debugger
-    [Fact(Skip = "reference kept after finalize")]
+    [Fact]
     public void WaiterRemovedWhenCollectedWithoutDispose()
     {
         var timer1Counter = 0;

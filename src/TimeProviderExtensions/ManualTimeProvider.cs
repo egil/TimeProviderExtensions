@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 
 namespace TimeProviderExtensions;
 
@@ -11,13 +10,13 @@ namespace TimeProviderExtensions;
 /// Learn more at <see href="https://github.com/egil/TimeProviderExtensions"/>.
 /// </remarks>
 [DebuggerDisplay("{ToString()}. Scheduled callback count: {ScheduledCallbackCount}")]
-public class ManualTimeProvider : TimeProvider
+public partial class ManualTimeProvider : TimeProvider
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     internal const uint UnsignedInfinite = unchecked((uint)-1);
     internal static readonly DateTimeOffset DefaultStartDateTime = new(2000, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
 
-    private readonly List<ManualTimerScheduledCallback> callbacks = new();
+    private readonly List<ManualTimerScheduler> callbacks = new();
     private DateTimeOffset utcNow;
     private TimeZoneInfo localTimeZone;
     private TimeSpan autoAdvanceAmount = TimeSpan.Zero;
@@ -227,7 +226,7 @@ public class ManualTimeProvider : TimeProvider
     {
         if (value < utcNow)
         {
-            throw new ArgumentOutOfRangeException(nameof(value), $"The new UtcNow must be greater than or equal to the curren time {utcNow}. Going back in time is not supported.");
+            throw new ArgumentOutOfRangeException(nameof(value), $"The new UtcNow must be greater than or equal to the curren time {ToString()}. Going back in time is not supported.");
         }
 
         lock (callbacks)
@@ -238,16 +237,16 @@ public class ManualTimeProvider : TimeProvider
                 return;
             }
 
-            while (utcNow <= value && TryGetNext(value) is ManualTimerScheduledCallback mtsc)
+            while (utcNow <= value && TryGetNext(value) is ManualTimerScheduler mtsc)
             {
                 utcNow = mtsc.CallbackTime;
-                mtsc.Timer.TimerElapsed();
+                mtsc.TimerElapsed();
             }
 
             utcNow = value;
         }
 
-        ManualTimerScheduledCallback? TryGetNext(DateTimeOffset targetUtcNow)
+        ManualTimerScheduler? TryGetNext(DateTimeOffset targetUtcNow)
         {
             if (callbacks.Count > 0 && callbacks[0].CallbackTime <= targetUtcNow)
             {
@@ -266,174 +265,33 @@ public class ManualTimeProvider : TimeProvider
     /// <returns>A string representing the clock's current time.</returns>
     public override string ToString() => utcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture);
 
-    private void ScheduleCallback(ManualTimer timer, TimeSpan waitTime)
+    private void ScheduleCallback(ManualTimerScheduler scheduler, TimeSpan waitTime)
     {
         lock (callbacks)
         {
-            var timerCallback = new ManualTimerScheduledCallback(timer, utcNow + waitTime);
-            var insertPosition = callbacks.FindIndex(x => x.CallbackTime > timerCallback.CallbackTime);
+            scheduler.CallbackTime = utcNow + waitTime;
+
+            var insertPosition = callbacks.FindIndex(x => x.CallbackTime > scheduler.CallbackTime);
 
             if (insertPosition == -1)
             {
-                callbacks.Add(timerCallback);
+                callbacks.Add(scheduler);
             }
             else
             {
-                callbacks.Insert(insertPosition, timerCallback);
+                callbacks.Insert(insertPosition, scheduler);
             }
         }
     }
 
-    private void RemoveCallback(ManualTimer timer)
+    private void RemoveCallback(ManualTimerScheduler timerCallback)
     {
         lock (callbacks)
         {
-            var existingIndexOf = callbacks.FindIndex(0, x => ReferenceEquals(x.Timer, timer));
+            var existingIndexOf = callbacks.FindIndex(0, x => ReferenceEquals(x, timerCallback));
             if (existingIndexOf >= 0)
+            {
                 callbacks.RemoveAt(existingIndexOf);
-        }
-    }
-
-    private readonly struct ManualTimerScheduledCallback :
-        IEqualityComparer<ManualTimerScheduledCallback>,
-        IComparable<ManualTimerScheduledCallback>
-    {
-        public readonly ManualTimer Timer { get; }
-
-        public readonly DateTimeOffset CallbackTime { get; }
-
-        public ManualTimerScheduledCallback(ManualTimer timer, DateTimeOffset callbackTime)
-        {
-            Timer = timer;
-            CallbackTime = callbackTime;
-        }
-
-        public readonly bool Equals(ManualTimerScheduledCallback x, ManualTimerScheduledCallback y)
-            => ReferenceEquals(x.Timer, y.Timer);
-
-        public readonly int GetHashCode(ManualTimerScheduledCallback obj)
-            => Timer.GetHashCode();
-
-        public readonly int CompareTo(ManualTimerScheduledCallback other)
-            => Comparer<DateTimeOffset>.Default.Compare(CallbackTime, other.CallbackTime);
-    }
-
-    private sealed class ManualTimer : ITimer
-    {
-        private ManualTimeProvider? timeProvider;
-        private bool isDisposed;
-        private bool running;
-
-        private TimeSpan currentDueTime;
-        private TimeSpan currentPeriod;
-        private object? state;
-        private TimerCallback? callback;
-
-        public ManualTimer(TimerCallback callback, object? state, ManualTimeProvider timeProvider)
-        {
-            this.timeProvider = timeProvider;
-            this.callback = callback;
-            this.state = state;
-        }
-
-        public bool Change(TimeSpan dueTime, TimeSpan period)
-        {
-            ValidateTimeSpanRange(dueTime);
-            ValidateTimeSpanRange(period);
-
-            if (isDisposed || timeProvider is null)
-            {
-                return false;
-            }
-
-            if (running)
-            {
-                timeProvider.RemoveCallback(this);
-            }
-
-            currentDueTime = dueTime;
-            currentPeriod = period;
-
-            if (currentDueTime != Timeout.InfiniteTimeSpan)
-            {
-                ScheduleCallback(dueTime);
-            }
-
-            return true;
-        }
-
-        public void Dispose()
-        {
-            if (isDisposed || timeProvider is null)
-            {
-                return;
-            }
-
-            isDisposed = true;
-
-            if (running)
-            {
-                timeProvider.RemoveCallback(this);
-            }
-
-            callback = null;
-            state = null;
-            timeProvider = null;
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            Dispose();
-            return ValueTask.CompletedTask;
-        }
-
-        internal void TimerElapsed()
-        {
-            if (isDisposed || timeProvider is null)
-            {
-                return;
-            }
-
-            running = false;
-
-            callback?.Invoke(state);
-
-            if (currentPeriod != Timeout.InfiniteTimeSpan && currentPeriod != TimeSpan.Zero)
-            {
-                ScheduleCallback(currentPeriod);
-            }
-        }
-
-        private void ScheduleCallback(TimeSpan waitTime)
-        {
-            if (isDisposed || timeProvider is null)
-            {
-                return;
-            }
-
-            running = true;
-
-            if (waitTime == TimeSpan.Zero)
-            {
-                TimerElapsed();
-            }
-            else
-            {
-                timeProvider.ScheduleCallback(this, waitTime);
-            }
-        }
-
-        private static void ValidateTimeSpanRange(TimeSpan time, [CallerArgumentExpression("time")] string? parameter = null)
-        {
-            long tm = (long)time.TotalMilliseconds;
-            if (tm < -1)
-            {
-                throw new ArgumentOutOfRangeException(parameter, $"{parameter}.TotalMilliseconds must be greater than -1.");
-            }
-
-            if (tm > MaxSupportedTimeout)
-            {
-                throw new ArgumentOutOfRangeException(parameter, $"{parameter}.TotalMilliseconds must be less than than {MaxSupportedTimeout}.");
             }
         }
     }
