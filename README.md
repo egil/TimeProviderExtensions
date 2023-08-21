@@ -2,7 +2,7 @@
 
 Extensions for [`System.TimeProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider) API. It includes a version of the `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
 
-An instance of `TimeProvider` for production use is available on the `TimeProvider.System` property, and `ManualTimeProvider` can be used during testing.
+An instance of `TimeProvider` for production use is available on the [`TimeProvider.System`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider.system?#system-timeprovider-system) property, and `ManualTimeProvider` can be used during testing.
 
 During testing, you can move time forward by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` on `ManualTimeProvider`. This allows you to write tests that run fast and predictably, even if the system under test pauses execution for multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
 
