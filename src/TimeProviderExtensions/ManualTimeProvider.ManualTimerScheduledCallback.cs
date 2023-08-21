@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace TimeProviderExtensions;
 
 /// <summary>
@@ -33,6 +35,11 @@ public partial class ManualTimeProvider : TimeProvider
             => other is not null
             ? Comparer<DateTimeOffset>.Default.Compare(CallbackTime, other.CallbackTime)
             : -1;
+
+        public override string ToString()
+            => running
+            ? $"Next callback invocation {CallbackTime.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+            : "Idle";
 
         internal void Cancel()
         {

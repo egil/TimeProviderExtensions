@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace TimeProviderExtensions;
@@ -9,10 +10,13 @@ namespace TimeProviderExtensions;
 /// Learn more at <see href="https://github.com/egil/TimeProviderExtensions"/>.
 /// </remarks>
 public partial class ManualTimeProvider : TimeProvider
-{    
+{
+    [DebuggerDisplay("ManualTimer: {scheduledCallback.ToString(),nq}, due time = {dueTime}, period = {period}.")]
     private sealed class ManualTimer : ITimer
     {
         private ManualTimerScheduler? scheduledCallback;
+        private TimeSpan dueTime;
+        private TimeSpan period;
 
         public ManualTimer(TimerCallback callback, object? state, ManualTimeProvider timeProvider)
         {
@@ -29,6 +33,9 @@ public partial class ManualTimeProvider : TimeProvider
             {
                 return false;
             }
+
+            this.dueTime = dueTime;
+            this.period = period;
 
             scheduledCallback.Change(dueTime, period);
 
