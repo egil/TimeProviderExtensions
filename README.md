@@ -18,7 +18,7 @@ If we call `Advance(TimeSpan.FromSeconds(1))` three times, effectively moving ti
 
 ![Advancing time by three seconds in one-second increments.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/advance-1-second.svg)
 
-However, if we instead call `Advance(TimeSpan.FromSeconds(3))` once, the two implementations behave differently. `ManualTimeProvider` will invoke the timer callback at the same time as if we had called `Advance(TimeSpan.FromSeconds(1))` three times, as illustrated in the drawing below:
+However, if we instead call `Advance(TimeSpan.FromSeconds(3))` once, the two implementations behave differently. `ManualTimeProvider` will invoke the timer callback at the same time (`00:01`, `00:02`, and `00:03`) as if we had called `Advance(TimeSpan.FromSeconds(1))` three times, as illustrated in the drawing below:
 
 ![Advancing time by three seconds in one step using ManualTimeProvider.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/ManualTimeProvider-advance-3-seconds.svg)
 
