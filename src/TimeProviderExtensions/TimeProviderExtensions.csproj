@@ -63,6 +63,18 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
+		<None Include="..\..\docs\advance-1-second.svg">
+			<Pack>True</Pack>
+			<PackagePath>\docs\</PackagePath>
+		</None>
+		<None Include="..\..\docs\FakeTimeProvider-advance-3-seconds.svg">
+			<Pack>True</Pack>
+			<PackagePath>\docs\</PackagePath>
+		</None>
+		<None Include="..\..\docs\ManualTimeProvider-advance-3-seconds.svg">
+			<Pack>True</Pack>
+			<PackagePath>\docs\</PackagePath>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
