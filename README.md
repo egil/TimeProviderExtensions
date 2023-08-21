@@ -30,10 +30,14 @@ Technically, both implementations are correct since the `ITimer` abstractions on
 
 However, I strongly prefer the `ManualTimeProvider` approach since it behaves consistently independent of how time is moved forward. It seems much more in the spirit of how a deterministic time provider should behave and avoids users being surprised when writing tests. I imagine users may get stuck for a while trying to debug why the time reported by `GetUtcNow()` is not set as expected due to the subtle difference in behavior of `FakeTimeProvider`.
 
-## Known limitations:
+## Known limitations and issues:
 
 - If running on .NET versions earlier than .NET 8.0, there is a constraint when invoking `CancellationTokenSource.CancelAfter(TimeSpan)` on the `CancellationTokenSource` object returned by `CreateCancellationTokenSource(TimeSpan delay)`. This action will not terminate the initial timer indicated by the `delay` argument initially passed the `CreateCancellationTokenSource` method. However, this restriction does not apply to .NET 8.0 and later versions.
 - To enable controlling `PeriodicTimer` via `TimeProvider` in versions of .NET earlier than .NET 8.0, the `TimeProvider.CreatePeriodicTimer` returns a `PeriodicTimerWrapper` object instead of a `PeriodicTimer` object. The `PeriodicTimerWrapper` type is just a lightweight wrapper around the original `System.Threading.PeriodicTimer` and will behave identically to it.
+- If `ManualTimeProvider` is created via [AutoFixture](https://github.com/AutoFixture/AutoFixture), be aware that will set `AutoAdvanceAmount` to a random positive time span. This behavior can be overridden by providing a customization to AutoFixture, e.g.:  
+  ```c#
+  fixture.Customize<ManualTimeProvider>(x => x.With(tp => tp.AutoAdvanceAmount, TimeSpan.Zero));
+  ```
 
 ## Installation
 
