@@ -19,10 +19,11 @@ public partial class ManualTimeProvider : TimeProvider
         private readonly TimerCallback callback;
         private readonly object? state;
         private readonly ManualTimeProvider timeProvider;
-        private TimeSpan period;
         private bool running;
 
         public DateTimeOffset CallbackTime { get; set; }
+
+        public TimeSpan Period { get; private set; }
 
         public ManualTimerScheduler(ManualTimeProvider timeProvider, TimerCallback callback, object? state)
         {
@@ -53,7 +54,7 @@ public partial class ManualTimeProvider : TimeProvider
         {
             Cancel();
 
-            this.period = period;
+            Period = period;
 
             if (dueTime != Timeout.InfiniteTimeSpan)
             {
@@ -67,9 +68,9 @@ public partial class ManualTimeProvider : TimeProvider
 
             callback.Invoke(state);
 
-            if (period != Timeout.InfiniteTimeSpan && period != TimeSpan.Zero)
+            if (Period != Timeout.InfiniteTimeSpan && Period != TimeSpan.Zero)
             {
-                ScheduleCallback(period);
+                ScheduleCallback(Period);
             }
         }
 

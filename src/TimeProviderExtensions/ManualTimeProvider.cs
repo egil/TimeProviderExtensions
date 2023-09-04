@@ -199,6 +199,31 @@ public partial class ManualTimeProvider : TimeProvider
     /// indirectly using this provider as a time source. Whereas when using <see cref="TimeProvider.System"/>, time
     /// marches forward automatically in hardware, for the manual time provider the application is responsible for
     /// doing this explicitly by calling this method.
+    /// <para>
+    /// If advancing time moves it paste multiple scheduled timer callbacks, the current
+    /// date/time reported by <see cref="GetUtcNow"/> at the point when each callback is invoked will match the
+    /// due time of the callback.
+    /// </para>
+    /// <para>
+    /// For example:
+    /// <code>
+    /// var start = sut.GetTimestamp();
+    /// var timer = manualTimeProvider.CreateTimer(_ => manualTimeProvider.GetElapsedTime(start), null, TimeSpan.FromSecond(1), TimeSpan.FromSecond(1));
+    /// manualtTimeProvider.Advance(TimeSpan.FromSecond(3));
+    /// </code>
+    /// The call to <c>Advance(TimeSpan.FromSecond(3))</c> causes the <c>timer</c>s callback to be invoked three times,
+    /// and the result of the <c>manualTimeProvider.GetElapsedTime(start)</c> in the callback call will be <em>1 second</em>, <em>2 seconds</em>,
+    /// and <em>3 seconds</em>. In other words, the time of the provider is set before the time callback is invoked
+    /// to the time that the callback is scheduled to be invoked at.
+    /// </para>
+    /// <para>
+    /// If the desired result is to jump time by <paramref name="delta"/> and then invoke the timer callbacks
+    /// the expected number of times, i.e. such that the result of <c>manualTimeProvider.GetElapsedTime(start)</c> in the callback is
+    /// <em>3 seconds</em>, <em>3 seconds</em>, and <em>3 seconds</em>, use <see cref="Jump(DateTimeOffset)"/> or <see cref="Jump(TimeSpan)"/> instead.
+    /// </para>
+    /// <para>
+    /// Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
+    /// </para>
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="delta"/> is negative. Going back in time is not supported.</exception>
     public void Advance(TimeSpan delta)
@@ -221,6 +246,37 @@ public partial class ManualTimeProvider : TimeProvider
     /// scheduled items that are waiting for time to be forwarded.
     /// </summary>
     /// <param name="value">The new UtcNow time.</param>
+    /// <remarks>
+    /// Setting time affects the timers created from this provider, and all other operations that are directly or
+    /// indirectly using this provider as a time source. Whereas when using <see cref="TimeProvider.System"/>, time
+    /// marches forward automatically in hardware, for the manual time provider the application is responsible for
+    /// doing this explicitly by calling this method.
+    /// <para>
+    /// If the set time moves it paste multiple scheduled timer callbacks, the current
+    /// date/time reported by <see cref="GetUtcNow"/> at the point when each callback is invoked will match the
+    /// due time of the callback.
+    /// </para>
+    /// <para>
+    /// For example:
+    /// <code>
+    /// var start = sut.GetTimestamp();
+    /// var timer = manualTimeProvider.CreateTimer(_ => manualTimeProvider.GetElapsedTime(start), null, TimeSpan.FromSecond(1), TimeSpan.FromSecond(1));
+    /// manualtTimeProvider.SetUtcNow(manualtTimeProvider.Start + TimeSpan.FromSecond(3));
+    /// </code>
+    /// The call to <c>SetUtcNow(manualtTimeProvider.Start + TimeSpan.FromSecond(3))</c> causes the <c>timer</c>s callback to be invoked three times,
+    /// and the result of the <c>manualTimeProvider.GetElapsedTime(start)</c> in the callback call will be <em>1 second</em>, <em>2 seconds</em>,
+    /// and <em>3 seconds</em>. In other words, the time of the provider is set before the time callback is invoked
+    /// to the time that the callback is scheduled to be invoked at.
+    /// </para>
+    /// <para>
+    /// If the desired result is to jump to the time specified in <paramref name="value"/> and then invoke the timer callbacks
+    /// the expected number of times, i.e. such that the result of <c>manualTimeProvider.GetElapsedTime(start)</c> in the callback is
+    /// <em>3 seconds</em>, <em>3 seconds</em>, and <em>3 seconds</em>, use <see cref="Jump(DateTimeOffset)"/> or <see cref="Jump(TimeSpan)"/> instead.
+    /// </para>
+    /// <para>
+    /// Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
+    /// </para>
+    /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="value"/> is less than the value returned by <see cref="GetUtcNow()"/>. Going back in time is not supported.</exception>
     public void SetUtcNow(DateTimeOffset value)
     {
@@ -237,10 +293,10 @@ public partial class ManualTimeProvider : TimeProvider
                 return;
             }
 
-            while (utcNow <= value && TryGetNext(value) is ManualTimerScheduler mtsc)
+            while (utcNow <= value && TryGetNext(value) is ManualTimerScheduler scheduler)
             {
-                utcNow = mtsc.CallbackTime;
-                mtsc.TimerElapsed();
+                utcNow = scheduler.CallbackTime;
+                scheduler.TimerElapsed();
             }
 
             utcNow = value;
@@ -256,6 +312,134 @@ public partial class ManualTimeProvider : TimeProvider
             }
 
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Jumps time by a specific amount.
+    /// </summary>
+    /// <param name="delta">The amount of time to jump the clock by.</param>
+    /// <remarks>
+    /// Jumping time affects the timers created from this provider, and all other operations that are directly or
+    /// indirectly using this provider as a time source. Whereas when using <see cref="TimeProvider.System"/>, time
+    /// marches forward automatically in hardware, for the manual time provider the application is responsible for
+    /// doing this explicitly by calling this method.
+    /// <para>
+    /// If jumping time moves it paste one or more scheduled timer callbacks, the current
+    /// date/time reported by <see cref="GetUtcNow"/> and <see cref="GetTimestamp"/> will match the new date/time
+    /// based on the <paramref name="delta"/> specified in the request.
+    /// </para>
+    /// <para>
+    /// For example:
+    /// <code>
+    /// var start = sut.GetTimestamp();
+    /// var timer = manualTimeProvider.CreateTimer(_ => manualTimeProvider.GetElapsedTime(start), null, TimeSpan.FromSecond(1), TimeSpan.FromSecond(1));
+    /// manualtTimeProvider.Jump(TimeSpan.FromSecond(3));
+    /// </code>
+    /// The call to <c>Jump(TimeSpan.FromSecond(3))</c> causes the <c>timer</c>s callback to be invoked three times,
+    /// and the result of the <c>manualTimeProvider.GetElapsedTime(start)</c> in the callback call will be <em>3 seconds</em>
+    /// during all three invocations.
+    /// </para>
+    /// <para>
+    /// If the desired result is that timer callbacks happens exactly at their scheduled callback time, i.e. such that the result
+    /// of <c>manualTimeProvider.GetElapsedTime(start)</c> in the callback will be <em>1 second</em>, <em>2 seconds</em>, and <em>3 seconds</em>,
+    /// use <see cref="Advance(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/> instead.
+    /// </para>
+    /// <para>
+    /// Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="delta"/> is negative. Going back in time is not supported.</exception>
+    public void Jump(TimeSpan delta)
+    {
+        if (delta < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(delta), "Going back in time is not supported. ");
+        }
+
+        if (delta == TimeSpan.Zero)
+        {
+            return;
+        }
+
+        Jump(utcNow + delta);
+    }
+
+    /// <summary>
+    /// Jumps the date and time returned by <see cref="GetUtcNow()"/> to <paramref name="value"/> and triggers any
+    /// scheduled items that are waiting for time to be forwarded.
+    /// </summary>
+    /// <param name="value">The new UtcNow time.</param>
+    /// <remarks>
+    /// Jumping time affects the timers created from this provider, and all other operations that are directly or
+    /// indirectly using this provider as a time source. Whereas when using <see cref="TimeProvider.System"/>, time
+    /// marches forward automatically in hardware, for the manual time provider the application is responsible for
+    /// doing this explicitly by calling this method.
+    /// <para>
+    /// If jumping time moves it paste one or more scheduled timer callbacks, the current
+    /// date/time reported by <see cref="GetUtcNow"/> and <see cref="GetTimestamp"/> will match the new date/time
+    /// based on the <paramref name="value"/> specified in the request.
+    /// </para>
+    /// <para>
+    /// For example:
+    /// <code>
+    /// var start = sut.GetTimestamp();
+    /// var timer = manualTimeProvider.CreateTimer(_ => manualTimeProvider.GetElapsedTime(start), null, TimeSpan.FromSecond(1), TimeSpan.FromSecond(1));
+    /// manualtTimeProvider.Jump(manualtTimeProvider.Start + TimeSpan.FromSecond(3));
+    /// </code>
+    /// The call to <c>Jump(manualtTimeProvider.Start + TimeSpan.FromSecond(3))</c> causes the <c>timer</c>s callback to be invoked three times,
+    /// and the result of the <c>manualTimeProvider.GetElapsedTime(start)</c> in the callback call will be <em>3 seconds</em>
+    /// during all three invocations.
+    /// </para>
+    /// <para>
+    /// If the desired result is that timer callbacks happens exactly at their scheduled callback time, i.e. such that the result
+    /// of <c>manualTimeProvider.GetElapsedTime(start)</c> in the callback will be <em>1 second</em>, <em>2 seconds</em>, and <em>3 seconds</em>,
+    /// use <see cref="Advance(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/> instead.
+    /// </para>
+    /// <para>
+    /// Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="value"/> is less than the value returned by <see cref="GetUtcNow()"/>. Going back in time is not supported.</exception>
+    public void Jump(DateTimeOffset value)
+    {
+        if (value < utcNow)
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), $"The new UtcNow must be greater than or equal to the curren time {ToString()}. Going back in time is not supported.");
+        }
+
+        lock (callbacks)
+        {
+            // Double check in case another thread already advanced time.
+            if (value <= utcNow)
+            {
+                return;
+            }
+
+            var jump = value - utcNow;
+            utcNow = value;
+
+            foreach (var scheduler in TryGetNext(utcNow))
+            {
+                // Calculates how many callbacks should have happened
+                // in the jump period and invokes the callback that
+                // number of times. Has to happen at least one time.
+                var callbacksPassed = Math.Max(1, Math.Floor(jump / scheduler.Period));
+                for (int i = 0; i < callbacksPassed; i++)
+                {
+                    scheduler.TimerElapsed();
+                }
+            }
+        }
+
+        IEnumerable<ManualTimerScheduler> TryGetNext(DateTimeOffset targetUtcNow)
+        {
+            while (callbacks.Count > 0 && callbacks[0].CallbackTime <= targetUtcNow)
+            {
+                var callback = callbacks[0];
+                callbacks.RemoveAt(0);
+                yield return callback;
+            }
         }
     }
 

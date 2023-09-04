@@ -1,5 +1,3 @@
-using FluentAssertions.Extensions;
-
 namespace TimeProviderExtensions;
 
 public class ManualTimeProviderTests
@@ -78,7 +76,39 @@ public class ManualTimeProviderTests
     }
 #endif
 
-#if NET8_0_OR_GREATER
+#if !NET8_0_OR_GREATER
+    [Fact(Skip = "Include after NET 8 rc1 release")]
+    public async Task Callbacks_happens_in_schedule_order()
+    {
+        var sut = new ManualTimeProvider();
+        var periodicTimer = sut.CreatePeriodicTimer(TimeSpan.FromSeconds(10));
+        var startTime = sut.GetUtcNow();
+        var callbacks = new List<DateTimeOffset>();
+        var callbacksTask = AsyncCallbacks(periodicTimer);
+
+        sut.Advance(TimeSpan.FromSeconds(29));
+
+        callbacks.Should().HaveCount(4);
+        callbacks.Should().ContainInOrder(
+            startTime + TimeSpan.FromSeconds(10),
+            startTime + TimeSpan.FromSeconds(13),
+            startTime + TimeSpan.FromSeconds(20),
+            startTime + TimeSpan.FromSeconds(23));
+
+        periodicTimer.Dispose();
+        await callbacksTask;
+
+        async Task AsyncCallbacks(PeriodicTimerWrapper periodicTimer)
+        {
+            while (await periodicTimer.WaitForNextTickAsync().ConfigureAwait(false))
+            {
+                callbacks.Add(sut.GetUtcNow());
+                await sut.Delay(TimeSpan.FromSeconds(3));
+                callbacks.Add(sut.GetUtcNow());
+            }
+        }
+    }
+#else
     [Fact]
     public async Task Callbacks_happens_in_schedule_order()
     {
@@ -88,8 +118,9 @@ public class ManualTimeProviderTests
         var callbacks = new List<DateTimeOffset>();
         var callbacksTask = AsyncCallbacks(periodicTimer);
 
-        sut.Advance(TimeSpan.FromSeconds(23));
+        sut.Advance(TimeSpan.FromSeconds(29));
 
+        callbacks.Should().HaveCount(4);
         callbacks.Should().ContainInOrder(
             startTime + TimeSpan.FromSeconds(10),
             startTime + TimeSpan.FromSeconds(13),

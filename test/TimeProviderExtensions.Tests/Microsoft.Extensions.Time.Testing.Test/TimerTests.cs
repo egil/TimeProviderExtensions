@@ -344,6 +344,60 @@ public class TimerTests
     }
 
     [Fact]
+    public void LongPausesTriggerMultipleCallbacks_Jump()
+    {
+        var callbackTimes = new List<DateTimeOffset>();
+        var timeProvider = new FakeTimeProvider();
+        var period = TimeSpan.FromMilliseconds(10);
+        var timer = timeProvider.CreateTimer(_ => { callbackTimes.Add(timeProvider.GetUtcNow()); }, null, TimeSpan.Zero, period);
+
+        var value1 = callbackTimes.ToArray();
+
+        timeProvider.Jump(period + period + period);
+
+        var value2 = callbackTimes.ToArray();
+
+        Assert.Equal(new[] { timeProvider.Start }, value1);
+        Assert.Equal(new[]
+        {
+            timeProvider.Start,
+            timeProvider.Start + period + period + period,
+            timeProvider.Start + period + period + period,
+            timeProvider.Start + period + period + period,
+        },
+        value2);
+    }
+
+    [Fact]
+    public void MultipleTimersCallbackInvokedInScheduledOrder_Jump()
+    {
+        var callbacks = new List<(int timerId, TimeSpan callbackTime)>();
+        var timeProvider = new FakeTimeProvider();
+        var startTime = timeProvider.GetTimestamp();
+        using var timer1 = timeProvider.CreateTimer(_ => callbacks.Add((1, timeProvider.GetElapsedTime(startTime))), null, TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(3));
+        using var timer2 = timeProvider.CreateTimer(_ => callbacks.Add((2, timeProvider.GetElapsedTime(startTime))), null, TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(3));
+        using var timer3 = timeProvider.CreateTimer(_ => callbacks.Add((3, timeProvider.GetElapsedTime(startTime))), null, TimeSpan.FromMilliseconds(6), TimeSpan.FromMilliseconds(5));
+
+        timeProvider.Jump(TimeSpan.FromMilliseconds(3));
+        timeProvider.Jump(TimeSpan.FromMilliseconds(3));
+        timeProvider.Jump(TimeSpan.FromMilliseconds(3));
+        timeProvider.Jump(TimeSpan.FromMilliseconds(2));
+
+        Assert.Equal(new[]
+        {
+            (1, TimeSpan.FromMilliseconds(3)),
+            (2, TimeSpan.FromMilliseconds(3)),
+            (3, TimeSpan.FromMilliseconds(6)),
+            (1, TimeSpan.FromMilliseconds(6)),
+            (2, TimeSpan.FromMilliseconds(6)),
+            (1, TimeSpan.FromMilliseconds(9)),
+            (2, TimeSpan.FromMilliseconds(9)),
+            (3, TimeSpan.FromMilliseconds(11)),
+        },
+        callbacks);
+    }
+
+    [Fact]
     public void OutOfOrderWakeTimes()
     {
         const int MaxDueTime = 10;

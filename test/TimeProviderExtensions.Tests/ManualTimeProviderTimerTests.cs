@@ -115,7 +115,7 @@ public class ManualTimeProviderTimerTests
     }
 
     [Fact]
-    public void GetUtcNow_matches_time_at_callback_time()
+    public void Advancing_GetUtcNow_matches_time_at_callback_time()
     {
         var sut = new ManualTimeProvider();
         var startTime = sut.GetUtcNow();
@@ -143,17 +143,17 @@ public class ManualTimeProviderTimerTests
     }
 
     [Fact]
-    public void Multiple_timers_invokes_callback_in_order()
+    public void Advancing_causes_multiple_timers_invokes_callback_in_order()
     {
+        var oneSec = TimeSpan.FromSeconds(1);
         var callbacks = new List<(int TimerNumber, TimeSpan CallbackTime)>();
         var sut = new ManualTimeProvider();
         var startTime = sut.GetTimestamp();
         using var timer1 = sut.CreateTimer(_ => callbacks.Add((1, sut.GetElapsedTime(startTime))), null, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2));
         using var timer2 = sut.CreateTimer(_ => callbacks.Add((2, sut.GetElapsedTime(startTime))), null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3));
 
-        sut.Advance(TimeSpan.FromSeconds(10));
+        sut.Advance(TimeSpan.FromSeconds(11));
 
-        var oneSec = TimeSpan.FromSeconds(1);
         callbacks.Should().Equal(
             (1, oneSec * 2),
             (2, oneSec * 3),
@@ -163,5 +163,50 @@ public class ManualTimeProviderTimerTests
             (1, oneSec * 8),
             (2, oneSec * 9),
             (1, oneSec * 10));
+    }
+
+    [Fact]
+    public void Jumping_causes_multiple_timers_invokes_callback_in_order()
+    {
+        var oneSec = TimeSpan.FromSeconds(1);
+        var callbacks = new List<int>();
+        var sut = new ManualTimeProvider();
+        var startTime = sut.GetTimestamp();
+        using var timer1 = sut.CreateTimer(_ => callbacks.Add(1), null, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2));
+        using var timer2 = sut.CreateTimer(_ => callbacks.Add(2), null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3));
+
+        sut.Advance(TimeSpan.FromSeconds(11));
+
+        callbacks.Should().Equal(1, 2, 1, 2, 1, 1, 2, 1);
+    }
+
+    [Fact]
+    public void Jumping_GetUtcNow_matches_jump_target()
+    {
+        var sut = new ManualTimeProvider();
+        var startTime = sut.GetUtcNow();
+        var callbackTimes = new List<DateTimeOffset>();
+        var interval = TimeSpan.FromSeconds(3);
+        var target = interval + interval + interval;
+        using var timer = sut.CreateTimer(_ => callbackTimes.Add(sut.GetUtcNow()), null, interval, interval);
+
+        sut.Jump(target);
+
+        callbackTimes.Should().Equal(startTime + target, startTime + target, startTime + target);
+    }
+
+    [Fact]
+    public void Jumping_past_longer_than_recurrence()
+    {
+        var sut = new ManualTimeProvider();
+        var startTime = sut.GetUtcNow();
+        var callbackTimes = new List<DateTimeOffset>();
+        var interval = TimeSpan.FromSeconds(3);
+        var target = TimeSpan.FromSeconds(4);
+        using var timer = sut.CreateTimer(_ => callbackTimes.Add(sut.GetUtcNow()), null, interval, interval);
+
+        sut.Jump(target);
+
+        callbackTimes.Should().Equal(startTime + target);
     }
 }
