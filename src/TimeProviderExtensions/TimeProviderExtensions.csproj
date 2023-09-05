@@ -15,7 +15,6 @@
 		<RepositoryUrl>https://github.com/egil/TimeProviderExtensions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<PackageReleaseNotes>Release notes: https://github.com/egil/TimeProviderExtensions/blob/main/CHANGELOG.md</PackageReleaseNotes>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<MinVerTagPrefix>v</MinVerTagPrefix>
@@ -25,7 +24,13 @@
 		<!--<PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>-->
 	</PropertyGroup>
 
-	<PropertyGroup>		
+	<Target Name="SetPackageReleaseNotes" BeforeTargets="GenerateNuspec">
+		<PropertyGroup>
+			<PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/../../CHANGELOG.md"))</PackageReleaseNotes>
+		</PropertyGroup>
+	</Target>
+
+	<PropertyGroup>
 		<TargetFrameworks>net8.0;net6.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>

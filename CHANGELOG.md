@@ -1,9 +1,13 @@
 # Changelog
 
-All notable changes to TimeScheduler will be documented in this file.
+All notable changes to TimeProviderExtensions will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0-preview.6]
+
+- Added `Jump(TimeSpan)` and `Jump(DateTimeOffset)` methods that will jump time to the specified place. Any timer callbacks between the start and end of the jump will be invoked the expected number of times, but the date/time returned from `GetUtcNow()` and `GetTimestamp()` will always be the jump time. This differs from how `Advance` and `SetUtcNow` works. See the readme for a detailed description.
 
 ## [1.0.0-preview.5]
 
