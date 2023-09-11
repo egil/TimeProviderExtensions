@@ -39,9 +39,15 @@
 		<Deterministic>true</Deterministic>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
 		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DefaultDocumentationFolder>../../docs</DefaultDocumentationFolder>
+		<DefaultDocumentationGeneratedAccessModifiers>Public,Protected,ProtectedInternal</DefaultDocumentationGeneratedAccessModifiers>
+		<DefaultDocumentationGeneratedPages>Classes</DefaultDocumentationGeneratedPages>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Analyzer settings">
@@ -59,6 +65,7 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="MinVer" Version="4.3.0" PrivateAssets="All" />
+		<PackageReference Include="DefaultDocumentation" Version="0.8.2" PrivateAssets="all" Condition="'$(TargetFramework)' == 'net6.0'" />
 	</ItemGroup>
 
 	<ItemGroup>

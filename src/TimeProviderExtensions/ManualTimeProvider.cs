@@ -107,7 +107,7 @@ public partial class ManualTimeProvider : TimeProvider
     /// <summary>
     /// Gets the current high-frequency value designed to measure small time intervals with high accuracy in the timer mechanism.
     /// </summary>
-    /// <returns>A long integer representing the high-frequency counter value of the underlying timer mechanism. </returns>
+    /// <returns>A long integer representing the high-frequency counter value of the underlying timer mechanism.</returns>
     /// <remarks>
     /// This implementation bases timestamp on <see cref="DateTimeOffset.UtcTicks"/>,
     /// since the progression of time is represented by the date and time returned from <see cref="GetUtcNow()" />.
@@ -208,7 +208,13 @@ public partial class ManualTimeProvider : TimeProvider
     /// For example:
     /// <code>
     /// var start = sut.GetTimestamp();
-    /// var timer = manualTimeProvider.CreateTimer(_ => manualTimeProvider.GetElapsedTime(start), null, TimeSpan.FromSecond(1), TimeSpan.FromSecond(1));
+    /// 
+    /// var timer = manualTimeProvider.CreateTimer(
+    ///                 callback: _ => manualTimeProvider.GetElapsedTime(start),
+    ///                 state: null,
+    ///                 dueTime: Span.FromSecond(1),
+    ///                 period: TimeSpan.FromSecond(1));
+    /// 
     /// manualtTimeProvider.Advance(TimeSpan.FromSecond(3));
     /// </code>
     /// The call to <c>Advance(TimeSpan.FromSecond(3))</c> causes the <c>timer</c>s callback to be invoked three times,
@@ -260,7 +266,13 @@ public partial class ManualTimeProvider : TimeProvider
     /// For example:
     /// <code>
     /// var start = sut.GetTimestamp();
-    /// var timer = manualTimeProvider.CreateTimer(_ => manualTimeProvider.GetElapsedTime(start), null, TimeSpan.FromSecond(1), TimeSpan.FromSecond(1));
+    /// 
+    /// var timer = manualTimeProvider.CreateTimer(
+    ///                 callback: _ => manualTimeProvider.GetElapsedTime(start),
+    ///                 state: null,
+    ///                 dueTime: Span.FromSecond(1),
+    ///                 period: TimeSpan.FromSecond(1));
+    /// 
     /// manualtTimeProvider.SetUtcNow(manualtTimeProvider.Start + TimeSpan.FromSecond(3));
     /// </code>
     /// The call to <c>SetUtcNow(manualtTimeProvider.Start + TimeSpan.FromSecond(3))</c> causes the <c>timer</c>s callback to be invoked three times,
@@ -333,7 +345,13 @@ public partial class ManualTimeProvider : TimeProvider
     /// For example:
     /// <code>
     /// var start = sut.GetTimestamp();
-    /// var timer = manualTimeProvider.CreateTimer(_ => manualTimeProvider.GetElapsedTime(start), null, TimeSpan.FromSecond(1), TimeSpan.FromSecond(1));
+    /// 
+    /// var timer = manualTimeProvider.CreateTimer(
+    ///                 callback: _ => manualTimeProvider.GetElapsedTime(start),
+    ///                 state: null,
+    ///                 dueTime: Span.FromSecond(1),
+    ///                 period: TimeSpan.FromSecond(1));
+    /// 
     /// manualtTimeProvider.Jump(TimeSpan.FromSecond(3));
     /// </code>
     /// The call to <c>Jump(TimeSpan.FromSecond(3))</c> causes the <c>timer</c>s callback to be invoked three times,
@@ -384,7 +402,13 @@ public partial class ManualTimeProvider : TimeProvider
     /// For example:
     /// <code>
     /// var start = sut.GetTimestamp();
-    /// var timer = manualTimeProvider.CreateTimer(_ => manualTimeProvider.GetElapsedTime(start), null, TimeSpan.FromSecond(1), TimeSpan.FromSecond(1));
+    /// 
+    /// var timer = manualTimeProvider.CreateTimer(
+    ///                 callback: _ => manualTimeProvider.GetElapsedTime(start),
+    ///                 state: null,
+    ///                 dueTime: Span.FromSecond(1),
+    ///                 period: TimeSpan.FromSecond(1));
+    ///
     /// manualtTimeProvider.Jump(manualtTimeProvider.Start + TimeSpan.FromSecond(3));
     /// </code>
     /// The call to <c>Jump(manualtTimeProvider.Start + TimeSpan.FromSecond(3))</c> causes the <c>timer</c>s callback to be invoked three times,

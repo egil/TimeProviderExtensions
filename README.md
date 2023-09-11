@@ -17,47 +17,24 @@ This describes how to get started:
 
 2. Take a dependency on `TimeProvider` in your code. Inject the production version of `TimeProvider` available via the [`TimeProvider.System`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider.system?#system-timeprovider-system) property during production.
 
-3. During testing, inject the `ManualTimeProvider` from this library. With `ManualTimeProvider`, you can move advance time by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` and jump ahead in time using `Jump(TimeSpan)` or `Jump(DateTimeOffset)`. This allows you to write tests that run fast and predictably, even if the system under test pauses execution for multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
+3. During testing, inject the `ManualTimeProvider` from this library. This allows you to write tests that run fast and predictably.
+   - Advance time by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` or
+   - Jump ahead in time using `Jump(TimeSpan)` or `Jump(DateTimeOffset)`     
 
-Read the rest of this README for further details and examples.
+4. See the **[`ManualTimeProvider API`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/TimeProviderExtensions.ManualTimeProvider.md) page** for the full API documentation for `ManualTimeProvider`.
 
-## ManualTimeProvider API
+5. Read the rest of this README for further details and examples.
 
-The ManualTimeProvider represents a synthetic time provider that can be used to enable deterministic behavior in tests.
+## API Overview
 
-## Difference between `ManualTimeProvider` and `FakeTimeProvider`
+These pages has all the details of the API included in this package:
 
-The .NET team has published a similar test-specific time provider, the [`Microsoft.Extensions.Time.Testing.FakeTimeProvider`](https://www.nuget.org/packages/Microsoft.Extensions.Time.Testing.FakeTimeProvider/).
+- [`ManualTimeProvider`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/TimeProviderExtensions.ManualTimeProvider.md)
 
-The public API of both `FakeTimeProvider` and `ManualTimeProvider` are compatible, but there are some differences in when time is set before timer callbacks. Let's illustrate this with an example:
+**.NET 7 and earlier:**
 
-For example, if we create an `ITimer` with a *due time* and *period* set to **1 second**, the `DateTimeOffset` returned from `GetUtcNow()` during the timer callback may be different depending on the amount passed to `Advance()` (or `SetUtcNow()`).
-
-If we call `Advance(TimeSpan.FromSeconds(1))` three times, effectively moving time forward by three seconds, the timer callback will be invoked once at times `00:01`, `00:02`, and `00:03`, as illustrated in the drawing below. Both `FakeTimeProvider` and `ManualTimeProvider` behave like this:
-
-![Advancing time by three seconds in one-second increments.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/advance-1-second.svg)
-
-If we instead call `Advance(TimeSpan.FromSeconds(3))` once, the two implementations behave differently. `ManualTimeProvider` will invoke the timer callback at the same time (`00:01`, `00:02`, and `00:03`) as if we had called `Advance(TimeSpan.FromSeconds(1))` three times, as illustrated in the drawing below:
-
-![Advancing time by three seconds in one step using ManualTimeProvider.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/ManualTimeProvider-advance-3-seconds.svg)
-
-However, `FakeTimeProvider` will invoke the timer callback at time `00:03` three times, as illustrated in the drawings below:
-
-![Advancing time by three seconds in one step using FakeTimeProvider.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/FakeTimeProvider-advance-3-seconds.svg)
-
-Technically, both implementations are correct since the `ITimer` abstractions only promise to invoke the callback timer *on or after the due time/period has elapsed*, never before.
-
-However, I strongly prefer the `ManualTimeProvider` approach since it behaves consistently independent of how time is moved forward. It seems much more in the spirit of how a deterministic time provider should behave and avoids users being surprised when writing tests. I imagine users may get stuck for a while trying to debug why the time reported by `GetUtcNow()` is not set as expected due to the subtle difference in the behavior of `FakeTimeProvider`.
-
-That said, it can be useful to test that your code behaves correctly if a timer isn't allocated processor time immediately when it's callback should fire, and for that, `ManualTimeProvider` includes a different method, `Jump`.
-
-### Jumping to a point in time
-
-A real `ITimer`'s callback may not be allocated processor time and be able to fire at the moment it has been scheduled, e.g. if the processor is busy doing other things. The callback will eventually fire (unless the timer is disposed of).
-
-To support testing this scenario, `ManualtTimeProvider` includes a method that will jump time to a specific point, and then invoke all scheduled timer callbacks between the start and end of the jump. This behavior is similar to how `FakeTimeProvider`s `Advance` method works, as described in the previous section.
-
-![Jumping ahead in time by three seconds in one step using ManualTimeProvider.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/jump-3-seconds.svg)
+- [`PeriodicTimerWrapper`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/System.Threading.PeriodicTimerWrapper.md)
+- [`TimeProviderPeriodicTimerExtensions`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/System.Threading.TimeProviderPeriodicTimerExtensions.md)
 
 ## Known limitations and issues:
 
@@ -216,3 +193,37 @@ public async Task DoStuff_does_stuff_every_11_seconds()
     .BeCloseTo(DateTimeOffset.UtcNow, precision: TimeSpan.FromMilliseconds(50));
 }
 ```
+
+## Difference between `ManualTimeProvider` and `FakeTimeProvider`
+
+The .NET team has published a similar test-specific time provider, the [`Microsoft.Extensions.Time.Testing.FakeTimeProvider`](https://www.nuget.org/packages/Microsoft.Extensions.Time.Testing.FakeTimeProvider/).
+
+The public API of both `FakeTimeProvider` and `ManualTimeProvider` are compatible, but there are some differences in when time is set before timer callbacks. Let's illustrate this with an example:
+
+For example, if we create an `ITimer` with a *due time* and *period* set to **1 second**, the `DateTimeOffset` returned from `GetUtcNow()` during the timer callback may be different depending on the amount passed to `Advance()` (or `SetUtcNow()`).
+
+If we call `Advance(TimeSpan.FromSeconds(1))` three times, effectively moving time forward by three seconds, the timer callback will be invoked once at times `00:01`, `00:02`, and `00:03`, as illustrated in the drawing below. Both `FakeTimeProvider` and `ManualTimeProvider` behave like this:
+
+![Advancing time by three seconds in one-second increments.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/advance-1-second.svg)
+
+If we instead call `Advance(TimeSpan.FromSeconds(3))` once, the two implementations behave differently. `ManualTimeProvider` will invoke the timer callback at the same time (`00:01`, `00:02`, and `00:03`) as if we had called `Advance(TimeSpan.FromSeconds(1))` three times, as illustrated in the drawing below:
+
+![Advancing time by three seconds in one step using ManualTimeProvider.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/ManualTimeProvider-advance-3-seconds.svg)
+
+However, `FakeTimeProvider` will invoke the timer callback at time `00:03` three times, as illustrated in the drawings below:
+
+![Advancing time by three seconds in one step using FakeTimeProvider.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/FakeTimeProvider-advance-3-seconds.svg)
+
+Technically, both implementations are correct since the `ITimer` abstractions only promise to invoke the callback timer *on or after the due time/period has elapsed*, never before.
+
+However, I strongly prefer the `ManualTimeProvider` approach since it behaves consistently independent of how time is moved forward. It seems much more in the spirit of how a deterministic time provider should behave and avoids users being surprised when writing tests. I imagine users may get stuck for a while trying to debug why the time reported by `GetUtcNow()` is not set as expected due to the subtle difference in the behavior of `FakeTimeProvider`.
+
+That said, it can be useful to test that your code behaves correctly if a timer isn't allocated processor time immediately when it's callback should fire, and for that, `ManualTimeProvider` includes a different method, `Jump`.
+
+### Jumping to a point in time
+
+A real `ITimer`'s callback may not be allocated processor time and be able to fire at the moment it has been scheduled, e.g. if the processor is busy doing other things. The callback will eventually fire (unless the timer is disposed of).
+
+To support testing this scenario, `ManualtTimeProvider` includes a method that will jump time to a specific point, and then invoke all scheduled timer callbacks between the start and end of the jump. This behavior is similar to how `FakeTimeProvider`s `Advance` method works, as described in the previous section.
+
+![Jumping ahead in time by three seconds in one step using ManualTimeProvider.](https://raw.githubusercontent.com/egil/TimeProviderExtensions/main/docs/jump-3-seconds.svg)
