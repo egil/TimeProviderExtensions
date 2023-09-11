@@ -76,7 +76,7 @@ public class ManualTimeProviderTests
     }
 #endif
 
-#if !NET8_0_OR_GREATER
+#if !NET8_0_OR_GREATER && NET6_0_OR_GREATER
     [Fact(Skip = "Include after NET 8 rc1 release")]
     public async Task Callbacks_happens_in_schedule_order()
     {
@@ -108,7 +108,7 @@ public class ManualTimeProviderTests
             }
         }
     }
-#else
+#elif NET8_0_OR_GREATER
     [Fact]
     public async Task Callbacks_happens_in_schedule_order()
     {

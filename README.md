@@ -1,10 +1,29 @@
+[![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/egil/TimeProviderExtensions?include_prereleases&logo=github&style=flat-square)](https://github.com/egil/TimeProviderExtensions/releases)
+[![Nuget](https://img.shields.io/nuget/dt/TimeProviderExtensions?logo=nuget&style=flat-square)](https://www.nuget.org/packages/TimeProviderExtensions/)
+[![Issues Open](https://img.shields.io/github/issues/egil/TimeProviderExtensions.svg?style=flat-square&logo=github)](https://github.com/egil/TimeProviderExtensions/issues)
+
 # TimeProvider Extensions
 
-Extensions for [`System.TimeProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider) API. It includes a version of the `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
+Extensions for the [`System.TimeProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider) API. It includes:
 
-An instance of `TimeProvider` for production use is available on the [`TimeProvider.System`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider.system?#system-timeprovider-system) property, and `ManualTimeProvider` can be used during testing.
+- A test/fake version of `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
+- A backported version of `PeriodicTimer` that supports `TimeProvider` in .NET 6.
 
-During testing, you can move time forward by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` on `ManualTimeProvider`. This allows you to write tests that run fast and predictably, even if the system under test pauses execution for multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
+## Quick start
+
+This describes how to get started:
+
+1. Get the latest release from https://www.nuget.org/packages/TimeProviderExtensions.
+
+2. Take a dependency on `TimeProvider` in your code. Inject the production version of `TimeProvider` available via the [`TimeProvider.System`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider.system?#system-timeprovider-system) property during production.
+
+3. During testing, inject the `ManualTimeProvider` from this library. With `ManualTimeProvider`, you can move advance time by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` and jump ahead in time using `Jump(TimeSpan)` or `Jump(DateTimeOffset)`. This allows you to write tests that run fast and predictably, even if the system under test pauses execution for multiple minutes using e.g. `TimeProvider.Delay(TimeSpan)`, the replacement for `Task.Delay(TimeSpan)`.
+
+Read the rest of this README for further details and examples.
+
+## ManualTimeProvider API
+
+The ManualTimeProvider represents a synthetic time provider that can be used to enable deterministic behavior in tests.
 
 ## Difference between `ManualTimeProvider` and `FakeTimeProvider`
 
@@ -49,11 +68,11 @@ To support testing this scenario, `ManualtTimeProvider` includes a method that w
   fixture.Customize<ManualTimeProvider>(x => x.With(tp => tp.AutoAdvanceAmount, TimeSpan.Zero));
   ```
 
-## Installation
+## Installation and Usage
 
 Get the latest release from https://www.nuget.org/packages/TimeProviderExtensions
 
-## Set up in production
+### Set up in production
 
 To use in production, pass in `TimeProvider.System` to the types that depend on `TimeProvider`.
 This can be done directly or via an IoC Container, e.g. .NETs built-in `IServiceCollection` like so:
@@ -84,7 +103,7 @@ public class MyService
 
 This allows you to explicitly pass in a `ManualTimeProvider` during testing.
 
-## Example - control time during tests
+### Example - control time during tests
 
 If a system under test (SUT) uses things like `Task.Delay`, `DateTimeOffset.UtcNow`, `Task.WaitAsync`, or `PeriodicTimer`,
 it becomes hard to create tests that run fast and predictably.

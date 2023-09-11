@@ -424,7 +424,7 @@ public partial class ManualTimeProvider : TimeProvider
                 // Calculates how many callbacks should have happened
                 // in the jump period and invokes the callback that
                 // number of times. Has to happen at least one time.
-                var callbacksPassed = Math.Max(1, Math.Floor(jump / scheduler.Period));
+                var callbacksPassed = Math.Max(1, Math.Floor((double)jump.Ticks / scheduler.Period.Ticks));
                 for (int i = 0; i < callbacksPassed; i++)
                 {
                     scheduler.TimerElapsed();

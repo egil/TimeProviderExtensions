@@ -55,7 +55,11 @@ public partial class ManualTimeProvider : TimeProvider
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+#if NET5_0_OR_GREATER
             return ValueTask.CompletedTask;
+#else
+            return default;
+#endif
         }
 
         private void Dispose(bool _)

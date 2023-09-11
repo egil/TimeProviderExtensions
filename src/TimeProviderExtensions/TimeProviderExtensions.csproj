@@ -6,7 +6,9 @@
 		<Company>Egil Hansen</Company>
 		<Authors>Egil Hansen</Authors>
 		<Description>
-			Extensions for `System.TimeProvider` API. It includes a test version of the `TimeProvider`, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
+			Extensions for the `System.TimeProvider` API. It includes a test version of the `TimeProvider`, named `ManualTimeProvider`,
+			that allows you to control the progress of time during testing deterministically and a backport of the `PeriodicTimer`
+			version from .NET 8 to .NET 6/7 that supports `TimeProvider`.
 		</Description>
 		<PackageTags>TimeProvider, testing</PackageTags>
 		<Copyright>Egil Hansen</Copyright>
@@ -31,7 +33,7 @@
 	</Target>
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Deterministic>true</Deterministic>
@@ -51,12 +53,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.TimeProvider" Version="8.0.0-preview.*" />
 		<PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="MinVer" Version="4.3.0" PrivateAssets="All" />
-		<PackageReference Include="Microsoft.Bcl.TimeProvider" Version="8.0.0-preview.*" />
 	</ItemGroup>
 
 	<ItemGroup>

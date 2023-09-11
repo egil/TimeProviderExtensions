@@ -210,9 +210,7 @@ public class ManualTimeProviderTests
 
         cs.Cancel();
 
-#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
         await Assert.ThrowsAsync<TaskCanceledException>(async () => await delay);
-#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
     }
 
     [Fact]

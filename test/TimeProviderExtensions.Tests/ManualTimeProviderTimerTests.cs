@@ -155,14 +155,14 @@ public class ManualTimeProviderTimerTests
         sut.Advance(TimeSpan.FromSeconds(11));
 
         callbacks.Should().Equal(
-            (1, oneSec * 2),
-            (2, oneSec * 3),
-            (1, oneSec * 4),
-            (2, oneSec * 6),
-            (1, oneSec * 6),
-            (1, oneSec * 8),
-            (2, oneSec * 9),
-            (1, oneSec * 10));
+            (1, TimeSpan.FromSeconds(2)),
+            (2, TimeSpan.FromSeconds(3)),
+            (1, TimeSpan.FromSeconds(4)),
+            (2, TimeSpan.FromSeconds(6)),
+            (1, TimeSpan.FromSeconds(6)),
+            (1, TimeSpan.FromSeconds(8)),
+            (2, TimeSpan.FromSeconds(9)),
+            (1, TimeSpan.FromSeconds(10)));
     }
 
     [Fact]
