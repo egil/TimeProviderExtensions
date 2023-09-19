@@ -15,7 +15,11 @@ public class ManualTimeProviderDelayTests
         task.Status.Should().Be(TaskStatus.RanToCompletion);
     }
 
+#if NET8_0_OR_GREATER
     [Fact]
+#else
+    [Fact(Skip = "Bug in .NET 7 and earlier - https://github.com/dotnet/runtime/issues/92264")]
+#endif
     public void Delayed_task_is_cancelled()
     {
         using var cts = new CancellationTokenSource();

@@ -23,7 +23,7 @@ public class ManualTimeProviderTests
 
         sut.GetUtcNow().Should().Be(startTime + TimeSpan.FromTicks(1));
     }
-#if NET8_0_OR_GREATER
+
     [Fact]
     public async Task Delay_callbacks_runs_synchronously()
     {
@@ -46,7 +46,11 @@ public class ManualTimeProviderTests
         }
     }
 
+#if NET8_0_OR_GREATER
     [Fact]
+#else
+    [Fact(Skip = "Bug in .NET 7 and earlier - https://github.com/dotnet/runtime/issues/92264")]
+#endif
     public async Task WaitAsync_callbacks_runs_synchronously()
     {
         // arrange
@@ -65,7 +69,8 @@ public class ManualTimeProviderTests
         {
             try
             {
-                await Task.Delay(TimeSpan.FromDays(1))
+                await Task
+                    .Delay(TimeSpan.FromDays(1))
                     .WaitAsync(TimeSpan.FromSeconds(10), timeProvider);
             }
             catch (TimeoutException)
@@ -74,10 +79,9 @@ public class ManualTimeProviderTests
             }
         }
     }
-#endif
 
 #if !NET8_0_OR_GREATER && NET6_0_OR_GREATER
-    [Fact(Skip = "Include after NET 8 rc1 release")]
+    [Fact]
     public async Task Callbacks_happens_in_schedule_order()
     {
         var sut = new ManualTimeProvider();
