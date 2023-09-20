@@ -14,7 +14,7 @@ public partial class ManualTimeProvider : TimeProvider
     // the GC should be collect the ManualTimer in case users forget to dispose it.
     // If all the references captured by this type was part of the ManualTimer
     // type, the finalizer would not be invoked on ManualTimer if a callback was scheduled.
-    private sealed class ManualTimerScheduler : IComparable<ManualTimerScheduler>
+    private sealed class ManualTimerScheduler
     {
         private readonly TimerCallback callback;
         private readonly object? state;
@@ -31,11 +31,6 @@ public partial class ManualTimeProvider : TimeProvider
             this.callback = callback;
             this.state = state;
         }
-
-        public int CompareTo(ManualTimerScheduler? other)
-            => other is not null
-            ? Comparer<DateTimeOffset>.Default.Compare(CallbackTime, other.CallbackTime)
-            : -1;
 
         public override string ToString()
             => running

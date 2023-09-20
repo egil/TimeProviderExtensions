@@ -8,10 +8,7 @@ public class ManualTimeProviderWaitAsyncTests
     private readonly static TimeSpan DelayedTaskDelay = TimeSpan.FromMilliseconds(2);
     private readonly static string StringTaskResult = Guid.NewGuid().ToString();
 
-    private static async Task DelayedTask(TimeProvider provider)
-    {
-        await provider.Delay(DelayedTaskDelay);
-    }
+    private static async Task DelayedTask(TimeProvider provider) => await provider.Delay(DelayedTaskDelay);
 
     private static async Task<string> DelayedStringTask(TimeProvider provider)
     {
@@ -40,8 +37,6 @@ public class ManualTimeProviderWaitAsyncTests
         await sut.Invoking(invalidInvocation)
             .Should()
             .ThrowAsync<ArgumentOutOfRangeException>();
-        // This should be timeout in all cases, but it seems the .NET 8 implementation sometimes returns dueTime.
-        //.WithParameterName("timeout"); 
     }
 
     public static TheoryData<Func<ManualTimeProvider, Task>> CompletedInvocations { get; } =

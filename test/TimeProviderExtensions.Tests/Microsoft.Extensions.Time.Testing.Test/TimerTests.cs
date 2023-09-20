@@ -210,12 +210,12 @@ public class TimerTests
         var timer2Counter = 0;
 
         var timeProvider = new FakeTimeProvider();
-        var waitersCountStart = timeProvider.ScheduledCallbackCount;
+        var waitersCountStart = timeProvider.ScheduledCallbacks;
 
         var timer1 = timeProvider.CreateTimer(_ => timer1Counter++, null, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(1));
         var timer2 = timeProvider.CreateTimer(_ => timer2Counter++, null, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(1));
 
-        var waitersCountDuring = timeProvider.ScheduledCallbackCount;
+        var waitersCountDuring = timeProvider.ScheduledCallbacks;
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(1));
 
@@ -223,7 +223,7 @@ public class TimerTests
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(1));
 
-        var waitersCountAfter = timeProvider.ScheduledCallbackCount;
+        var waitersCountAfter = timeProvider.ScheduledCallbacks;
 
         Assert.Equal(0, waitersCountStart);
         Assert.Equal(2, waitersCountDuring);
@@ -240,12 +240,12 @@ public class TimerTests
         var timer2Counter = 0;
 
         var timeProvider = new FakeTimeProvider();
-        var waitersCountStart = timeProvider.ScheduledCallbackCount;
+        var waitersCountStart = timeProvider.ScheduledCallbacks;
 
         var timer1 = timeProvider.CreateTimer(_ => timer1Counter++, null, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(1));
         var timer2 = timeProvider.CreateTimer(_ => timer2Counter++, null, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(1));
 
-        var waitersCountDuring = timeProvider.ScheduledCallbackCount;
+        var waitersCountDuring = timeProvider.ScheduledCallbacks;
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(1));
 
@@ -257,7 +257,7 @@ public class TimerTests
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(1));
 
-        var waitersCountAfter = timeProvider.ScheduledCallbackCount;
+        var waitersCountAfter = timeProvider.ScheduledCallbacks;
 
         Assert.Equal(0, waitersCountStart);
         Assert.Equal(2, waitersCountDuring);

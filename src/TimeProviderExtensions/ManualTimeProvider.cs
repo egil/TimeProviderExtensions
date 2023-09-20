@@ -9,7 +9,7 @@ namespace TimeProviderExtensions;
 /// <remarks>
 /// Learn more at <see href="https://github.com/egil/TimeProviderExtensions"/>.
 /// </remarks>
-[DebuggerDisplay("{ToString()}. Scheduled callback count: {ScheduledCallbackCount}")]
+[DebuggerDisplay("UtcNow: {ToString(),nq}. Scheduled timer callbacks: {callbacks.Count}. Auto advance amount: {autoAdvanceAmount,nq}.")]
 public partial class ManualTimeProvider : TimeProvider
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
@@ -24,7 +24,7 @@ public partial class ManualTimeProvider : TimeProvider
     /// <summary>
     /// Gets the number of callbacks that are scheduled to be triggered in the future.
     /// </summary>
-    internal int ScheduledCallbackCount => callbacks.Count;
+    internal int ScheduledCallbacks => callbacks.Count;
 
     /// <summary>
     /// Gets the starting date and time for this provider.

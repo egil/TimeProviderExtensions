@@ -73,7 +73,7 @@ public partial class ManualTimeProvider : TimeProvider
             scheduledCallback = null;
         }
 
-        private static void ValidateTimeSpanRange(TimeSpan time, [CallerArgumentExpression("time")] string? parameter = null)
+        private static void ValidateTimeSpanRange(TimeSpan time, [CallerArgumentExpression(nameof(time))] string? parameter = null)
         {
             long tm = (long)time.TotalMilliseconds;
             if (tm < -1)
