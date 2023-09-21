@@ -331,6 +331,8 @@ public class ManualTimeProvider : TimeProvider
             }
 
             utcNow = value;
+
+            Debug.Assert(callbacks.All(x => x.CallbackTime > utcNow), "Because there should never by any callbacks scheduled in the past at this point.");
         }
 
         ManualTimerScheduler? TryGetNext(DateTimeOffset targetUtcNow)
@@ -473,6 +475,8 @@ public class ManualTimeProvider : TimeProvider
                     scheduler.TimerElapsed();
                 }
             }
+
+            Debug.Assert(callbacks.All(x => x.CallbackTime > utcNow), "Because there should never by any callbacks scheduled in the past at this point.");
         }
 
         IEnumerable<ManualTimerScheduler> TryGetNext(DateTimeOffset targetUtcNow)
@@ -496,6 +500,8 @@ public class ManualTimeProvider : TimeProvider
     {
         lock (callbacks)
         {
+            Debug.Assert(!callbacks.Contains(scheduler), "A scheduler should only be added to callbacks one time.");
+
             scheduler.CallbackTime = utcNow + waitTime;
 
             var insertPosition = callbacks.FindIndex(x => x.CallbackTime > scheduler.CallbackTime);
