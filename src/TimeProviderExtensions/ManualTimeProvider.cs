@@ -174,12 +174,28 @@ public class ManualTimeProvider : TimeProvider
     /// To move time forward for the returned <see cref="ITimer"/>, call <see cref="Advance(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/> on this time provider.
     /// </para>
     /// </remarks>
-    public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+    public sealed override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
     {
-        var result = new ManualTimer(callback, state, this);
+        var result = CreateManualTimer(callback, state, this);
         result.Change(dueTime, period);
         return result;
     }
+
+    /// <summary>
+    /// Creates an instance of a <see cref="ManualTimer"/>. This method is called by <see cref="CreateTimer(TimerCallback, object?, TimeSpan, TimeSpan)"/>.
+    /// </summary>
+    /// <remarks>
+    /// Override this methods to return a custom implementation of <see cref="ManualTimer"/>. This also allows for intercepting and wrapping
+    /// the provided timer <paramref name="callback"/> and <paramref name="state"/>, enabling more advanced testing scenarioes.
+    /// </remarks>
+    /// <param name="callback">
+    /// A delegate representing a method to be executed when the timer fires. The method specified for callback should be reentrant,
+    /// as it may be invoked simultaneously on two threads if the timer fires again before or while a previous callback is still being handled.
+    /// </param>
+    /// <param name="state">An object to be passed to the <paramref name="callback"/>. This may be null.</param>
+    /// <param name="timeProvider">The <see cref="ManualTimeProvider"/> which is used to schedule invocations of the <paramref name="callback"/> with.</param>
+    protected internal virtual ManualTimer CreateManualTimer(TimerCallback callback, object? state, ManualTimeProvider timeProvider)
+        => new ManualTimer(callback, state, timeProvider);
 
     /// <summary>
     /// Sets the local time zone.

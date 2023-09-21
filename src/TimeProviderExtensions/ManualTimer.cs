@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
@@ -16,7 +17,18 @@ public class ManualTimer : ITimer
     private ManualTimerScheduler? scheduler;
 
     /// <summary>
-    /// Gets the next time the timer callback will be invoked, or <c>null</c> if the timer is inactive.
+    /// Gets whether the timer is currently active, i.e. has a future callback invocation scheduled.
+    /// </summary>
+    /// <remarks>
+    /// When <see cref="IsActive"/> returns <see langword="true"/>, <see cref="CallbackTime"/> is not <see langword="null"/>.
+    /// </remarks>
+#if NET6_0_OR_GREATER
+    [MemberNotNullWhen(true, nameof(CallbackTime))]
+#endif
+    public bool IsActive => scheduler?.CallbackTime.HasValue ?? false;
+
+    /// <summary>
+    /// Gets the next time the timer callback will be invoked, or <see langword="null"/> if the timer is inactive.
     /// </summary>
     public DateTimeOffset? CallbackTime => scheduler?.CallbackTime;
 

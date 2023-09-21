@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow `ManualTimeProvider.Start` to be set using property initializers.
 
+- Made the timer type created by `ManualTimeProvider`, the `ManualTimer` type, public, and introduced a protected method `CreateManualTimer` on `ManualTimeProvider`. This enables advanced scenarioes where a custom `ManualTimer` is needed. 
+
+  A custom implementation of `ManualTimer` can override the `Change` method and add custom behavior to it.
+
+  Overriding `CreateManualTimer` makes it possible to intercept a `TimerCallback` and perform actions before and after the timer callback has been invoked.
+
 ## [1.0.0-rc.1]
 
 - Updated Microsoft.Bcl.TimeProvider package dependency to rc.1 version.

@@ -214,6 +214,43 @@ the expected number of times, i.e. such that the result of `manualTimeProvider.G
 
 Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
 
+<a name='TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider)'></a>
+
+## ManualTimeProvider.CreateManualTimer(TimerCallback, object, ManualTimeProvider) Method
+
+Creates an instance of a [ManualTimer](TimeProviderExtensions.ManualTimer.md 'TimeProviderExtensions.ManualTimer'). This method is called by [CreateTimer(TimerCallback, object, TimeSpan, TimeSpan)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.CreateTimer(System.Threading.TimerCallback,object,System.TimeSpan,System.TimeSpan) 'TimeProviderExtensions.ManualTimeProvider.CreateTimer(System.Threading.TimerCallback, object, System.TimeSpan, System.TimeSpan)').
+
+```csharp
+protected internal virtual TimeProviderExtensions.ManualTimer CreateManualTimer(System.Threading.TimerCallback callback, object? state, TimeProviderExtensions.ManualTimeProvider timeProvider);
+```
+#### Parameters
+
+<a name='TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider).callback'></a>
+
+`callback` [System.Threading.TimerCallback](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.TimerCallback 'System.Threading.TimerCallback')
+
+A delegate representing a method to be executed when the timer fires. The method specified for callback should be reentrant,
+as it may be invoked simultaneously on two threads if the timer fires again before or while a previous callback is still being handled.
+
+<a name='TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider).state'></a>
+
+`state` [System.Object](https://docs.microsoft.com/en-us/dotnet/api/System.Object 'System.Object')
+
+An object to be passed to the [callback](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider).callback 'TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback, object, TimeProviderExtensions.ManualTimeProvider).callback'). This may be null.
+
+<a name='TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider).timeProvider'></a>
+
+`timeProvider` [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider')
+
+The [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider') which is used to schedule invocations of the [callback](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider).callback 'TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback, object, TimeProviderExtensions.ManualTimeProvider).callback') with.
+
+#### Returns
+[ManualTimer](TimeProviderExtensions.ManualTimer.md 'TimeProviderExtensions.ManualTimer')
+
+### Remarks
+Override this methods to return a custom implementation of [ManualTimer](TimeProviderExtensions.ManualTimer.md 'TimeProviderExtensions.ManualTimer'). This also allows for intercepting and wrapping
+the provided timer [callback](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider).callback 'TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback, object, TimeProviderExtensions.ManualTimeProvider).callback') and [state](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider).state 'TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback, object, TimeProviderExtensions.ManualTimeProvider).state'), enabling more advanced testing scenarioes.
+
 <a name='TimeProviderExtensions.ManualTimeProvider.CreateTimer(System.Threading.TimerCallback,object,System.TimeSpan,System.TimeSpan)'></a>
 
 ## ManualTimeProvider.CreateTimer(TimerCallback, object, TimeSpan, TimeSpan) Method
@@ -221,7 +258,7 @@ Learn more about this behavior at <seealso href="https://github.com/egil/TimePro
 Creates a new [System.Threading.ITimer](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.ITimer 'System.Threading.ITimer') instance, using [System.TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan 'System.TimeSpan') values to measure time intervals.
 
 ```csharp
-public override System.Threading.ITimer CreateTimer(System.Threading.TimerCallback callback, object? state, System.TimeSpan dueTime, System.TimeSpan period);
+public sealed override System.Threading.ITimer CreateTimer(System.Threading.TimerCallback callback, object? state, System.TimeSpan dueTime, System.TimeSpan period);
 ```
 #### Parameters
 

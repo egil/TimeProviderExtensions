@@ -281,5 +281,30 @@ public class ManualTimeProviderTests
         sut.Advance(1.Seconds());
 
         sut.ActiveTimers.Should().Be(0);
-    }    
+    }
+
+
+    [Fact]
+    public void CreateManualTimer_with_custom_timer_type()
+    {
+        var sut = new CustomManualTimeProvider();
+
+        using var timer = sut.CreateTimer(_ => { }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+
+        timer.Should().BeOfType<CustomManualTimer>();
+    }
+
+    private sealed class CustomManualTimeProvider : ManualTimeProvider
+    {
+        protected internal override ManualTimer CreateManualTimer(TimerCallback callback, object? state, ManualTimeProvider timeProvider)
+            => new CustomManualTimer(callback, state, timeProvider);
+    }
+
+    private sealed class CustomManualTimer : ManualTimer
+    {
+        internal CustomManualTimer(TimerCallback callback, object? state, ManualTimeProvider timeProvider)
+            : base(callback, state, timeProvider)
+        {
+        }
+    }
 }

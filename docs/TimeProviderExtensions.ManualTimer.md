@@ -52,7 +52,7 @@ The [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProvi
 
 ## ManualTimer.CallbackTime Property
 
-Gets the next time the timer callback will be invoked, or `null` if the timer is inactive.
+Gets the next time the timer callback will be invoked, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null') if the timer is inactive.
 
 ```csharp
 public System.Nullable<System.DateTimeOffset> CallbackTime { get; }
@@ -73,6 +73,22 @@ public System.TimeSpan DueTime { get; set; }
 
 #### Property Value
 [System.TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan 'System.TimeSpan')
+
+<a name='TimeProviderExtensions.ManualTimer.IsActive'></a>
+
+## ManualTimer.IsActive Property
+
+Gets whether the timer is currently active, i.e. has a future callback invocation scheduled.
+
+```csharp
+public bool IsActive { get; }
+```
+
+#### Property Value
+[System.Boolean](https://docs.microsoft.com/en-us/dotnet/api/System.Boolean 'System.Boolean')
+
+### Remarks
+When [IsActive](TimeProviderExtensions.ManualTimer.md#TimeProviderExtensions.ManualTimer.IsActive 'TimeProviderExtensions.ManualTimer.IsActive') returns [true](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool'), [CallbackTime](TimeProviderExtensions.ManualTimer.md#TimeProviderExtensions.ManualTimer.CallbackTime 'TimeProviderExtensions.ManualTimer.CallbackTime') is not [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null').
 
 <a name='TimeProviderExtensions.ManualTimer.Period'></a>
 
