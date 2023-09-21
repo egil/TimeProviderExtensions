@@ -189,7 +189,7 @@ public class ManualTimeProvider : TimeProvider
     /// </summary>
     /// <remarks>
     /// Override this methods to return a custom implementation of <see cref="ManualTimer"/>. This also allows for intercepting and wrapping
-    /// the provided timer <paramref name="callback"/> and <paramref name="state"/>, enabling more advanced testing scenarioes.
+    /// the provided timer <paramref name="callback"/> and <paramref name="state"/>, enabling more advanced testing scenarios.
     /// </remarks>
     /// <param name="callback">
     /// A delegate representing a method to be executed when the timer fires. The method specified for callback should be reentrant,

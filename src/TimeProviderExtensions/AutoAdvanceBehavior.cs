@@ -17,7 +17,7 @@ public sealed record class AutoAdvanceBehavior
     /// <remarks>
     /// Set to <see cref="TimeSpan.Zero"/> to disable auto advance. The default value is <see cref="TimeSpan.Zero"/>.
     /// </remarks>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value than <see cref="TimeSpan.Zero"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value less than <see cref="TimeSpan.Zero"/>.</exception>
     public TimeSpan ClockAdvanceAmount { get => clockAdvanceAmount; set { ThrowIfLessThanZero(value); clockAdvanceAmount = value; } }
 
     /// <summary>
@@ -27,7 +27,7 @@ public sealed record class AutoAdvanceBehavior
     /// <remarks>
     /// Set to <see cref="TimeSpan.Zero"/> to disable auto advance. The default value is <see cref="TimeSpan.Zero"/>.
     /// </remarks>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value than <see cref="TimeSpan.Zero"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value less than <see cref="TimeSpan.Zero"/>.</exception>
     public TimeSpan TimestampAdvanceAmount { get => timestampAdvanceAmount; set { ThrowIfLessThanZero(value); timestampAdvanceAmount = value; } }
 
     private static void ThrowIfLessThanZero(TimeSpan value, [CallerMemberName] string? parameterName = null)

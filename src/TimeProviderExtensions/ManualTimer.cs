@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace TimeProviderExtensions;
 
 /// <summary>
-/// A implementaiton of a <see cref="ITimer"/> whose callbacks are scheduled via a <see cref="ManualTimeProvider"/>.
+/// A implementation of a <see cref="ITimer"/> whose callbacks are scheduled via a <see cref="ManualTimeProvider"/>.
 /// </summary>
 [DebuggerDisplay("{ToString(),nq}")]
 public class ManualTimer : ITimer
