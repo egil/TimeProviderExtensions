@@ -152,12 +152,96 @@ public class ManualTimeProviderTests
         var oneSecond = TimeSpan.FromSeconds(1);
         var timeProvider = new ManualTimeProvider() { AutoAdvanceAmount = oneSecond };
 
-        var t1 = timeProvider.CreateTimer(_ =>
+        using var t1 = timeProvider.CreateTimer(_ =>
         {
             timeProvider.GetUtcNow();
         }, null, TimeSpan.Zero, oneSecond);
 
         timeProvider.GetUtcNow().Should().Be(timeProvider.Start + oneSecond);
+    }
+
+    [Fact]
+    public void Advance_zero()
+    {
+        var sut = new ManualTimeProvider();
+
+        sut.Advance(TimeSpan.Zero);
+
+        sut.GetUtcNow().Should().Be(sut.Start);
+    }
+
+    [Fact]
+    public void Jump_zero()
+    {
+        var sut = new ManualTimeProvider();
+
+        sut.Jump(TimeSpan.Zero);
+
+        sut.GetUtcNow().Should().Be(sut.Start);
+    }
+
+    [Fact]
+    public void AutoAdvanceAmount_throws_when_lt_zero()
+    {
+        var sut = new ManualTimeProvider();
+
+        var throws = () => sut.AutoAdvanceAmount = TimeSpan.FromTicks(-1);
+
+        throws.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void Jump_throws_when_lt_zero()
+    {
+        var sut = new ManualTimeProvider();
+
+        var throws = () => sut.Jump(TimeSpan.FromTicks(-1));
+
+        throws.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void Jump_throws_going_back_in_time()
+    {
+        var sut = new ManualTimeProvider();
+
+        var throws = () => sut.Jump(sut.GetUtcNow() - TimeSpan.FromTicks(1));
+
+        throws.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public async Task Multi_threaded_SetUtcNow()
+    {
+        var callbackCount = 0;
+        var sut = new ManualTimeProvider();
+        using var timer = sut.CreateTimer(_ =>
+        {
+            Thread.Sleep(20);
+            callbackCount++;
+        }, null, 1.Seconds(), 1.Seconds());
+
+        var tasks = Enumerable.Range(1, 100).Select(_ => Task.Run(() => sut.SetUtcNow(sut.Start + 1.Seconds())));
+
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+        callbackCount.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Multi_threaded_Jump()
+    {
+        var callbackCount = 0;
+        var sut = new ManualTimeProvider();
+        using var timer = sut.CreateTimer(_ =>
+        {
+            Thread.Sleep(20);
+            callbackCount++;
+        }, null, 1.Seconds(), 1.Seconds());
+
+        var tasks = Enumerable.Range(1, 100).Select(_ => Task.Run(() => sut.Jump(sut.Start + 1.Seconds())));
+
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+        callbackCount.Should().Be(1);
     }
 
     [Fact]
@@ -197,5 +281,5 @@ public class ManualTimeProviderTests
         sut.Advance(1.Seconds());
 
         sut.ActiveTimers.Should().Be(0);
-    }
+    }    
 }
