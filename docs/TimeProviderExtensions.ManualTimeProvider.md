@@ -78,6 +78,19 @@ Optional local time zone to use during testing. Defaults to [System.TimeZoneInfo
 The provider is set to not automatically advance time each time it is read.
 ### Properties
 
+<a name='TimeProviderExtensions.ManualTimeProvider.ActiveTimers'></a>
+
+## ManualTimeProvider.ActiveTimers Property
+
+Gets the number of active [TimeProviderExtensions.ManualTimeProvider.ManualTimer](https://docs.microsoft.com/en-us/dotnet/api/TimeProviderExtensions.ManualTimeProvider.ManualTimer 'TimeProviderExtensions.ManualTimeProvider.ManualTimer'), that have callbacks that are scheduled to be triggered at some point in the future.
+
+```csharp
+public int ActiveTimers { get; }
+```
+
+#### Property Value
+[System.Int32](https://docs.microsoft.com/en-us/dotnet/api/System.Int32 'System.Int32')
+
 <a name='TimeProviderExtensions.ManualTimeProvider.AutoAdvanceAmount'></a>
 
 ## ManualTimeProvider.AutoAdvanceAmount Property

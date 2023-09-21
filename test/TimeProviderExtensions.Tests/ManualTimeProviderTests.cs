@@ -159,4 +159,43 @@ public class ManualTimeProviderTests
 
         timeProvider.GetUtcNow().Should().Be(timeProvider.Start + oneSecond);
     }
+
+    [Fact]
+    public void ActiveTimers_with_no_timers()
+    {
+        var sut = new ManualTimeProvider();
+
+        sut.ActiveTimers.Should().Be(0);
+    }
+
+    [Fact]
+    public void ActiveTimers_with_active_timers()
+    {
+        var sut = new ManualTimeProvider();
+
+        var timer = sut.CreateTimer(_ => { }, null, 1.Seconds(), Timeout.InfiniteTimeSpan);
+
+        sut.ActiveTimers.Should().Be(1);
+    }
+
+    [Fact]
+    public void ActiveTimers_with_inactive_timers()
+    {
+        var sut = new ManualTimeProvider();
+
+        var timer = sut.CreateTimer(_ => { }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+
+        sut.ActiveTimers.Should().Be(0);
+    }
+
+    [Fact]
+    public void ActiveTimers_with_after_timer_state_change()
+    {
+        var sut = new ManualTimeProvider();
+
+        var timer = sut.CreateTimer(_ => { }, null, 1.Seconds(), Timeout.InfiniteTimeSpan);
+        sut.Advance(1.Seconds());
+
+        sut.ActiveTimers.Should().Be(0);
+    }
 }

@@ -210,12 +210,12 @@ public class TimerTests
         var timer2Counter = 0;
 
         var timeProvider = new FakeTimeProvider();
-        var waitersCountStart = timeProvider.ScheduledCallbacks;
+        var waitersCountStart = timeProvider.ActiveTimers;
 
         var timer1 = timeProvider.CreateTimer(_ => timer1Counter++, null, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(1));
         var timer2 = timeProvider.CreateTimer(_ => timer2Counter++, null, TimeSpan.FromMilliseconds(1), TimeSpan.FromMilliseconds(1));
 
-        var waitersCountDuring = timeProvider.ScheduledCallbacks;
+        var waitersCountDuring = timeProvider.ActiveTimers;
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(1));
 
@@ -223,7 +223,7 @@ public class TimerTests
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(1));
 
-        var waitersCountAfter = timeProvider.ScheduledCallbacks;
+        var waitersCountAfter = timeProvider.ActiveTimers;
 
         Assert.Equal(0, waitersCountStart);
         Assert.Equal(2, waitersCountDuring);
