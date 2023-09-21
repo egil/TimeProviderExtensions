@@ -93,10 +93,29 @@ public class ManualTimeProvider : TimeProvider
     /// </summary>
     /// <returns>A long integer representing the high-frequency counter value of the underlying timer mechanism.</returns>
     /// <remarks>
+    /// <para>
     /// This implementation bases timestamp on <see cref="DateTimeOffset.UtcTicks"/>,
     /// since the progression of time is represented by the date and time returned from <see cref="GetUtcNow()" />.
+    /// </para>
+    /// <para>
+    /// If <see cref="AutoAdvanceBehavior.TimestampAdvanceAmount"/> is greater than <see cref="TimeSpan.Zero"/>, calling this
+    /// method will move time forward by the amount specified by <see cref="AutoAdvanceBehavior.TimestampAdvanceAmount"/>.
+    /// The <see langword="long"/> returned from this method will reflect the timestamp before
+    /// the auto advance was applied, if any.
+    /// </para>
     /// </remarks>
-    public override long GetTimestamp() => utcNow.UtcTicks;
+    public override long GetTimestamp()
+    {
+        long result;
+
+        lock (callbacks)
+        {
+            result = utcNow.UtcTicks;
+            Advance(AutoAdvanceBehavior.TimestampAdvanceAmount);
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// Gets a <see cref="DateTimeOffset"/> value whose date and time are set to the current

@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Replace `AutoAdvanceAmount` property with the `AutoAdvanceBehavior` property on `ManualTimeProvider`, and introduced the `AutoAdvanceBehavior` type.
 
+- Enable auto advance feature for `GetTimestamp()` and `GetElapsedTime(long)`.
+
 ## [1.0.0-rc.1]
 
 - Updated Microsoft.Bcl.TimeProvider package dependency to rc.1 version.

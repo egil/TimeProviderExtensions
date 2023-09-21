@@ -323,8 +323,14 @@ public override long GetTimestamp();
 A long integer representing the high-frequency counter value of the underlying timer mechanism.
 
 ### Remarks
+
 This implementation bases timestamp on [System.DateTimeOffset.UtcTicks](https://docs.microsoft.com/en-us/dotnet/api/System.DateTimeOffset.UtcTicks 'System.DateTimeOffset.UtcTicks'),
 since the progression of time is represented by the date and time returned from [GetUtcNow()](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.GetUtcNow() 'TimeProviderExtensions.ManualTimeProvider.GetUtcNow()').
+
+If [TimestampAdvanceAmount](TimeProviderExtensions.AutoAdvanceBehavior.md#TimeProviderExtensions.AutoAdvanceBehavior.TimestampAdvanceAmount 'TimeProviderExtensions.AutoAdvanceBehavior.TimestampAdvanceAmount') is greater than [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero'), calling this
+method will move time forward by the amount specified by [TimestampAdvanceAmount](TimeProviderExtensions.AutoAdvanceBehavior.md#TimeProviderExtensions.AutoAdvanceBehavior.TimestampAdvanceAmount 'TimeProviderExtensions.AutoAdvanceBehavior.TimestampAdvanceAmount').
+The [long](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/long 'https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/long') returned from this method will reflect the timestamp before
+the auto advance was applied, if any.
 
 <a name='TimeProviderExtensions.ManualTimeProvider.GetUtcNow()'></a>
 
@@ -342,8 +348,8 @@ public override System.DateTimeOffset GetUtcNow();
 [System.DateTimeOffset](https://docs.microsoft.com/en-us/dotnet/api/System.DateTimeOffset 'System.DateTimeOffset')
 
 ### Remarks
-If [AutoAdvanceAmount](https://docs.microsoft.com/en-us/dotnet/api/AutoAdvanceAmount 'AutoAdvanceAmount') is greater than [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero'), calling this
-method will move time forward by the amount specified by [AutoAdvanceAmount](https://docs.microsoft.com/en-us/dotnet/api/AutoAdvanceAmount 'AutoAdvanceAmount').
+If [ClockAdvanceAmount](TimeProviderExtensions.AutoAdvanceBehavior.md#TimeProviderExtensions.AutoAdvanceBehavior.ClockAdvanceAmount 'TimeProviderExtensions.AutoAdvanceBehavior.ClockAdvanceAmount') is greater than [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero'), calling this
+method will move time forward by the amount specified by [ClockAdvanceAmount](TimeProviderExtensions.AutoAdvanceBehavior.md#TimeProviderExtensions.AutoAdvanceBehavior.ClockAdvanceAmount 'TimeProviderExtensions.AutoAdvanceBehavior.ClockAdvanceAmount').
 The [System.DateTimeOffset](https://docs.microsoft.com/en-us/dotnet/api/System.DateTimeOffset 'System.DateTimeOffset') returned from this method will reflect the time before
 the auto advance was applied, if any.
 

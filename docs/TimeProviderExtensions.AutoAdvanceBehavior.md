@@ -19,10 +19,33 @@ Implements [System.IEquatable&lt;](https://docs.microsoft.com/en-us/dotnet/api/S
 
 ## AutoAdvanceBehavior.ClockAdvanceAmount Property
 
-Gets or sets the amount of time by which time advances whenever the clock is read via [System.TimeProvider.GetUtcNow](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider.GetUtcNow 'System.TimeProvider.GetUtcNow') or [System.TimeProvider.GetLocalNow](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider.GetLocalNow 'System.TimeProvider.GetLocalNow').
+Gets or sets the amount of time by which time advances whenever the clock is read via [System.TimeProvider.GetUtcNow](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider.GetUtcNow 'System.TimeProvider.GetUtcNow')
+or [System.TimeProvider.GetLocalNow](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider.GetLocalNow 'System.TimeProvider.GetLocalNow').
 
 ```csharp
 public System.TimeSpan ClockAdvanceAmount { get; set; }
+```
+
+#### Property Value
+[System.TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan 'System.TimeSpan')
+
+#### Exceptions
+
+[System.ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/System.ArgumentOutOfRangeException 'System.ArgumentOutOfRangeException')  
+Thrown when set to a value than [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero').
+
+### Remarks
+Set to [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero') to disable auto advance. The default value is [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero').
+
+<a name='TimeProviderExtensions.AutoAdvanceBehavior.TimestampAdvanceAmount'></a>
+
+## AutoAdvanceBehavior.TimestampAdvanceAmount Property
+
+Gets or sets the amount of time by which time advances whenever the a timestamp is read via [System.TimeProvider.GetTimestamp](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider.GetTimestamp 'System.TimeProvider.GetTimestamp')
+or an elapsed time is calculated with [System.TimeProvider.GetElapsedTime(System.Int64)](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider.GetElapsedTime#System_TimeProvider_GetElapsedTime_System_Int64_ 'System.TimeProvider.GetElapsedTime(System.Int64)').
+
+```csharp
+public System.TimeSpan TimestampAdvanceAmount { get; set; }
 ```
 
 #### Property Value

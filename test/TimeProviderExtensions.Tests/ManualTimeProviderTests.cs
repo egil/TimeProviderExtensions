@@ -150,14 +150,59 @@ public class ManualTimeProviderTests
     public void Timer_callback_GetUtcNow_AutoAdvance()
     {
         var oneSecond = TimeSpan.FromSeconds(1);
-        var timeProvider = new ManualTimeProvider() { AutoAdvanceBehavior = { ClockAdvanceAmount = oneSecond } };
+        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { ClockAdvanceAmount = oneSecond } };
 
-        using var t1 = timeProvider.CreateTimer(_ =>
+        using var t1 = sut.CreateTimer(_ =>
         {
-            timeProvider.GetUtcNow();
+            sut.GetUtcNow();
         }, null, TimeSpan.Zero, oneSecond);
 
-        timeProvider.GetUtcNow().Should().Be(timeProvider.Start + oneSecond);
+        sut.GetUtcNow().Should().Be(sut.Start + oneSecond);
+    }
+
+    [Fact]
+    public void GetUtcNow_with_ClockAdvanceAmount_gt_zero()
+    {
+        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { ClockAdvanceAmount = 1.Seconds() } };
+
+        var result = sut.GetUtcNow();
+
+        result.Should().Be(sut.Start);
+        sut.GetUtcNow().Should().Be(sut.Start + 1.Seconds());
+    }
+
+    [Fact]
+    public void GetLocalNow_with_ClockAdvanceAmount_gt_zero()
+    {
+        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { ClockAdvanceAmount = 1.Seconds() } };
+
+        var result = sut.GetLocalNow();
+
+        result.Should().Be(sut.Start);
+        sut.GetLocalNow().Should().Be(sut.Start + 1.Seconds());
+    }
+
+    [Fact]
+    public void GetTimestamp_with_TimestampAdvanceAmount_gt_zero()
+    {
+        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { TimestampAdvanceAmount = 1.Seconds() } };
+
+        var result = sut.GetTimestamp();
+
+        result.Should().Be(sut.Start.Ticks);
+        sut.GetTimestamp().Should().Be(result + 1.Seconds().Ticks);
+    }
+
+    [Fact]
+    public void GetElapsedTime_with_TimestampAdvanceAmount_gt_zero()
+    {
+        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { TimestampAdvanceAmount = 1.Seconds() } };
+        var start = sut.Start.Ticks;
+
+        var result = sut.GetElapsedTime(start);
+
+        result.Should().Be(0.Seconds());
+        sut.GetElapsedTime(start).Should().Be(1.Seconds());
     }
 
     [Fact]
