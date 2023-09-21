@@ -150,7 +150,7 @@ public class ManualTimeProviderTests
     public void Timer_callback_GetUtcNow_AutoAdvance()
     {
         var oneSecond = TimeSpan.FromSeconds(1);
-        var timeProvider = new ManualTimeProvider() { AutoAdvanceAmount = oneSecond };
+        var timeProvider = new ManualTimeProvider() { AutoAdvanceBehavior = { ClockAdvanceAmount = oneSecond } };
 
         using var t1 = timeProvider.CreateTimer(_ =>
         {
@@ -178,16 +178,6 @@ public class ManualTimeProviderTests
         sut.Jump(TimeSpan.Zero);
 
         sut.GetUtcNow().Should().Be(sut.Start);
-    }
-
-    [Fact]
-    public void AutoAdvanceAmount_throws_when_lt_zero()
-    {
-        var sut = new ManualTimeProvider();
-
-        var throws = () => sut.AutoAdvanceAmount = TimeSpan.FromTicks(-1);
-
-        throws.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     [Fact]

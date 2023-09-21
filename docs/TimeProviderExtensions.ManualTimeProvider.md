@@ -91,26 +91,18 @@ public int ActiveTimers { get; }
 #### Property Value
 [System.Int32](https://docs.microsoft.com/en-us/dotnet/api/System.Int32 'System.Int32')
 
-<a name='TimeProviderExtensions.ManualTimeProvider.AutoAdvanceAmount'></a>
+<a name='TimeProviderExtensions.ManualTimeProvider.AutoAdvanceBehavior'></a>
 
-## ManualTimeProvider.AutoAdvanceAmount Property
+## ManualTimeProvider.AutoAdvanceBehavior Property
 
-Gets or sets the amount of time by which time advances whenever the clock is read via [GetUtcNow()](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.GetUtcNow() 'TimeProviderExtensions.ManualTimeProvider.GetUtcNow()').
+Gets or sets the auto advance behavior of this [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider').
 
 ```csharp
-public System.TimeSpan AutoAdvanceAmount { get; set; }
+public TimeProviderExtensions.AutoAdvanceBehavior AutoAdvanceBehavior { get; set; }
 ```
 
 #### Property Value
-[System.TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan 'System.TimeSpan')
-
-#### Exceptions
-
-[System.ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/System.ArgumentOutOfRangeException 'System.ArgumentOutOfRangeException')  
-Thrown when set to a value than [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero').
-
-### Remarks
-Set to [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero') to disable auto advance. The default value is [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero').
+[AutoAdvanceBehavior](TimeProviderExtensions.AutoAdvanceBehavior.md 'TimeProviderExtensions.AutoAdvanceBehavior')
 
 <a name='TimeProviderExtensions.ManualTimeProvider.LocalTimeZone'></a>
 
@@ -350,8 +342,8 @@ public override System.DateTimeOffset GetUtcNow();
 [System.DateTimeOffset](https://docs.microsoft.com/en-us/dotnet/api/System.DateTimeOffset 'System.DateTimeOffset')
 
 ### Remarks
-If [AutoAdvanceAmount](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.AutoAdvanceAmount 'TimeProviderExtensions.ManualTimeProvider.AutoAdvanceAmount') is greater than [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero'), calling this
-method will move time forward by the amount specified by [AutoAdvanceAmount](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.AutoAdvanceAmount 'TimeProviderExtensions.ManualTimeProvider.AutoAdvanceAmount').
+If [AutoAdvanceAmount](https://docs.microsoft.com/en-us/dotnet/api/AutoAdvanceAmount 'AutoAdvanceAmount') is greater than [System.TimeSpan.Zero](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan.Zero 'System.TimeSpan.Zero'), calling this
+method will move time forward by the amount specified by [AutoAdvanceAmount](https://docs.microsoft.com/en-us/dotnet/api/AutoAdvanceAmount 'AutoAdvanceAmount').
 The [System.DateTimeOffset](https://docs.microsoft.com/en-us/dotnet/api/System.DateTimeOffset 'System.DateTimeOffset') returned from this method will reflect the time before
 the auto advance was applied, if any.
 

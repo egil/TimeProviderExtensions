@@ -7,6 +7,7 @@
 
 namespace Microsoft.Extensions.Time.Testing.Test;
 
+using TimeProviderExtensions;
 using FakeTimeProvider = TimeProviderExtensions.ManualTimeProvider;
 
 public class ManualTimeProviderTests
@@ -29,7 +30,7 @@ public class ManualTimeProviderTests
         Assert.Equal(0, now.Millisecond);
         Assert.Equal(TimeSpan.Zero, now.Offset);
         Assert.Equal(10_000_000, frequency);
-        Assert.Equal(TimeSpan.Zero, timeProvider.AutoAdvanceAmount);
+        Assert.Equal(new AutoAdvanceBehavior(), timeProvider.AutoAdvanceBehavior);
 
         var timestamp2 = timeProvider.GetTimestamp();
         var frequency2 = timeProvider.TimestampFrequency;
@@ -59,7 +60,7 @@ public class ManualTimeProviderTests
         Assert.Equal(TimeSpan.Zero, now.Offset);
         Assert.Equal(8, now.Millisecond);
         Assert.Equal(10_000_000, frequency);
-        Assert.Equal(TimeSpan.Zero, timeProvider.AutoAdvanceAmount);
+        Assert.Equal(new AutoAdvanceBehavior(), timeProvider.AutoAdvanceBehavior);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(8));
         var pnow2 = timeProvider.GetTimestamp();
@@ -305,10 +306,7 @@ public class ManualTimeProviderTests
     [Fact]
     public void AutoAdvance()
     {
-        var timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow)
-        {
-            AutoAdvanceAmount = TimeSpan.FromSeconds(1)
-        };
+        var timeProvider = new FakeTimeProvider { AutoAdvanceBehavior = { ClockAdvanceAmount = TimeSpan.FromSeconds(1) } };
 
         var first = timeProvider.GetUtcNow();
         var second = timeProvider.GetUtcNow();
@@ -332,14 +330,11 @@ public class ManualTimeProviderTests
     [Fact]
     public void ToString_AutoAdvance_on()
     {
-        var timeProvider = new FakeTimeProvider
-        {
-            AutoAdvanceAmount = TimeSpan.FromSeconds(1)
-        };
+        var timeProvider = new FakeTimeProvider { AutoAdvanceBehavior = { ClockAdvanceAmount = TimeSpan.FromSeconds(1) } };
 
         _ = timeProvider.ToString();
 
-        timeProvider.AutoAdvanceAmount = TimeSpan.Zero;
+        timeProvider.AutoAdvanceBehavior.ClockAdvanceAmount = TimeSpan.Zero;
         Assert.Equal(timeProvider.Start, timeProvider.GetUtcNow());
     }
 }

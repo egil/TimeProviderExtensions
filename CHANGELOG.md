@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Overriding `CreateManualTimer` makes it possible to intercept a `TimerCallback` and perform actions before and after the timer callback has been invoked.
 
+- Replace `AutoAdvanceAmount` property with the `AutoAdvanceBehavior` property on `ManualTimeProvider`, and introduced the `AutoAdvanceBehavior` type.
+
 ## [1.0.0-rc.1]
 
 - Updated Microsoft.Bcl.TimeProvider package dependency to rc.1 version.

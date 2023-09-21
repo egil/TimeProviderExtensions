@@ -9,7 +9,7 @@ namespace TimeProviderExtensions;
 /// <remarks>
 /// Learn more at <see href="https://github.com/egil/TimeProviderExtensions"/>.
 /// </remarks>
-[DebuggerDisplay("UtcNow: {ToString(),nq}. Active timers: {ActiveTimers}. Auto advance amount: {AutoAdvanceAmount,nq}.")]
+[DebuggerDisplay("UtcNow: {ToString(),nq}. Active timers: {ActiveTimers}. {AutoAdvanceBehavior,nq}.")]
 public class ManualTimeProvider : TimeProvider
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
@@ -19,7 +19,7 @@ public class ManualTimeProvider : TimeProvider
     private readonly List<ManualTimerScheduler> callbacks = new();
     private DateTimeOffset utcNow;
     private TimeZoneInfo localTimeZone;
-    private TimeSpan autoAdvanceAmount = TimeSpan.Zero;
+    private AutoAdvanceBehavior autoAdvanceBehavior = new AutoAdvanceBehavior();
 
     /// <summary>
     /// Gets the number of active <see cref="ManualTimer"/>, that have callbacks that are scheduled to be triggered at some point in the future.
@@ -32,25 +32,9 @@ public class ManualTimeProvider : TimeProvider
     public DateTimeOffset Start { get; init; }
 
     /// <summary>
-    /// Gets or sets the amount of time by which time advances whenever the clock is read via <see cref="GetUtcNow"/>.
+    /// Gets or sets the auto advance behavior of this <see cref="ManualTimeProvider"/>.
     /// </summary>
-    /// <remarks>
-    /// Set to <see cref="TimeSpan.Zero"/> to disable auto advance. The default value is <see cref="TimeSpan.Zero"/>.
-    /// </remarks>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value than <see cref="TimeSpan.Zero"/>.</exception>
-    public TimeSpan AutoAdvanceAmount
-    {
-        get => autoAdvanceAmount;
-        set
-        {
-            if (value < TimeSpan.Zero)
-            {
-                throw new ArgumentOutOfRangeException(nameof(AutoAdvanceAmount), "Auto advance amount cannot be less than zero. ");
-            }
-
-            autoAdvanceAmount = value;
-        }
-    }
+    public AutoAdvanceBehavior AutoAdvanceBehavior { get => autoAdvanceBehavior; set => autoAdvanceBehavior = value ?? new AutoAdvanceBehavior(); }
 
     /// <summary>
     /// Gets the amount by which the value from <see cref="GetTimestamp"/> increments per second.
@@ -120,8 +104,8 @@ public class ManualTimeProvider : TimeProvider
     /// all according to this <see cref="ManualTimeProvider"/>'s notion of time.
     /// </summary>
     /// <remarks>
-    /// If <see cref="AutoAdvanceAmount"/> is greater than <see cref="TimeSpan.Zero"/>, calling this
-    /// method will move time forward by the amount specified by <see cref="AutoAdvanceAmount"/>.
+    /// If <see cref="AutoAdvanceBehavior.ClockAdvanceAmount"/> is greater than <see cref="TimeSpan.Zero"/>, calling this
+    /// method will move time forward by the amount specified by <see cref="AutoAdvanceBehavior.ClockAdvanceAmount"/>.
     /// The <see cref="DateTimeOffset"/> returned from this method will reflect the time before
     /// the auto advance was applied, if any.
     /// </remarks>
@@ -132,7 +116,7 @@ public class ManualTimeProvider : TimeProvider
         lock (callbacks)
         {
             result = utcNow;
-            Advance(AutoAdvanceAmount);
+            Advance(AutoAdvanceBehavior.ClockAdvanceAmount);
         }
 
         return result;
