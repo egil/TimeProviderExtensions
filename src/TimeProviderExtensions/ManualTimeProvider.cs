@@ -29,7 +29,7 @@ public partial class ManualTimeProvider : TimeProvider
     /// <summary>
     /// Gets the starting date and time for this provider.
     /// </summary>
-    public DateTimeOffset Start { get; }
+    public DateTimeOffset Start { get; init; }
 
     /// <summary>
     /// Gets or sets the amount of time by which time advances whenever the clock is read via <see cref="GetUtcNow"/>.

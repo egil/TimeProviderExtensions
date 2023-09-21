@@ -135,7 +135,7 @@ The default implementation returns [System.TimeZoneInfo.Local](https://docs.micr
 Gets the starting date and time for this provider.
 
 ```csharp
-public System.DateTimeOffset Start { get; }
+public System.DateTimeOffset Start { get; set; }
 ```
 
 #### Property Value
