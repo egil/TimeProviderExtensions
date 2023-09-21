@@ -19,3 +19,4 @@
 | Classes | |
 | :--- | :--- |
 | [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider') | Represents a synthetic time provider that can be used to enable deterministic behavior in tests. |
+| [ManualTimer](TimeProviderExtensions.ManualTimer.md 'TimeProviderExtensions.ManualTimer') | A implementaiton of a [System.Threading.ITimer](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.ITimer 'System.Threading.ITimer') whose callbacks are scheduled via a [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider'). |

@@ -10,7 +10,7 @@ namespace TimeProviderExtensions;
 /// Learn more at <see href="https://github.com/egil/TimeProviderExtensions"/>.
 /// </remarks>
 [DebuggerDisplay("UtcNow: {ToString(),nq}. Active timers: {ActiveTimers}. Auto advance amount: {AutoAdvanceAmount,nq}.")]
-public partial class ManualTimeProvider : TimeProvider
+public class ManualTimeProvider : TimeProvider
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;
     internal const uint UnsignedInfinite = unchecked((uint)-1);
@@ -305,9 +305,9 @@ public partial class ManualTimeProvider : TimeProvider
                 return;
             }
 
-            while (utcNow <= value && TryGetNext(value) is ManualTimerScheduler scheduler)
+            while (utcNow <= value && TryGetNext(value) is ManualTimerScheduler { CallbackTime: not null } scheduler)
             {
-                utcNow = scheduler.CallbackTime;
+                utcNow = scheduler.CallbackTime.Value;
                 scheduler.TimerElapsed();
             }
 
@@ -473,7 +473,7 @@ public partial class ManualTimeProvider : TimeProvider
     /// <returns>A string representing the clock's current time.</returns>
     public override string ToString() => utcNow.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture);
 
-    private void ScheduleCallback(ManualTimerScheduler scheduler, TimeSpan waitTime)
+    internal void ScheduleCallback(ManualTimerScheduler scheduler, TimeSpan waitTime)
     {
         lock (callbacks)
         {
@@ -492,7 +492,7 @@ public partial class ManualTimeProvider : TimeProvider
         }
     }
 
-    private void RemoveCallback(ManualTimerScheduler timerCallback)
+    internal void RemoveCallback(ManualTimerScheduler timerCallback)
     {
         lock (callbacks)
         {

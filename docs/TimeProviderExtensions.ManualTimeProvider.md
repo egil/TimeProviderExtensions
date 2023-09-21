@@ -82,7 +82,7 @@ The provider is set to not automatically advance time each time it is read.
 
 ## ManualTimeProvider.ActiveTimers Property
 
-Gets the number of active [TimeProviderExtensions.ManualTimeProvider.ManualTimer](https://docs.microsoft.com/en-us/dotnet/api/TimeProviderExtensions.ManualTimeProvider.ManualTimer 'TimeProviderExtensions.ManualTimeProvider.ManualTimer'), that have callbacks that are scheduled to be triggered at some point in the future.
+Gets the number of active [ManualTimer](TimeProviderExtensions.ManualTimer.md 'TimeProviderExtensions.ManualTimer'), that have callbacks that are scheduled to be triggered at some point in the future.
 
 ```csharp
 public int ActiveTimers { get; }
