@@ -31,7 +31,6 @@ public sealed record class AutoAdvanceBehavior
     /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value less than <see cref="TimeSpan.Zero"/>.</exception>
     public TimeSpan TimestampAdvanceAmount { get => timestampAdvanceAmount; set { ThrowIfLessThanZero(value); timestampAdvanceAmount = value; } }
 
-#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
     /// <summary>
     /// <para>
     /// Gets or sets the amount of times timer callbacks will automatically be triggered.
@@ -43,13 +42,13 @@ public sealed record class AutoAdvanceBehavior
     /// or <see cref="ManualTimeProvider.SetUtcNow(DateTimeOffset)"/> was manually called.
     /// </para>
     /// <para>
-    /// Setting this to <c>1</c> can be used to ensure all timers, e.g. those used by <see cref="Task.Delay(TimeSpan, TimeProvider)"/>,
-    /// <see cref="Task.WaitAsync(TimeSpan, TimeProvider)"/>, <see cref="CancellationTokenSource.CancelAfter(TimeSpan)"/> and others
+    /// Setting this to <c>1</c> can be used to ensure all timers, e.g. those used by <c>Task.Delay(TimeSpan, TimeProvider)</c>,
+    /// <c>Task.WaitAsync(TimeSpan, TimeProvider)</c>, <c>CancellationTokenSource.CancelAfter(TimeSpan)</c> and others
     /// are completed immediately. 
     /// </para>
     /// <para>
-    /// Setting this to a number larger than <c>1</c>, e.g. <c>10</c>, can be used to automatically cause a <see cref="PeriodicTimer(TimeSpan, TimeProvider)"/>
-    /// to automatically have its <see cref="PeriodicTimer.WaitForNextTickAsync(CancellationToken)"/> async enumerable return <c>10</c> times.
+    /// Setting this to a number larger than <c>1</c>, e.g. <c>10</c>, can be used to automatically cause a <c>PeriodicTimer(TimeSpan, TimeProvider)</c>
+    /// to automatically have its <c>PeriodicTimer.WaitForNextTickAsync(CancellationToken)</c> async enumerable return <c>10</c> times.
     /// </para>
     /// </summary>
     /// <remarks>
@@ -57,7 +56,6 @@ public sealed record class AutoAdvanceBehavior
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value less than zero <c>0</c>.</exception>
     public int TimerAutoTriggerCount { get => timerAutoInvokeCount; set { ThrowIfLessThanZero(value); timerAutoInvokeCount = value; } }
-#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
     private static void ThrowIfLessThanZero(TimeSpan value, [CallerMemberName] string? parameterName = null)
     {

@@ -27,12 +27,12 @@ specified by [TimerAutoTriggerCount](TimeProviderExtensions.AutoAdvanceBehavior.
 the time the callback was scheduled to be invoked, just as it is if [Advance(TimeSpan)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.Advance(System.TimeSpan) 'TimeProviderExtensions.ManualTimeProvider.Advance(System.TimeSpan)')
 or [SetUtcNow(DateTimeOffset)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.SetUtcNow(System.DateTimeOffset) 'TimeProviderExtensions.ManualTimeProvider.SetUtcNow(System.DateTimeOffset)') was manually called.
 
-Setting this to `1` can be used to ensure all timers, e.g. those used by [Task.Delay(TimeSpan, TimeProvider)](https://docs.microsoft.com/en-us/dotnet/api/Task.Delay#Task_Delay_TimeSpan, TimeProvider_ 'Task.Delay(TimeSpan, TimeProvider)'),
-[Task.WaitAsync(TimeSpan, TimeProvider)](https://docs.microsoft.com/en-us/dotnet/api/Task.WaitAsync#Task_WaitAsync_TimeSpan, TimeProvider_ 'Task.WaitAsync(TimeSpan, TimeProvider)'), [System.Threading.CancellationTokenSource.CancelAfter(System.TimeSpan)](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.CancellationTokenSource.CancelAfter#System_Threading_CancellationTokenSource_CancelAfter_System_TimeSpan_ 'System.Threading.CancellationTokenSource.CancelAfter(System.TimeSpan)') and others
+Setting this to `1` can be used to ensure all timers, e.g. those used by `Task.Delay(TimeSpan, TimeProvider)`,
+`Task.WaitAsync(TimeSpan, TimeProvider)`, `CancellationTokenSource.CancelAfter(TimeSpan)` and others
 are completed immediately.
 
-Setting this to a number larger than `1`, e.g. `10`, can be used to automatically cause a [PeriodicTimer(TimeSpan, TimeProvider)](https://docs.microsoft.com/en-us/dotnet/api/PeriodicTimer#PeriodicTimer_TimeSpan, TimeProvider_ 'PeriodicTimer(TimeSpan, TimeProvider)')
-to automatically have its [System.Threading.PeriodicTimer.WaitForNextTickAsync(System.Threading.CancellationToken)](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.PeriodicTimer.WaitForNextTickAsync#System_Threading_PeriodicTimer_WaitForNextTickAsync_System_Threading_CancellationToken_ 'System.Threading.PeriodicTimer.WaitForNextTickAsync(System.Threading.CancellationToken)') async enumerable return `10` times.
+Setting this to a number larger than `1`, e.g. `10`, can be used to automatically cause a `PeriodicTimer(TimeSpan, TimeProvider)`
+to automatically have its `PeriodicTimer.WaitForNextTickAsync(CancellationToken)` async enumerable return `10` times.
 
 ```csharp
 public int TimerAutoTriggerCount { get; set; }
