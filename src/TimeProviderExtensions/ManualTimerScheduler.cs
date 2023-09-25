@@ -51,13 +51,13 @@ internal sealed class ManualTimerScheduler
         }
     }
 
-    internal void TimerElapsed()
+    internal void TimerElapsed(bool scheduleNextCallback)
     {
         CallbackTime = null;
         callback.Invoke(state);
         CallbackInvokeCount++;
 
-        if (Period != Timeout.InfiniteTimeSpan && Period != TimeSpan.Zero)
+        if (scheduleNextCallback && Period != Timeout.InfiniteTimeSpan && Period != TimeSpan.Zero)
         {
             ScheduleCallback(Period);
         }
@@ -67,7 +67,7 @@ internal sealed class ManualTimerScheduler
     {
         if (waitTime == TimeSpan.Zero)
         {
-            TimerElapsed();
+            TimerElapsed(scheduleNextCallback: true);
         }
         else
         {

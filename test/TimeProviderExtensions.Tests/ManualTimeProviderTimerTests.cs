@@ -209,4 +209,30 @@ public class ManualTimeProviderTimerTests
 
         callbackTimes.Should().Equal(startTime + target);
     }
+
+    [Fact]
+    public void jumping_causes_multiple_timers_invokes_callback_in_order()
+    {
+        var sut = new ManualTimeProvider();
+        var callbacks = new List<(int timerId, TimeSpan callbackTime)>();
+        var startTime = sut.GetTimestamp();
+        using var timer1 = sut.CreateTimer(_ => callbacks.Add((1, sut.GetElapsedTime(startTime))), null, TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(3));
+        using var timer2 = sut.CreateTimer(_ => callbacks.Add((2, sut.GetElapsedTime(startTime))), null, TimeSpan.FromMilliseconds(3), TimeSpan.FromMilliseconds(3));
+        using var timer3 = sut.CreateTimer(_ => callbacks.Add((3, sut.GetElapsedTime(startTime))), null, TimeSpan.FromMilliseconds(6), TimeSpan.FromMilliseconds(5));
+
+        sut.Jump(TimeSpan.FromMilliseconds(3));
+        sut.Jump(TimeSpan.FromMilliseconds(3));
+        sut.Jump(TimeSpan.FromMilliseconds(3));
+        sut.Jump(TimeSpan.FromMilliseconds(2));
+
+        callbacks.Should().Equal(
+            (1, TimeSpan.FromMilliseconds(3)),
+            (2, TimeSpan.FromMilliseconds(3)),
+            (3, TimeSpan.FromMilliseconds(6)),
+            (1, TimeSpan.FromMilliseconds(6)),
+            (2, TimeSpan.FromMilliseconds(6)),
+            (1, TimeSpan.FromMilliseconds(9)),
+            (2, TimeSpan.FromMilliseconds(9)),
+            (3, TimeSpan.FromMilliseconds(11)));
+    }
 }

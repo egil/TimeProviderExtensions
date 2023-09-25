@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace TimeProviderExtensions;
 
@@ -327,10 +328,13 @@ public class ManualTimeProvider : TimeProvider
             while (utcNow <= value && TryGetNext(value) is ManualTimerScheduler { CallbackTime: not null } scheduler)
             {
                 utcNow = scheduler.CallbackTime.Value;
-                scheduler.TimerElapsed();
+                scheduler.TimerElapsed(scheduleNextCallback: true);
             }
 
-            utcNow = value;
+            if (utcNow < value)
+            {
+                utcNow = value;
+            }
 
             Debug.Assert(callbacks.All(x => x.CallbackTime > utcNow), "Because there should never by any callbacks scheduled in the past at this point.");
         }
@@ -470,9 +474,13 @@ public class ManualTimeProvider : TimeProvider
                 // in the jump period and invokes the callback that
                 // number of times. Has to happen at least one time.
                 var callbacksPassed = Math.Max(1, Math.Floor((double)jump.Ticks / scheduler.Period.Ticks));
-                for (int i = 0; i < callbacksPassed; i++)
+
+                // Invoke scheduler.TimerElapsed with scheduleNextCallback = false
+                // to prevent duplicates in the callbacks collection.
+                // Only the last call should schedule next callback.
+                for (int invocations = 0; invocations < callbacksPassed; invocations++)
                 {
-                    scheduler.TimerElapsed();
+                    scheduler.TimerElapsed(scheduleNextCallback: invocations == callbacksPassed - 1);
                 }
             }
 
@@ -500,7 +508,7 @@ public class ManualTimeProvider : TimeProvider
     {
         lock (callbacks)
         {
-            Debug.Assert(!callbacks.Contains(scheduler), "A scheduler should only be added to callbacks one time.");
+            Debug.Assert(!callbacks.Contains(scheduler), "A scheduler should only be added to callbacks one time, and is expected to be removed before callback is invoked.");
 
             scheduler.CallbackTime = utcNow + waitTime;
 
@@ -517,11 +525,11 @@ public class ManualTimeProvider : TimeProvider
         }
     }
 
-    internal void RemoveCallback(ManualTimerScheduler timerCallback)
+    internal void RemoveCallback(ManualTimerScheduler scheduler)
     {
         lock (callbacks)
         {
-            var existingIndexOf = callbacks.FindIndex(0, x => ReferenceEquals(x, timerCallback));
+            var existingIndexOf = callbacks.FindIndex(0, x => ReferenceEquals(x, scheduler));
             if (existingIndexOf >= 0)
             {
                 callbacks.RemoveAt(existingIndexOf);

@@ -318,7 +318,6 @@ public class ManualTimeProviderTests
         sut.ActiveTimers.Should().Be(0);
     }
 
-
     [Fact]
     public void CreateManualTimer_with_custom_timer_type()
     {

@@ -3,7 +3,7 @@
 
 ## ManualTimer Class
 
-A implementaiton of a [System.Threading.ITimer](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.ITimer 'System.Threading.ITimer') whose callbacks are scheduled via a [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider').
+A implementation of a [System.Threading.ITimer](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.ITimer 'System.Threading.ITimer') whose callbacks are scheduled via a [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider').
 
 ```csharp
 public class ManualTimer :
