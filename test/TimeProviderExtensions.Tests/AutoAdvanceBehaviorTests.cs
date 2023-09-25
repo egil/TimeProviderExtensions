@@ -7,10 +7,10 @@ public class AutoAdvanceBehaviorTests
     {
         var sut = new AutoAdvanceBehavior();
 
-        var throws = () => sut.ClockAdvanceAmount = TimeSpan.FromTicks(-1);
+        var throws = () => sut.UtcNowAdvanceAmount = TimeSpan.FromTicks(-1);
 
         throws.Should().Throw<ArgumentOutOfRangeException>()
-            .And.ParamName.Should().Be(nameof(AutoAdvanceBehavior.ClockAdvanceAmount));
+            .And.ParamName.Should().Be(nameof(AutoAdvanceBehavior.UtcNowAdvanceAmount));
     }
 
     [Fact]

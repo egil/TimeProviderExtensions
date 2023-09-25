@@ -17,9 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Overriding `CreateManualTimer` makes it possible to intercept a `TimerCallback` and perform actions before and after the timer callback has been invoked.
 
-- Replace `AutoAdvanceAmount` property with the `AutoAdvanceBehavior` property on `ManualTimeProvider`, and introduced the `AutoAdvanceBehavior` type.
+- Replace `AutoAdvanceAmount` property with the `AutoAdvanceBehavior` property on `ManualTimeProvider`, and introduced the `AutoAdvanceBehavior` type. To automatically advance time when `GetUtcNow()` or `GetLocalNow()` is called, set `AutoAdvanceBehavior.UtcNowAdvanceAmount` to a time span larger than zero.
 
-- Enable auto advance feature for `GetTimestamp()` and `GetElapsedTime(long)`.
+- Enable auto advance feature for `GetTimestamp()` and `GetElapsedTime(long)`. To automatically advance time when `GetTimestamp()` or `GetElapsedTime(long)` is called, set `AutoAdvanceBehavior.TimestampAdvanceAmount` to a time span larger than zero.
 
 ## [1.0.0-rc.1]
 

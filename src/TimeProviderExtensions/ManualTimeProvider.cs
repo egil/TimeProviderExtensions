@@ -124,8 +124,8 @@ public class ManualTimeProvider : TimeProvider
     /// all according to this <see cref="ManualTimeProvider"/>'s notion of time.
     /// </summary>
     /// <remarks>
-    /// If <see cref="AutoAdvanceBehavior.ClockAdvanceAmount"/> is greater than <see cref="TimeSpan.Zero"/>, calling this
-    /// method will move time forward by the amount specified by <see cref="AutoAdvanceBehavior.ClockAdvanceAmount"/>.
+    /// If <see cref="AutoAdvanceBehavior.UtcNowAdvanceAmount"/> is greater than <see cref="TimeSpan.Zero"/>, calling this
+    /// method will move time forward by the amount specified by <see cref="AutoAdvanceBehavior.UtcNowAdvanceAmount"/>.
     /// The <see cref="DateTimeOffset"/> returned from this method will reflect the time before
     /// the auto advance was applied, if any.
     /// </remarks>
@@ -136,7 +136,7 @@ public class ManualTimeProvider : TimeProvider
         lock (callbacks)
         {
             result = utcNow;
-            Advance(AutoAdvanceBehavior.ClockAdvanceAmount);
+            Advance(AutoAdvanceBehavior.UtcNowAdvanceAmount);
         }
 
         return result;
@@ -248,7 +248,7 @@ public class ManualTimeProvider : TimeProvider
     /// <em>3 seconds</em>, <em>3 seconds</em>, and <em>3 seconds</em>, use <see cref="Jump(DateTimeOffset)"/> or <see cref="Jump(TimeSpan)"/> instead.
     /// </para>
     /// <para>
-    /// Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
+    /// Learn more about this behavior at <see href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="delta"/> is negative. Going back in time is not supported.</exception>
@@ -306,7 +306,7 @@ public class ManualTimeProvider : TimeProvider
     /// <em>3 seconds</em>, <em>3 seconds</em>, and <em>3 seconds</em>, use <see cref="Jump(DateTimeOffset)"/> or <see cref="Jump(TimeSpan)"/> instead.
     /// </para>
     /// <para>
-    /// Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
+    /// Learn more about this behavior at <see href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="value"/> is less than the value returned by <see cref="GetUtcNow()"/>. Going back in time is not supported.</exception>
@@ -389,7 +389,7 @@ public class ManualTimeProvider : TimeProvider
     /// use <see cref="Advance(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/> instead.
     /// </para>
     /// <para>
-    /// Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
+    /// Learn more about this behavior at <see href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="delta"/> is negative. Going back in time is not supported.</exception>
@@ -446,7 +446,7 @@ public class ManualTimeProvider : TimeProvider
     /// use <see cref="Advance(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/> instead.
     /// </para>
     /// <para>
-    /// Learn more about this behavior at <seealso href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
+    /// Learn more about this behavior at <see href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider"/>.
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="value"/> is less than the value returned by <see cref="GetUtcNow()"/>. Going back in time is not supported.</exception>

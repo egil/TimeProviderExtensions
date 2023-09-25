@@ -306,7 +306,7 @@ public class ManualTimeProviderTests
     [Fact]
     public void AutoAdvance()
     {
-        var timeProvider = new FakeTimeProvider { AutoAdvanceBehavior = { ClockAdvanceAmount = TimeSpan.FromSeconds(1) } };
+        var timeProvider = new FakeTimeProvider { AutoAdvanceBehavior = { UtcNowAdvanceAmount = TimeSpan.FromSeconds(1) } };
 
         var first = timeProvider.GetUtcNow();
         var second = timeProvider.GetUtcNow();
@@ -330,11 +330,11 @@ public class ManualTimeProviderTests
     [Fact]
     public void ToString_AutoAdvance_on()
     {
-        var timeProvider = new FakeTimeProvider { AutoAdvanceBehavior = { ClockAdvanceAmount = TimeSpan.FromSeconds(1) } };
+        var timeProvider = new FakeTimeProvider { AutoAdvanceBehavior = { UtcNowAdvanceAmount = TimeSpan.FromSeconds(1) } };
 
         _ = timeProvider.ToString();
 
-        timeProvider.AutoAdvanceBehavior.ClockAdvanceAmount = TimeSpan.Zero;
+        timeProvider.AutoAdvanceBehavior.UtcNowAdvanceAmount = TimeSpan.Zero;
         Assert.Equal(timeProvider.Start, timeProvider.GetUtcNow());
     }
 }

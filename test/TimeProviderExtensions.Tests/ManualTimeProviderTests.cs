@@ -150,7 +150,7 @@ public class ManualTimeProviderTests
     public void Timer_callback_GetUtcNow_AutoAdvance()
     {
         var oneSecond = TimeSpan.FromSeconds(1);
-        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { ClockAdvanceAmount = oneSecond } };
+        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { UtcNowAdvanceAmount = oneSecond } };
 
         using var t1 = sut.CreateTimer(_ =>
         {
@@ -163,7 +163,7 @@ public class ManualTimeProviderTests
     [Fact]
     public void GetUtcNow_with_ClockAdvanceAmount_gt_zero()
     {
-        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { ClockAdvanceAmount = 1.Seconds() } };
+        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { UtcNowAdvanceAmount = 1.Seconds() } };
 
         var result = sut.GetUtcNow();
 
@@ -174,7 +174,7 @@ public class ManualTimeProviderTests
     [Fact]
     public void GetLocalNow_with_ClockAdvanceAmount_gt_zero()
     {
-        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { ClockAdvanceAmount = 1.Seconds() } };
+        var sut = new ManualTimeProvider() { AutoAdvanceBehavior = { UtcNowAdvanceAmount = 1.Seconds() } };
 
         var result = sut.GetLocalNow();
 

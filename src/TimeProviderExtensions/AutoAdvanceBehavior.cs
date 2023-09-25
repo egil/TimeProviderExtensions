@@ -18,7 +18,7 @@ public sealed record class AutoAdvanceBehavior
     /// Set to <see cref="TimeSpan.Zero"/> to disable auto advance. The default value is <see cref="TimeSpan.Zero"/>.
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value less than <see cref="TimeSpan.Zero"/>.</exception>
-    public TimeSpan ClockAdvanceAmount { get => clockAdvanceAmount; set { ThrowIfLessThanZero(value); clockAdvanceAmount = value; } }
+    public TimeSpan UtcNowAdvanceAmount { get => clockAdvanceAmount; set { ThrowIfLessThanZero(value); clockAdvanceAmount = value; } }
 
     /// <summary>
     /// Gets or sets the amount of time by which time advances whenever the a timestamp is read via <see cref="TimeProvider.GetTimestamp"/>
