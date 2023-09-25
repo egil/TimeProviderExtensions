@@ -6,14 +6,32 @@
 		<Company>Egil Hansen</Company>
 		<Authors>Egil Hansen</Authors>
 		<Description>
-			Extensions for the `System.TimeProvider` API. It includes a test version of the `TimeProvider`, named `ManualTimeProvider`,
-			that allows you to control the progress of time during testing deterministically and a backport of the `PeriodicTimer`
-			version from .NET 8 to .NET 6/7 that supports `TimeProvider`.
+# TimeProvider Extensions
+
+Testing extensions for the [`System.TimeProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider) API. It includes:
+
+- An advanced test/fake version of the `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically (see the difference to Microsoft's `FakeTimeProvider` below).
+- A backported version of `PeriodicTimer` that supports `TimeProvider` in .NET 6.
+
+## Quick start
+
+This describes how to get started:
+
+1. Get the latest release from https://www.nuget.org/packages/TimeProviderExtensions.
+
+2. Take a dependency on `TimeProvider` in your production code. Inject the production version of `TimeProvider` available via the [`TimeProvider.System`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider.system?#system-timeprovider-system) property during production.
+
+3. During testing, inject the `ManualTimeProvider` from this library. This allows you to write tests that run fast and predictably.
+   - Advance time by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` or
+   - Jump ahead in time using `Jump(TimeSpan)` or `Jump(DateTimeOffset)`.
+
+4. See the **[`ManualTimeProvider API`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/TimeProviderExtensions.ManualTimeProvider.md) page** for the full API documentation for `ManualTimeProvider`.
+
+5. Read the [README](https://github.com/egil/TimeProviderExtensions) for further details and examples.
 		</Description>
 		<PackageTags>TimeProvider, testing</PackageTags>
 		<Copyright>Egil Hansen</Copyright>
 		<PackageProjectUrl>https://github.com/egil/TimeProviderExtensions</PackageProjectUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/egil/TimeProviderExtensions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -70,10 +88,6 @@
 
 	<ItemGroup>
 		<None Include="..\..\LICENSE">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-		<None Include="..\..\README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>

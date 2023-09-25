@@ -4,9 +4,9 @@
 
 # TimeProvider Extensions
 
-Extensions for the [`System.TimeProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider) API. It includes:
+Testing extensions for the [`System.TimeProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider) API. It includes:
 
-- A test/fake version of `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically.
+- An advanced test/fake version of the `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time during testing deterministically (see the difference to Microsoft's `FakeTimeProvider` below).
 - A backported version of `PeriodicTimer` that supports `TimeProvider` in .NET 6.
 
 ## Quick start
@@ -15,11 +15,11 @@ This describes how to get started:
 
 1. Get the latest release from https://www.nuget.org/packages/TimeProviderExtensions.
 
-2. Take a dependency on `TimeProvider` in your code. Inject the production version of `TimeProvider` available via the [`TimeProvider.System`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider.system?#system-timeprovider-system) property during production.
+2. Take a dependency on `TimeProvider` in your production code. Inject the production version of `TimeProvider` available via the [`TimeProvider.System`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider.system?#system-timeprovider-system) property during production.
 
 3. During testing, inject the `ManualTimeProvider` from this library. This allows you to write tests that run fast and predictably.
    - Advance time by calling `Advance(TimeSpan)` or `SetUtcNow(DateTimeOffset)` or
-   - Jump ahead in time using `Jump(TimeSpan)` or `Jump(DateTimeOffset)`     
+   - Jump ahead in time using `Jump(TimeSpan)` or `Jump(DateTimeOffset)`.
 
 4. See the **[`ManualTimeProvider API`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/TimeProviderExtensions.ManualTimeProvider.md) page** for the full API documentation for `ManualTimeProvider`.
 
@@ -27,9 +27,11 @@ This describes how to get started:
 
 ## API Overview
 
-These pages has all the details of the API included in this package:
+These pages have all the details of the API included in this package:
 
 - [`ManualTimeProvider`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/TimeProviderExtensions.ManualTimeProvider.md)
+- [`AutoAdvanceBehavior`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/TimeProviderExtensions.AutoAdvanceBehavior.md)
+- [`ManualTimer`](https://github.com/egil/TimeProviderExtensions/blob/main/docs/TimeProviderExtensions.ManualTimer.md)
 
 **.NET 7 and earlier:**
 
@@ -40,10 +42,11 @@ These pages has all the details of the API included in this package:
 
 - If running on .NET versions earlier than .NET 8.0, there is a constraint when invoking `CancellationTokenSource.CancelAfter(TimeSpan)` on the `CancellationTokenSource` object returned by `CreateCancellationTokenSource(TimeSpan delay)`. This action will not terminate the initial timer indicated by the `delay` argument initially passed the `CreateCancellationTokenSource` method. However, this restriction does not apply to .NET 8.0 and later versions.
 - To enable controlling `PeriodicTimer` via `TimeProvider` in versions of .NET earlier than .NET 8.0, the `TimeProvider.CreatePeriodicTimer` returns a `PeriodicTimerWrapper` object instead of a `PeriodicTimer` object. The `PeriodicTimerWrapper` type is just a lightweight wrapper around the original `System.Threading.PeriodicTimer` and will behave identically to it.
-- If `ManualTimeProvider` is created via [AutoFixture](https://github.com/AutoFixture/AutoFixture), be aware that will set `AutoAdvanceAmount` to a random positive time span. This behavior can be overridden by providing a customization to AutoFixture, e.g.:  
+- If `ManualTimeProvider` is created via [AutoFixture](https://github.com/AutoFixture/AutoFixture), be aware that will set writable properties with random values. This behavior can be overridden by providing a customization to AutoFixture, e.g.:
   ```c#
-  fixture.Customize<ManualTimeProvider>(x => x.With(tp => tp.AutoAdvanceAmount, TimeSpan.Zero));
+  fixture.Customize<ManualTimeProvider>(x => x.OmitAutoProperties()));
   ```
+  or by using the `[NoAutoProperties]` attribute, if using `AutoFixture.Xunit2`.
 
 ## Installation and Usage
 
@@ -52,7 +55,7 @@ Get the latest release from https://www.nuget.org/packages/TimeProviderExtension
 ### Set up in production
 
 To use in production, pass in `TimeProvider.System` to the types that depend on `TimeProvider`.
-This can be done directly or via an IoC Container, e.g. .NETs built-in `IServiceCollection` like so:
+This can be done directly or via an IoC Container, e.g., .NETs built-in `IServiceCollection` like so:
 
 ```c#
 services.AddSingleton(TimeProvider.System);
