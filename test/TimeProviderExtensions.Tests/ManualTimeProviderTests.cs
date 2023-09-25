@@ -328,6 +328,96 @@ public class ManualTimeProviderTests
         timer.Should().BeOfType<CustomManualTimer>();
     }
 
+    [Theory]
+    [InlineData(1)]
+    [InlineData(10)]
+    public void Active_timer_with_TimerAutoAdvanceTimes_gt_zero(int timerAutoTriggerCount)
+    {
+        var sut = new ManualTimeProvider { AutoAdvanceBehavior = { TimerAutoTriggerCount = timerAutoTriggerCount } };
+        var callbackTimes = 0;
+
+        using var timer = sut.CreateTimer(_ => callbackTimes++, null, 1.Seconds(), 1.Seconds());
+
+        callbackTimes.Should().Be(timerAutoTriggerCount);
+        sut.GetUtcNow().Should().Be(sut.Start + TimeSpan.FromSeconds(timerAutoTriggerCount));
+        sut.ActiveTimers.Should().Be(1);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(10)]
+    public void Inactive_timer_with_TimerAutoAdvanceTimes_gt_zero(int timerAutoTriggerCount)
+    {
+        var sut = new ManualTimeProvider { AutoAdvanceBehavior = { TimerAutoTriggerCount = timerAutoTriggerCount } };
+        var callbackTimes = 0;
+
+        using var timer = sut.CreateTimer(_ => callbackTimes++, null, Timeout.InfiniteTimeSpan, 1.Seconds());
+
+        callbackTimes.Should().Be(0);
+        sut.GetUtcNow().Should().Be(sut.Start);
+        sut.ActiveTimers.Should().Be(0);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(10)]
+    public void Starting_timer_with_TimerAutoAdvanceTimes_gt_zero(int timerAutoTriggerCount)
+    {
+        var sut = new ManualTimeProvider { AutoAdvanceBehavior = { TimerAutoTriggerCount = timerAutoTriggerCount } };
+        var callbackTimes = 0;
+        using var timer = sut.CreateTimer(_ => callbackTimes++, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+
+        timer.Change(1.Seconds(), 1.Seconds());
+
+        callbackTimes.Should().Be(timerAutoTriggerCount);
+        sut.GetUtcNow().Should().Be(sut.Start + TimeSpan.FromSeconds(timerAutoTriggerCount));
+        sut.ActiveTimers.Should().Be(1);
+    }
+
+    [Fact]
+    public void Multiple_one_of_timers_with_TimerAutoAdvanceTimes_gt_zero()
+    {
+        var sut = new ManualTimeProvider { AutoAdvanceBehavior = { TimerAutoTriggerCount = 1 } };
+        var timer1CallbackTimes = 0;
+        var timer2CallbackTimes = 0;
+
+        using var timer1 = sut.CreateTimer(_ => timer1CallbackTimes++, null, 1.Seconds(), Timeout.InfiniteTimeSpan);
+        using var timer2 = sut.CreateTimer(_ => timer2CallbackTimes++, null, 2.Seconds(), Timeout.InfiniteTimeSpan);
+
+        sut.ActiveTimers.Should().Be(0);
+        sut.GetUtcNow().Should().Be(sut.Start + 1.Seconds() + 2.Seconds());
+        timer1CallbackTimes.Should().Be(1);
+        timer2CallbackTimes.Should().Be(1);
+    }
+
+    [Theory]
+    [InlineData(1, 3, 1, 3)]
+    [InlineData(10, 30, 10, 10 + 20)]
+    public void Multiple_periodic_timers_with_TimerAutoAdvanceTimes_gt_zero(int timerAutoTriggerCount, int timer1ExpectedCallbackCount, int timer2ExpectedCallbackCount, int expectedSecondsSpend)
+    {
+        var sut = new ManualTimeProvider { AutoAdvanceBehavior = { TimerAutoTriggerCount = timerAutoTriggerCount } };
+        var timer1CallbackTimes = 0;
+        var timer2CallbackTimes = 0;
+
+        using var timer1 = sut.CreateTimer(_ => timer1CallbackTimes++, null, 1.Seconds(), 1.Seconds());
+        using var timer2 = sut.CreateTimer(_ => timer2CallbackTimes++, null, 2.Seconds(), 2.Seconds());
+
+        sut.ActiveTimers.Should().Be(2);
+        sut.GetUtcNow().Should().Be(sut.Start + expectedSecondsSpend.Seconds());
+        timer1CallbackTimes.Should().Be(timer1ExpectedCallbackCount);
+        timer2CallbackTimes.Should().Be(timer2ExpectedCallbackCount);
+    }
+
+    [Fact]
+    public void Setting_AutoAdvanceBehavior_to_null()
+    {
+        var sut = new ManualTimeProvider();
+
+        sut.AutoAdvanceBehavior = null!;
+
+        sut.AutoAdvanceBehavior.Should().BeEquivalentTo(new AutoAdvanceBehavior());
+    }
+
     private sealed class CustomManualTimeProvider : ManualTimeProvider
     {
         protected internal override ManualTimer CreateManualTimer(TimerCallback callback, object? state, ManualTimeProvider timeProvider)

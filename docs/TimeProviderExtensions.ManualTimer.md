@@ -48,6 +48,19 @@ An object to be passed to the [callback](TimeProviderExtensions.ManualTimer.md#T
 The [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider') which is used to schedule invocations of the [callback](TimeProviderExtensions.ManualTimer.md#TimeProviderExtensions.ManualTimer.ManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider).callback 'TimeProviderExtensions.ManualTimer.ManualTimer(System.Threading.TimerCallback, object, TimeProviderExtensions.ManualTimeProvider).callback') with.
 ### Properties
 
+<a name='TimeProviderExtensions.ManualTimer.CallbackInvokeCount'></a>
+
+## ManualTimer.CallbackInvokeCount Property
+
+Gets the number of times a timer's callback has been invoked.
+
+```csharp
+public int CallbackInvokeCount { get; }
+```
+
+#### Property Value
+[System.Int32](https://docs.microsoft.com/en-us/dotnet/api/System.Int32 'System.Int32')
+
 <a name='TimeProviderExtensions.ManualTimer.CallbackTime'></a>
 
 ## ManualTimer.CallbackTime Property

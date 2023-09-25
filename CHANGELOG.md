@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Enable auto advance feature for `GetTimestamp()` and `GetElapsedTime(long)`. To automatically advance time when `GetTimestamp()` or `GetElapsedTime(long)` is called, set `AutoAdvanceBehavior.TimestampAdvanceAmount` to a time span larger than zero.
 
+- `ManualTimer` now exposes its current configuration. `DueTime`, `Period`, `IsActive`, `CallbackTime`, and `CallbackInvokeCount` are now publicly visible.
+
+- Enable auto advance feature for timers. This enables automatically calling timers callback a specified number of times, by setting the `AutoAdvanceBehavior.TimerAutoTriggerCount` property to a number larger than zero.
+
 ## [1.0.0-rc.1]
 
 - Updated Microsoft.Bcl.TimeProvider package dependency to rc.1 version.

@@ -5,6 +5,17 @@ namespace TimeProviderExtensions;
 public class ManualTimerTests
 {
     [Fact]
+    public void ToString_with_disposed_timer()
+    {
+        var timeProvider = new ManualTimeProvider();
+
+        var sut = timeProvider.CreateTimer(_ => { }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        sut.Dispose();
+
+        sut.ToString().Should().Be("Timer is disposed.");
+    }
+
+    [Fact]
     public void ToString_with_disabled_timer()
     {
         var timeProvider = new ManualTimeProvider();
@@ -62,5 +73,68 @@ public class ManualTimerTests
         var sut = (ManualTimer)timeProvider.CreateTimer(_ => { }, null, 2.Seconds(), Timeout.InfiniteTimeSpan);
 
         sut.CallbackTime.Should().Be(timeProvider.Start + 2.Seconds());
+    }
+
+    [Fact]
+    public void IsActive_with_disposed_timer()
+    {
+        var timeProvider = new ManualTimeProvider();
+
+        var sut = (ManualTimer)timeProvider.CreateTimer(_ => { }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        sut.Dispose();
+
+        sut.IsActive.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsActive_with_inactive_timer()
+    {
+        var timeProvider = new ManualTimeProvider();
+
+        var sut = (ManualTimer)timeProvider.CreateTimer(_ => { }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+
+        sut.IsActive.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsActive_with_active_timer()
+    {
+        var timeProvider = new ManualTimeProvider();
+
+        var sut = (ManualTimer)timeProvider.CreateTimer(_ => { }, null, 2.Seconds(), Timeout.InfiniteTimeSpan);
+
+        sut.IsActive.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CallbackInvokeCount_with_inactive_timer()
+    {
+        var timeProvider = new ManualTimeProvider();
+
+        var sut = (ManualTimer)timeProvider.CreateTimer(_ => { }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+
+        sut.CallbackInvokeCount.Should().Be(0);
+    }
+
+    [Fact]
+    public void CallbackInvokeCount_with_active_timer()
+    {
+        var timeProvider = new ManualTimeProvider() { AutoAdvanceBehavior = { TimerAutoTriggerCount = 1 } };
+
+        var sut = (ManualTimer)timeProvider.CreateTimer(_ => { }, null, 2.Seconds(), Timeout.InfiniteTimeSpan);
+
+        sut.CallbackInvokeCount.Should().Be(1);
+    }
+
+
+    [Fact]
+    public void CallbackInvokeCount_with_disposed_timer()
+    {
+        var timeProvider = new ManualTimeProvider() { AutoAdvanceBehavior = { TimerAutoTriggerCount = 1 } };
+
+        var sut = (ManualTimer)timeProvider.CreateTimer(_ => { }, null, 2.Seconds(), Timeout.InfiniteTimeSpan);
+        sut.Dispose();
+
+        sut.CallbackInvokeCount.Should().Be(1);
     }
 }

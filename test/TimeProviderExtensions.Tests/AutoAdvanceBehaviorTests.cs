@@ -23,4 +23,15 @@ public class AutoAdvanceBehaviorTests
         throws.Should().Throw<ArgumentOutOfRangeException>()
             .And.ParamName.Should().Be(nameof(AutoAdvanceBehavior.TimestampAdvanceAmount));
     }
+
+    [Fact]
+    public void TimerAutoTriggerCount_throws_when_lt_zero()
+    {
+        var sut = new AutoAdvanceBehavior();
+
+        var throws = () => sut.TimerAutoTriggerCount = -1;
+
+        throws.Should().Throw<ArgumentOutOfRangeException>()
+            .And.ParamName.Should().Be(nameof(AutoAdvanceBehavior.TimerAutoTriggerCount));
+    }
 }

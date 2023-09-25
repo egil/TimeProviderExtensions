@@ -178,7 +178,11 @@ public class ManualTimeProvider : TimeProvider
     /// To move time forward for the returned <see cref="ITimer"/>, call <see cref="Advance(TimeSpan)"/> or <see cref="SetUtcNow(DateTimeOffset)"/> on this time provider.
     /// </para>
     /// </remarks>
+#if NETSTANDARD2_0
     public sealed override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+#else
+    public sealed override ManualTimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+#endif
     {
         var result = CreateManualTimer(callback, state, this);
         result.Change(dueTime, period);
@@ -331,6 +335,8 @@ public class ManualTimeProvider : TimeProvider
                 scheduler.TimerElapsed(scheduleNextCallback: true);
             }
 
+            // If AAB.TimerAutoTriggerCount > 0 then time may have been moved further
+            // into the future than the initial requested value.
             if (utcNow < value)
             {
                 utcNow = value;
@@ -521,6 +527,12 @@ public class ManualTimeProvider : TimeProvider
             else
             {
                 callbacks.Insert(insertPosition, scheduler);
+            }
+
+
+            if (scheduler.CallbackInvokeCount < AutoAdvanceBehavior.TimerAutoTriggerCount)
+            {
+                SetUtcNow(scheduler.CallbackTime.Value);
             }
         }
     }

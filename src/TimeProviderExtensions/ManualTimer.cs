@@ -15,6 +15,7 @@ public class ManualTimer : ITimer
 
     private readonly object lockObject = new();
     private ManualTimerScheduler? scheduler;
+    private int callbackInvokeCount;
 
     /// <summary>
     /// Gets whether the timer is currently active, i.e. has a future callback invocation scheduled.
@@ -31,6 +32,11 @@ public class ManualTimer : ITimer
     /// Gets the next time the timer callback will be invoked, or <see langword="null"/> if the timer is inactive.
     /// </summary>
     public DateTimeOffset? CallbackTime => scheduler?.CallbackTime;
+
+    /// <summary>
+    /// Gets the number of times a timer's callback has been invoked.
+    /// </summary>
+    public int CallbackInvokeCount => scheduler?.CallbackInvokeCount ?? callbackInvokeCount;
 
     /// <summary>
     /// Gets the <see cref="TimeSpan"/> representing the amount of time to delay before invoking the callback method specified when the <see cref="ITimer"/> was constructed.
@@ -149,6 +155,7 @@ public class ManualTimer : ITimer
             }
 
             scheduler.Cancel();
+            callbackInvokeCount = scheduler.CallbackInvokeCount;
             scheduler = null;
         }
     }

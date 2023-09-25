@@ -179,5 +179,41 @@ public class ManualTimeProviderWaitAsyncTests
             .Should()
             .ThrowExactlyAsync<TaskCanceledException>();
     }
+
+    [Fact]
+    public void WaitAsync_with_TimerAutoInvokeCount_gt_zero()
+    {
+        var tcs = new TaskCompletionSource();
+        var sut = new ManualTimeProvider { AutoAdvanceBehavior = { TimerAutoTriggerCount= 1 } };
+
+        var task = tcs.Task.WaitAsync(1.Seconds(), sut);
+
+        task.Status.Should().Be(TaskStatus.Faulted);
+        task.Exception!.InnerException.Should().BeOfType<TimeoutException>();
+        sut.ActiveTimers.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Active_timer_with_TimerAutoAdvanceTimes_one_other_thread()
+    {
+        var sut = new ManualTimeProvider { AutoAdvanceBehavior = { TimerAutoTriggerCount = 1 } };
+        var tcs = new TaskCompletionSource();
+        using var t1 = sut.CreateTimer(_ => { }, null, 1.Seconds(), 1.Seconds());
+        using var t2 = sut.CreateTimer(_ => { }, null, 1.Minutes(), 1.Minutes());
+
+        var task = Task.Run(async () => await tcs.Task.WaitAsync(10.Seconds(), sut));
+
+        try
+        {
+            await task;
+        }
+        catch
+        {
+            task.Status.Should().Be(TaskStatus.Faulted);
+            task.Exception!.InnerException.Should().BeOfType<TimeoutException>();
+        }
+
+        sut.ActiveTimers.Should().Be(2);
+    }
 }
 #endif
