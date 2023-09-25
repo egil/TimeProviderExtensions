@@ -30,27 +30,6 @@ This creates a provider whose time is initially set to midnight January 1st 2000
 with the local time zone set to [System.TimeZoneInfo.Utc](https://docs.microsoft.com/en-us/dotnet/api/System.TimeZoneInfo.Utc 'System.TimeZoneInfo.Utc').
 The provider is set to not automatically advance time each time it is read.
 
-<a name='TimeProviderExtensions.ManualTimeProvider.ManualTimeProvider(System.DateTimeOffset)'></a>
-
-## ManualTimeProvider(DateTimeOffset) Constructor
-
-Initializes a new instance of the [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider') class.
-
-```csharp
-public ManualTimeProvider(System.DateTimeOffset startDateTime);
-```
-#### Parameters
-
-<a name='TimeProviderExtensions.ManualTimeProvider.ManualTimeProvider(System.DateTimeOffset).startDateTime'></a>
-
-`startDateTime` [System.DateTimeOffset](https://docs.microsoft.com/en-us/dotnet/api/System.DateTimeOffset 'System.DateTimeOffset')
-
-The initial time and date reported by the provider.
-
-### Remarks
-The local time zone set to [System.TimeZoneInfo.Utc](https://docs.microsoft.com/en-us/dotnet/api/System.TimeZoneInfo.Utc 'System.TimeZoneInfo.Utc').
-The provider is set to not automatically advance time each time it is read.
-
 <a name='TimeProviderExtensions.ManualTimeProvider.ManualTimeProvider(System.DateTimeOffset,System.TimeZoneInfo)'></a>
 
 ## ManualTimeProvider(DateTimeOffset, TimeZoneInfo) Constructor
@@ -75,6 +54,27 @@ The initial time and date reported by the provider.
 Optional local time zone to use during testing. Defaults to [System.TimeZoneInfo.Utc](https://docs.microsoft.com/en-us/dotnet/api/System.TimeZoneInfo.Utc 'System.TimeZoneInfo.Utc').
 
 ### Remarks
+The provider is set to not automatically advance time each time it is read.
+
+<a name='TimeProviderExtensions.ManualTimeProvider.ManualTimeProvider(System.DateTimeOffset)'></a>
+
+## ManualTimeProvider(DateTimeOffset) Constructor
+
+Initializes a new instance of the [ManualTimeProvider](TimeProviderExtensions.ManualTimeProvider.md 'TimeProviderExtensions.ManualTimeProvider') class.
+
+```csharp
+public ManualTimeProvider(System.DateTimeOffset startDateTime);
+```
+#### Parameters
+
+<a name='TimeProviderExtensions.ManualTimeProvider.ManualTimeProvider(System.DateTimeOffset).startDateTime'></a>
+
+`startDateTime` [System.DateTimeOffset](https://docs.microsoft.com/en-us/dotnet/api/System.DateTimeOffset 'System.DateTimeOffset')
+
+The initial time and date reported by the provider.
+
+### Remarks
+The local time zone set to [System.TimeZoneInfo.Utc](https://docs.microsoft.com/en-us/dotnet/api/System.TimeZoneInfo.Utc 'System.TimeZoneInfo.Utc').
 The provider is set to not automatically advance time each time it is read.
 ### Properties
 
