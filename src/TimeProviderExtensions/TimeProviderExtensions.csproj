@@ -6,10 +6,9 @@
 		<Company>Egil Hansen</Company>
 		<Authors>Egil Hansen</Authors>
 		<Description>
-			Testing extensions for the [`System.TimeProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider) API. It includes
-			an advanced test/fake version of the `TimeProvider` type, named `ManualTimeProvider`, that allows you to control the progress of time
-			during testing deterministically (see the difference to Microsoft's `FakeTimeProvider` below) and a backported version of
-			`PeriodicTimer` that supports `TimeProvider` in .NET 6.
+			Testing extensions for the System.TimeProvider API. It includes
+			an advanced test/fake version of the TimeProvider type that allows you to control the progress of time
+			during testing deterministically and a backported version of PeriodicTimer that supports TimeProvider in .NET 6.
 		</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>TimeProvider, testing</PackageTags>
