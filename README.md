@@ -1,6 +1,7 @@
 [![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/egil/TimeProviderExtensions?include_prereleases&logo=github&style=flat-square)](https://github.com/egil/TimeProviderExtensions/releases)
 [![Nuget](https://img.shields.io/nuget/dt/TimeProviderExtensions?logo=nuget&style=flat-square)](https://www.nuget.org/packages/TimeProviderExtensions/)
 [![Issues Open](https://img.shields.io/github/issues/egil/TimeProviderExtensions.svg?style=flat-square&logo=github)](https://github.com/egil/TimeProviderExtensions/issues)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fegil%2FTimeProviderExtensions%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/egil/TimeProviderExtensions/main)
 
 # TimeProvider Extensions
 
