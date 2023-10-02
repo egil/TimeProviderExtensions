@@ -12,7 +12,7 @@ public class ManualTimeProvider : System.TimeProvider
 Inheritance [System.Object](https://docs.microsoft.com/en-us/dotnet/api/System.Object 'System.Object') &#129106; [System.TimeProvider](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider 'System.TimeProvider') &#129106; ManualTimeProvider
 
 ### Remarks
-Learn more at [https://github.com/egil/TimeProviderExtensions](https://github.com/egil/TimeProviderExtensions 'https://github.com/egil/TimeProviderExtensions').
+Learn more at <a href="https://github.com/egil/TimeProviderExtensions">TimeProviderExtensions on GitHub</a>.
 ### Constructors
 
 <a name='TimeProviderExtensions.ManualTimeProvider.ManualTimeProvider()'></a>
@@ -193,7 +193,7 @@ var timer = manualTimeProvider.CreateTimer(
                 dueTime: Span.FromSecond(1),
                 period: TimeSpan.FromSecond(1));
 
-manualtTimeProvider.Advance(TimeSpan.FromSecond(3));
+manualTimeProvider.Advance(TimeSpan.FromSecond(3));
 ```
 The call to `Advance(TimeSpan.FromSecond(3))` causes the `timer`s callback to be invoked three times,
 and the result of the `manualTimeProvider.GetElapsedTime(start)` in the callback call will be <em>1 second</em>, <em>2 seconds</em>,
@@ -204,7 +204,7 @@ If the desired result is to jump time by [delta](TimeProviderExtensions.ManualTi
 the expected number of times, i.e. such that the result of `manualTimeProvider.GetElapsedTime(start)` in the callback is
 <em>3 seconds</em>, <em>3 seconds</em>, and <em>3 seconds</em>, use [Jump(DateTimeOffset)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.Jump(System.DateTimeOffset) 'TimeProviderExtensions.ManualTimeProvider.Jump(System.DateTimeOffset)') or [Jump(TimeSpan)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.Jump(System.TimeSpan) 'TimeProviderExtensions.ManualTimeProvider.Jump(System.TimeSpan)') instead.
 
-Learn more about this behavior at [https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider](https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider 'https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider').
+Learn more about this behavior at <a href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider">in the documentation</a>.
 
 <a name='TimeProviderExtensions.ManualTimeProvider.CreateManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider)'></a>
 
@@ -397,9 +397,9 @@ var timer = manualTimeProvider.CreateTimer(
                 dueTime: Span.FromSecond(1),
                 period: TimeSpan.FromSecond(1));
 
-manualtTimeProvider.Jump(manualtTimeProvider.Start + TimeSpan.FromSecond(3));
+manualTimeProvider.Jump(manualTimeProvider.Start + TimeSpan.FromSecond(3));
 ```
-The call to `Jump(manualtTimeProvider.Start + TimeSpan.FromSecond(3))` causes the `timer`s callback to be invoked three times,
+The call to `Jump(manualTimeProvider.Start + TimeSpan.FromSecond(3))` causes the `timer`s callback to be invoked three times,
 and the result of the `manualTimeProvider.GetElapsedTime(start)` in the callback call will be <em>3 seconds</em>
 during all three invocations.
 
@@ -407,7 +407,7 @@ If the desired result is that timer callbacks happens exactly at their scheduled
 of `manualTimeProvider.GetElapsedTime(start)` in the callback will be <em>1 second</em>, <em>2 seconds</em>, and <em>3 seconds</em>,
 use [Advance(TimeSpan)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.Advance(System.TimeSpan) 'TimeProviderExtensions.ManualTimeProvider.Advance(System.TimeSpan)') or [SetUtcNow(DateTimeOffset)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.SetUtcNow(System.DateTimeOffset) 'TimeProviderExtensions.ManualTimeProvider.SetUtcNow(System.DateTimeOffset)') instead.
 
-Learn more about this behavior at [https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider](https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider 'https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider').
+Learn more about this behavior at <a href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider">in the documentation</a>.    ///
 
 <a name='TimeProviderExtensions.ManualTimeProvider.Jump(System.TimeSpan)'></a>
 
@@ -452,7 +452,7 @@ var timer = manualTimeProvider.CreateTimer(
                 dueTime: Span.FromSecond(1),
                 period: TimeSpan.FromSecond(1));
 
-manualtTimeProvider.Jump(TimeSpan.FromSecond(3));
+manualTimeProvider.Jump(TimeSpan.FromSecond(3));
 ```
 The call to `Jump(TimeSpan.FromSecond(3))` causes the `timer`s callback to be invoked three times,
 and the result of the `manualTimeProvider.GetElapsedTime(start)` in the callback call will be <em>3 seconds</em>
@@ -462,7 +462,7 @@ If the desired result is that timer callbacks happens exactly at their scheduled
 of `manualTimeProvider.GetElapsedTime(start)` in the callback will be <em>1 second</em>, <em>2 seconds</em>, and <em>3 seconds</em>,
 use [Advance(TimeSpan)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.Advance(System.TimeSpan) 'TimeProviderExtensions.ManualTimeProvider.Advance(System.TimeSpan)') or [SetUtcNow(DateTimeOffset)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.SetUtcNow(System.DateTimeOffset) 'TimeProviderExtensions.ManualTimeProvider.SetUtcNow(System.DateTimeOffset)') instead.
 
-Learn more about this behavior at [https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider](https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider 'https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider').
+Learn more about this behavior at <a href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider">in the documentation</a>.    ///
 
 <a name='TimeProviderExtensions.ManualTimeProvider.SetLocalTimeZone(System.TimeZoneInfo)'></a>
 
@@ -525,9 +525,9 @@ var timer = manualTimeProvider.CreateTimer(
                 dueTime: Span.FromSecond(1),
                 period: TimeSpan.FromSecond(1));
 
-manualtTimeProvider.SetUtcNow(manualtTimeProvider.Start + TimeSpan.FromSecond(3));
+manualTimeProvider.SetUtcNow(manualTimeProvider.Start + TimeSpan.FromSecond(3));
 ```
-The call to `SetUtcNow(manualtTimeProvider.Start + TimeSpan.FromSecond(3))` causes the `timer`s callback to be invoked three times,
+The call to `SetUtcNow(manualTimeProvider.Start + TimeSpan.FromSecond(3))` causes the `timer`s callback to be invoked three times,
 and the result of the `manualTimeProvider.GetElapsedTime(start)` in the callback call will be <em>1 second</em>, <em>2 seconds</em>,
 and <em>3 seconds</em>. In other words, the time of the provider is set before the time callback is invoked
 to the time that the callback is scheduled to be invoked at.
@@ -536,7 +536,7 @@ If the desired result is to jump to the time specified in [value](TimeProviderEx
 the expected number of times, i.e. such that the result of `manualTimeProvider.GetElapsedTime(start)` in the callback is
 <em>3 seconds</em>, <em>3 seconds</em>, and <em>3 seconds</em>, use [Jump(DateTimeOffset)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.Jump(System.DateTimeOffset) 'TimeProviderExtensions.ManualTimeProvider.Jump(System.DateTimeOffset)') or [Jump(TimeSpan)](TimeProviderExtensions.ManualTimeProvider.md#TimeProviderExtensions.ManualTimeProvider.Jump(System.TimeSpan) 'TimeProviderExtensions.ManualTimeProvider.Jump(System.TimeSpan)') instead.
 
-Learn more about this behavior at [https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider](https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider 'https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider').
+Learn more about this behavior at <a href="https://github.com/egil/TimeProviderExtensions/#difference-between-manualtimeprovider-and-faketimeprovider">in the documentation</a>.    ///
 
 <a name='TimeProviderExtensions.ManualTimeProvider.ToString()'></a>
 

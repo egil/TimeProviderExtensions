@@ -18,6 +18,7 @@ namespace TimeProviderExtensions;
 /// may be in flight at any given moment.  <see cref="Dispose"/> may be used concurrently with an active <see cref="WaitForNextTickAsync"/>
 /// to interrupt it and cause it to return false.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 internal sealed class PeriodicTimerPort : IDisposable
 {
     internal const uint MaxSupportedTimeout = 0xfffffffe;

@@ -134,9 +134,9 @@ public class ManualTimeProviderTests
         periodicTimer.Dispose();
         await callbacksTask;
 
-        async Task AsyncCallbacks(PeriodicTimer periodicTimer)
+        async Task AsyncCallbacks(PeriodicTimer timer)
         {
-            while (await periodicTimer.WaitForNextTickAsync().ConfigureAwait(false))
+            while (await timer.WaitForNextTickAsync().ConfigureAwait(false))
             {
                 callbacks.Add(sut.GetUtcNow());
                 await sut.Delay(TimeSpan.FromSeconds(3));
@@ -292,7 +292,7 @@ public class ManualTimeProviderTests
     {
         var sut = new ManualTimeProvider();
 
-        var timer = sut.CreateTimer(_ => { }, null, 1.Seconds(), Timeout.InfiniteTimeSpan);
+        using var timer = sut.CreateTimer(_ => { }, null, 1.Seconds(), Timeout.InfiniteTimeSpan);
 
         sut.ActiveTimers.Should().Be(1);
     }
@@ -302,7 +302,7 @@ public class ManualTimeProviderTests
     {
         var sut = new ManualTimeProvider();
 
-        var timer = sut.CreateTimer(_ => { }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        using var timer = sut.CreateTimer(_ => { }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 
         sut.ActiveTimers.Should().Be(0);
     }
@@ -312,7 +312,7 @@ public class ManualTimeProviderTests
     {
         var sut = new ManualTimeProvider();
 
-        var timer = sut.CreateTimer(_ => { }, null, 1.Seconds(), Timeout.InfiniteTimeSpan);
+        using var timer = sut.CreateTimer(_ => { }, null, 1.Seconds(), Timeout.InfiniteTimeSpan);
         sut.Advance(1.Seconds());
 
         sut.ActiveTimers.Should().Be(0);

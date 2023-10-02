@@ -1,4 +1,5 @@
 #if NET6_0_OR_GREATER && !NET8_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
 using TimeProviderExtensions;
 
 namespace System.Threading;
@@ -14,6 +15,7 @@ namespace System.Threading;
 /// to interrupt it and cause it to return false.
 /// </para>
 /// </remarks>
+[ExcludeFromCodeCoverage]
 public abstract class PeriodicTimerWrapper : IDisposable
 {
     /// <summary>Wait for the next tick of the timer, or for the timer to be stopped.</summary>

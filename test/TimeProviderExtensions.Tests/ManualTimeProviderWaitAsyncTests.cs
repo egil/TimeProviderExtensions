@@ -4,9 +4,9 @@ namespace TimeProviderExtensions;
 
 public class ManualTimeProviderWaitAsyncTests
 {
-    internal const uint MaxSupportedTimeout = 0xfffffffe;
-    private readonly static TimeSpan DelayedTaskDelay = TimeSpan.FromMilliseconds(2);
-    private readonly static string StringTaskResult = Guid.NewGuid().ToString();
+    private const uint MaxSupportedTimeout = 0xfffffffe;
+    private static readonly TimeSpan DelayedTaskDelay = TimeSpan.FromMilliseconds(2);
+    private static readonly string StringTaskResult = Guid.NewGuid().ToString();
 
     private static async Task DelayedTask(TimeProvider provider) => await provider.Delay(DelayedTaskDelay);
 
