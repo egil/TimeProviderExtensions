@@ -8,6 +8,8 @@
 		<IsPackable>false</IsPackable>
 		<RootNamespace>TimeProviderExtensions</RootNamespace>
 		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>../../key.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup>
