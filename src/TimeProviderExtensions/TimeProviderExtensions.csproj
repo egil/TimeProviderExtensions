@@ -41,6 +41,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
 		<DebugType>embedded</DebugType>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>../../key.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -81,7 +83,7 @@
 
 	<ItemGroup>
 		<!-- Makes internal types in libraries visible to their test projects -->
-		<InternalsVisibleTo Include="$(AssemblyName).Tests" />
+		<InternalsVisibleTo Include="$(AssemblyName).Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001002139f9531affe959224abf4762c3cd1ac0474e4cef834b7ac7b501caff6167b29d5ef26ac2b713a89a819933bc11efc9a7ef00ad86af6b7ede90f00f7d7c8e7954ef3775b4bca2527626a20480acbcaa32d434b6d4aabc37fba5664931fa74b95519c2835d537ece2deced67726ff4a79df53bcfb998f62f240153da588b9fb9"/>
 	</ItemGroup>
 
 </Project>
