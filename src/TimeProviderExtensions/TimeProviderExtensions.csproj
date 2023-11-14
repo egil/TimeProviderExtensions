@@ -22,8 +22,7 @@
 		<MinVerTagPrefix>v</MinVerTagPrefix>
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<GenerateCompatibilitySuppressionFile>true</GenerateCompatibilitySuppressionFile>
-		<!-- Enable to establish a base line for breaking changes once v1 is shipped -->
-		<!--<PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>-->
+		<PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
 	</PropertyGroup>
 
 	<Target Name="SetPackageReleaseNotes" BeforeTargets="GenerateNuspec">
