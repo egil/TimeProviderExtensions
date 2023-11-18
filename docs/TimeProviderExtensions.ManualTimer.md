@@ -7,14 +7,13 @@ A implementation of a [System.Threading.ITimer](https://docs.microsoft.com/en-us
 
 ```csharp
 public class ManualTimer :
-System.Threading.ITimer,
 System.IDisposable,
 System.IAsyncDisposable
 ```
 
-Inheritance [System.Object](https://docs.microsoft.com/en-us/dotnet/api/System.Object 'System.Object') &#129106; ManualTimer
+Inheritance [System.Object](https://docs.microsoft.com/en-us/dotnet/api/System.Object 'System.Object') &#129106; [System.Threading.ITimer](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.ITimer 'System.Threading.ITimer') &#129106; ManualTimer
 
-Implements [System.Threading.ITimer](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.ITimer 'System.Threading.ITimer'), [System.IDisposable](https://docs.microsoft.com/en-us/dotnet/api/System.IDisposable 'System.IDisposable'), [System.IAsyncDisposable](https://docs.microsoft.com/en-us/dotnet/api/System.IAsyncDisposable 'System.IAsyncDisposable')
+Implements [System.IDisposable](https://docs.microsoft.com/en-us/dotnet/api/System.IDisposable 'System.IDisposable'), [System.IAsyncDisposable](https://docs.microsoft.com/en-us/dotnet/api/System.IAsyncDisposable 'System.IAsyncDisposable')
 ### Constructors
 
 <a name='TimeProviderExtensions.ManualTimer.ManualTimer(System.Threading.TimerCallback,object,TimeProviderExtensions.ManualTimeProvider)'></a>
@@ -152,8 +151,6 @@ Specify [System.Threading.Timeout.InfiniteTimeSpan](https://docs.microsoft.com/e
 
 The time interval between invocations of the callback method specified when the Timer was constructed.
 Specify [System.Threading.Timeout.InfiniteTimeSpan](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.Timeout.InfiniteTimeSpan 'System.Threading.Timeout.InfiniteTimeSpan') to disable periodic signaling.
-
-Implements [Change(TimeSpan, TimeSpan)](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.ITimer.Change#System_Threading_ITimer_Change_System_TimeSpan,System_TimeSpan_ 'System.Threading.ITimer.Change(System.TimeSpan,System.TimeSpan)')
 
 #### Returns
 [System.Boolean](https://docs.microsoft.com/en-us/dotnet/api/System.Boolean 'System.Boolean')  

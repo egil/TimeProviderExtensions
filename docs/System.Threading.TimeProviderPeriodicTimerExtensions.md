@@ -12,7 +12,7 @@ public static class TimeProviderPeriodicTimerExtensions
 Inheritance [System.Object](https://docs.microsoft.com/en-us/dotnet/api/System.Object 'System.Object') &#129106; TimeProviderPeriodicTimerExtensions
 ### Methods
 
-<a name='System.Threading.TimeProviderPeriodicTimerExtensions.CreatePeriodicTimer(thisSystem.TimeProvider,System.TimeSpan)'></a>
+<a name='System.Threading.TimeProviderPeriodicTimerExtensions.CreatePeriodicTimer(thisTimeProvider,System.TimeSpan)'></a>
 
 ## TimeProviderPeriodicTimerExtensions.CreatePeriodicTimer(this TimeProvider, TimeSpan) Method
 
@@ -20,15 +20,15 @@ Factory method that creates a periodic timer that enables waiting asynchronously
 Use this factory method as a replacement for instantiating a [System.Threading.PeriodicTimer](https://docs.microsoft.com/en-us/dotnet/api/System.Threading.PeriodicTimer 'System.Threading.PeriodicTimer').
 
 ```csharp
-public static System.Threading.PeriodicTimerWrapper CreatePeriodicTimer(this System.TimeProvider timeProvider, System.TimeSpan period);
+public static System.Threading.PeriodicTimerWrapper CreatePeriodicTimer(this TimeProvider timeProvider, System.TimeSpan period);
 ```
 #### Parameters
 
-<a name='System.Threading.TimeProviderPeriodicTimerExtensions.CreatePeriodicTimer(thisSystem.TimeProvider,System.TimeSpan).timeProvider'></a>
+<a name='System.Threading.TimeProviderPeriodicTimerExtensions.CreatePeriodicTimer(thisTimeProvider,System.TimeSpan).timeProvider'></a>
 
 `timeProvider` [System.TimeProvider](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider 'System.TimeProvider')
 
-<a name='System.Threading.TimeProviderPeriodicTimerExtensions.CreatePeriodicTimer(thisSystem.TimeProvider,System.TimeSpan).period'></a>
+<a name='System.Threading.TimeProviderPeriodicTimerExtensions.CreatePeriodicTimer(thisTimeProvider,System.TimeSpan).period'></a>
 
 `period` [System.TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/System.TimeSpan 'System.TimeSpan')
 

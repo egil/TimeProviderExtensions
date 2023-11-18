@@ -6,10 +6,10 @@
 Represents a synthetic time provider that can be used to enable deterministic behavior in tests.
 
 ```csharp
-public class ManualTimeProvider : System.TimeProvider
+public class ManualTimeProvider
 ```
 
-Inheritance [System.Object](https://docs.microsoft.com/en-us/dotnet/api/System.Object 'System.Object') &#129106; [System.TimeProvider](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider 'System.TimeProvider') &#129106; ManualTimeProvider
+Inheritance [System.TimeProvider](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider 'System.TimeProvider') &#129106; ManualTimeProvider
 
 ### Remarks
 Learn more at <a href="https://github.com/egil/TimeProviderExtensions">TimeProviderExtensions on GitHub</a>.
@@ -103,22 +103,6 @@ public TimeProviderExtensions.AutoAdvanceBehavior AutoAdvanceBehavior { get; set
 
 #### Property Value
 [AutoAdvanceBehavior](TimeProviderExtensions.AutoAdvanceBehavior.md 'TimeProviderExtensions.AutoAdvanceBehavior')
-
-<a name='TimeProviderExtensions.ManualTimeProvider.LocalTimeZone'></a>
-
-## ManualTimeProvider.LocalTimeZone Property
-
-Gets a [System.TimeZoneInfo](https://docs.microsoft.com/en-us/dotnet/api/System.TimeZoneInfo 'System.TimeZoneInfo') object that represents the local time zone according to this [System.TimeProvider](https://docs.microsoft.com/en-us/dotnet/api/System.TimeProvider 'System.TimeProvider')'s notion of time.
-
-```csharp
-public override System.TimeZoneInfo LocalTimeZone { get; }
-```
-
-#### Property Value
-[System.TimeZoneInfo](https://docs.microsoft.com/en-us/dotnet/api/System.TimeZoneInfo 'System.TimeZoneInfo')
-
-### Remarks
-The default implementation returns [System.TimeZoneInfo.Local](https://docs.microsoft.com/en-us/dotnet/api/System.TimeZoneInfo.Local 'System.TimeZoneInfo.Local').
 
 <a name='TimeProviderExtensions.ManualTimeProvider.Start'></a>
 
