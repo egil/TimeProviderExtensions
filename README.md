@@ -200,7 +200,7 @@ public async Task DoStuff_does_stuff_every_11_seconds()
 
 ## Difference between `ManualTimeProvider` and `FakeTimeProvider`
 
-The .NET team has published a similar test-specific time provider, the [`Microsoft.Extensions.Time.Testing.FakeTimeProvider`](https://www.nuget.org/packages/Microsoft.Extensions.Time.Testing.FakeTimeProvider/).
+The .NET team has published a similar test-specific time provider, the [`Microsoft.Extensions.Time.Testing.FakeTimeProvider`](https://www.nuget.org/packages/Microsoft.Extensions.TimeProvider.Testing).
 
 The public API of both `FakeTimeProvider` and `ManualTimeProvider` are compatible, but there are some differences in when time is set before timer callbacks. Let's illustrate this with an example:
 
